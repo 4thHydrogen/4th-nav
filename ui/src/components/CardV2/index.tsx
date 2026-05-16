@@ -2,8 +2,9 @@ import { useMemo, useState, useEffect } from "react";
 import "./index.css";
 import { getLogoUrl } from "../../utils/check";
 import { getJumpTarget } from "../../utils/setting";
+import type { CardProps } from "../../types";
 
-const Card = ({ title, url, des, logo, catelog, onClick, index, isSearching, noImageMode, compactMode }) => {
+const Card = ({ title, url, des, logo, catelog, onClick, index, isSearching, noImageMode, compactMode }: CardProps) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [showLoading, setShowLoading] = useState(true);
@@ -21,7 +22,6 @@ const Card = ({ title, url, des, logo, catelog, onClick, index, isSearching, noI
     // 10秒超时保护
     const timeout = setTimeout(() => {
       setShowLoading(false);
-      console.warn('Image loading timeout:', imageSrc);
     }, 10000);
     
     return () => clearTimeout(timeout);

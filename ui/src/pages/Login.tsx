@@ -23,7 +23,6 @@ const Login: React.FC = () => {
       }
     } catch (error) {
       message.error('登录失败');
-      console.error('登录失败:', error);
     }
   };
 

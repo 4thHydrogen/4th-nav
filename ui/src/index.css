@@ -1,6 +1,48 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --width-small: 500px;
+  --width-medium: 700px;
+  --width-large: 1060px;
+
+  /* 颜色 token */
+  --bg-primary: #ffffff;
+  --bg-card: #fafbfc;
+  --bg-card-hover: #ffffff;
+  --bg-input: #f4f5f7;
+  --bg-input-hover: #e5e6eb;
+  --bg-input-focus: #ffffff;
+  --bg-tag: #f2f3f5;
+  --bg-tag-active: #f4f5f7;
+  --border-input: #f4f5f7;
+  --border-input-hover: #e5e6eb;
+  --border-input-focus: #272e3b;
+  --text-primary: #272e3b;
+  --text-secondary: #8a92a6;
+  --text-muted: #86909c;
+  --text-tag: #878a95;
+  --shadow-card: 6px 6px 12px 0px #eceef4;
+  --color-record: #bbb;
+
+  /* 背景图片 */
+  --bg-topbar: rgba(255, 255, 255, 0.55);
+  --bg-input-bg: rgba(255, 255, 255, 0.45);
+  --border-input-bg: rgba(255, 255, 255, 0.3);
+
+  /* 毛玻璃 */
+  --blur-sm: blur(16px);
+  --blur-md: blur(20px);
+  --glass-bg-card: rgba(255, 255, 255, 0.15);
+  --glass-border-card: rgba(255, 255, 255, 0.18);
+  --glass-bg-topbar: rgba(255, 255, 255, 0.1);
+  --glass-bg-input: rgba(255, 255, 255, 0.15);
+  --glass-border-input: rgba(255, 255, 255, 0.25);
+  --glass-bg-tag: rgba(255, 255, 255, 0.1);
+  --glass-border-tag: rgba(255, 255, 255, 0.2);
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
@@ -8,33 +50,28 @@ body {
     "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #ffffff;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
   overflow: hidden;
 }
-:root {
-  --width-small: 500px;
-  --width-medium: 700px;
-  --width-large: 1060px;
-}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
-body.dark-mode .github-link-box svg {
-  fill: white;
-}
-body.dark-mode .github-link-box svg:hover {
-  fill: #f1f1f1;
-}
-body.dark-mode .theme-switch-box svg {
-  fill: white;
-}
-body.dark-mode .theme-switch-box svg:hover {
-  fill: #f1f1f1;
-}
+
+/* ===== 暗色模式 ===== */
 body.dark-mode {
   background-color: #121212;
   color: rgba(255, 255, 255, 0.6);
+}
+body.dark-mode .github-link-box svg,
+body.dark-mode .theme-switch-box svg {
+  fill: white;
+}
+body.dark-mode .github-link-box svg:hover,
+body.dark-mode .theme-switch-box svg:hover {
+  fill: #f1f1f1;
 }
 body.dark-mode .select-tag-active {
   background-color: #383838;
@@ -58,7 +95,7 @@ body.dark-mode input:hover {
   border: 1px solid #303030;
 }
 body.dark-mode input:focus,
-input:focus-visible {
+body.dark-mode input:focus-visible {
   background-color: #3d3d3d;
   border: 1px solid #3d3d3d;
 }
@@ -81,44 +118,69 @@ body.dark-mode .card-tag {
 
 @media (max-width: 1060px) and (min-width: 700px) {
   body.dark-mode span.card-tag {
-    background-color: #222222 !important;
+    background-color: #222222;
   }
 }
-
-@media (max-width: 700px) and (min-width: 500px) {
-  body.dark-mode a.card-box {
-    background-color: #121212;
-  }
-}
-@media (max-width: 500px) {
+@media (max-width: 700px) {
   body.dark-mode a.card-box {
     background-color: #121212;
   }
 }
 
-/* 毛玻璃效果 */
+/* ===== 背景图片模式 ===== */
+body.has-background {
+  background-color: transparent;
+}
+body.has-background .main {
+  background: transparent;
+}
+body.has-background .topbar {
+  background: var(--bg-topbar);
+  backdrop-filter: var(--blur-sm);
+  -webkit-backdrop-filter: var(--blur-sm);
+}
+body.has-background .content-wraper {
+  background: transparent;
+}
+body.has-background input {
+  background: var(--bg-input-bg);
+  border: 1px solid var(--border-input-bg);
+  color: var(--text-primary);
+}
+body.has-background.dark-mode .topbar {
+  background: rgba(30, 30, 30, 0.5);
+  backdrop-filter: var(--blur-sm);
+  -webkit-backdrop-filter: var(--blur-sm);
+}
+body.has-background.dark-mode input {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* ===== 毛玻璃效果 ===== */
 body.glassmorphism .card-box {
-  background: rgba(255, 255, 255, 0.15) !important;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: var(--glass-bg-card);
+  backdrop-filter: var(--blur-md);
+  -webkit-backdrop-filter: var(--blur-md);
+  border: 1px solid var(--glass-border-card);
 }
 body.glassmorphism .card-box:hover {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
 }
 body.glassmorphism .topbar {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: var(--glass-bg-topbar);
+  backdrop-filter: var(--blur-md);
+  -webkit-backdrop-filter: var(--blur-md);
 }
 body.glassmorphism input {
-  background: rgba(255, 255, 255, 0.15) !important;
-  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  background: var(--glass-bg-input);
+  border: 1px solid var(--glass-border-input);
   color: #fff;
 }
 body.glassmorphism .select-tag {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: var(--glass-bg-tag);
+  border: 1px solid var(--glass-border-tag);
   color: rgba(255, 255, 255, 0.8);
 }
 body.glassmorphism .select-tag:hover {
@@ -127,8 +189,8 @@ body.glassmorphism .select-tag:hover {
   color: #fff;
 }
 body.glassmorphism .select-tag-active {
-  background: rgba(255, 255, 255, 0.3) !important;
-  border: 1px solid rgba(255, 255, 255, 0.35) !important;
+  background: rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.35);
   color: #fff;
 }
 body.glassmorphism .card-right-title {
@@ -138,7 +200,7 @@ body.glassmorphism .card-right-bottom {
   color: rgba(255, 255, 255, 0.7);
 }
 body.glassmorphism .card-tag {
-  background: rgba(255, 255, 255, 0.15) !important;
+  background: rgba(255, 255, 255, 0.15);
   color: rgba(255, 255, 255, 0.7);
 }
 body.glassmorphism .record-wraper a {
@@ -147,12 +209,12 @@ body.glassmorphism .record-wraper a {
 
 /* 暗色 + 毛玻璃 */
 body.dark-mode.glassmorphism .card-box {
-  background: rgba(0, 0, 0, 0.3) !important;
+  background: rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 body.dark-mode.glassmorphism input {
-  background: rgba(0, 0, 0, 0.3) !important;
-  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   color: rgba(255, 255, 255, 0.7);
 }
 body.dark-mode.glassmorphism .select-tag {
@@ -165,6 +227,6 @@ body.dark-mode.glassmorphism .select-tag:hover {
   color: #fff;
 }
 body.dark-mode.glassmorphism .select-tag-active {
-  background: rgba(255, 255, 255, 0.2) !important;
-  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.25);
 }

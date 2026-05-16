@@ -1,7 +1,7 @@
 import { fetchGetEnabledSearchEngines } from './api';
+import type { SearchEngine, Tool } from '../types';
 
-// 搜索引擎缓存
-let searchEnginesCache: any[] = [];
+let searchEnginesCache: SearchEngine[] = [];
 let cacheExpiry = 0;
 const CACHE_DURATION = 5 * 60 * 1000; // 5分钟缓存
 
@@ -20,7 +20,6 @@ const getEnabledSearchEngines = async () => {
     cacheExpiry = now + CACHE_DURATION;
     return searchEnginesCache;
   } catch (error) {
-    console.error('获取搜索引擎失败，使用默认配置:', error);
     
     // 如果API调用失败，使用默认搜索引擎配置
     const defaultEngines = [
@@ -60,7 +59,7 @@ const getEnabledSearchEngines = async () => {
 };
 
 // 生成搜索引擎卡片
-export const generateSearchEngineCard = async (searchString: string) => {
+export const generateSearchEngineCard = async (searchString: string): Promise<Tool[]> => {
   if (!searchString.trim()) return [];
   
   try {
@@ -69,16 +68,17 @@ export const generateSearchEngineCard = async (searchString: string) => {
     return engines
       .filter(engine => engine.enabled)
       .sort((a, b) => a.sort - b.sort)
-      .map((engine, index) => ({
+      .map((engine) => ({
         name: `使用 ${engine.name} 搜索`,
         url: generateSearchUrl(engine.baseUrl, engine.queryParam, searchString),
         desc: `在 ${engine.name} 中搜索 「${searchString}」`,
-        id: 8800880000 + engine.id, // 使用特定的ID前缀避免冲突
+        id: 8800880000 + engine.id,
         logo: engine.logo,
+        catelog: "",
+        sort: 0,
         hide: false
       }));
   } catch (error) {
-    console.error('生成搜索引擎卡片失败:', error);
     return [];
   }
 };

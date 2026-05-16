@@ -26,13 +26,11 @@ export const applyTheme = (t: string, source: string, disableLog: boolean) => {
     const bodyEl = document.querySelector("body")!;
     bodyEl.classList.toggle("dark-mode", false);
     if (!disableLog) {
-      console.log(`[Apply Theme][${source}] ${t}`);
     }
   } else {
     const bodyEl = document.querySelector("body")!;
     bodyEl.classList.toggle("dark-mode", true);
     if (!disableLog) {
-      console.log(`[Apply Theme][${source}] ${t}`);
     }
   }
 };

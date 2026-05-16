@@ -283,12 +283,23 @@ func LoginHandler(c *gin.Context) {
 		})
 		return
 	}
-	if user.Password != data.Password {
+	if !utils.CheckPassword(user.Password, data.Password) {
 		c.JSON(200, gin.H{
 			"success":      false,
 			"errorMessage": "密码错误",
 		})
 		return
+	}
+	// 明文密码自动迁移为 bcrypt 哈希
+	if !utils.IsBcryptHash(user.Password) {
+		hashed, err := utils.HashPassword(data.Password)
+		if err == nil {
+			service.UpdateUser(types.UpdateUserDto{
+				Id:       int64(user.Id),
+				Name:     user.Name,
+				Password: hashed,
+			})
+		}
 	}
 	// 生成 token
 	token, err := utils.SignJWT(user)

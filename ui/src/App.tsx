@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { App as AntApp } from 'antd';
 import { Spin } from 'antd';
 import { decodeTheme, initTheme } from './utils/theme';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import './App.css';
 
 // 使用 React.lazy 懒加载组件
@@ -63,9 +64,10 @@ const LoadingFallback = () => {
 function App() {
   return (
     <AntApp>
-      <Router>
-        <Suspense fallback={<LoadingFallback />}>
-          <Routes>
+      <ErrorBoundary>
+        <Router>
+          <Suspense fallback={<LoadingFallback />}>
+            <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/admin" element={<AdminPage />}>
@@ -79,6 +81,7 @@ function App() {
           </Routes>
         </Suspense>
       </Router>
+      </ErrorBoundary>
     </AntApp>
   );
 }

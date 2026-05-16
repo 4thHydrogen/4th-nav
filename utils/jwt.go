@@ -3,6 +3,7 @@ package utils
 import (
 	"crypto/rand"
 	"encoding/hex"
+	"os"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -20,12 +21,16 @@ func RandomJWTKey() string {
 	return hex.EncodeToString(bytes)
 }
 
-// JTW 密钥
-var jwtSecret = []byte("boy_next_door")
+var jwtSecret []byte
 
 func init() {
-	jwtSecret = []byte(RandomJWTKey())
-	logger.LogInfo("jwtSecret Setted: %s", jwtSecret)
+	if envSecret := os.Getenv("JWT_SECRET"); envSecret != "" {
+		jwtSecret = []byte(envSecret)
+		logger.LogInfo("JWT Secret loaded from environment variable")
+	} else {
+		jwtSecret = []byte(RandomJWTKey())
+		logger.LogWarning("JWT_SECRET not set, using random key (tokens will invalidates on restart)")
+	}
 }
 
 // 签名一个 JTW

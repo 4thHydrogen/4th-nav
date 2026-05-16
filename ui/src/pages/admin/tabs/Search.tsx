@@ -85,7 +85,6 @@ const SearchEngineManager: React.FC = () => {
       setEngines(data);
     } catch (error) {
       message.error('加载搜索引擎失败');
-      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -179,7 +178,6 @@ const SearchEngineManager: React.FC = () => {
       loadEngines();
     } catch (error) {
       message.error('更新失败');
-      console.error(error);
     }
   };
 
@@ -196,7 +194,6 @@ const SearchEngineManager: React.FC = () => {
       loadEngines();
     } catch (error) {
       message.error('删除失败');
-      console.error(error);
     }
   };
 
@@ -219,7 +216,6 @@ const SearchEngineManager: React.FC = () => {
       setIsModalVisible(false);
       loadEngines();
     } catch (error) {
-      console.error('Validate Failed:', error);
     }
   };
 
@@ -247,7 +243,6 @@ const SearchEngineManager: React.FC = () => {
         message.success('排序已更新');
       } catch (error) {
         message.error('排序更新失败');
-        console.error(error);
         // 如果失败，重新加载数据
         loadEngines();
       }

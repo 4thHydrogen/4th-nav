@@ -72,7 +72,7 @@ export const AdminPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="admin-page min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8">

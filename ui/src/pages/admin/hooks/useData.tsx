@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { fetchAdminData } from "../../../utils/api";
 import { useOnce } from "../../../utils/useOnce";
+import type { AdminApiData } from "../../../types";
 
 export const useData = () => {
-  const [store, setState] = useState<any>({});
+  const [store, setState] = useState<AdminApiData | null>(null);
   const [loading, setLoading] = useState(false);
 
   const fetchData = async () => {

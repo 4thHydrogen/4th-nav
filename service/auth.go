@@ -8,8 +8,8 @@ import (
 
 func GetApiTokens() []types.Token {
 	sql_get_api_tokens := `
-		SELECT id,name,value,disabled FROM nav_api_token WHERE disabled = 0;
-		`
+			SELECT id,name,value,disabled FROM nav_api_token WHERE disabled = 0;
+			`
 	results := make([]types.Token, 0)
 	rows, err := database.DB.Query(sql_get_api_tokens)
 	utils.CheckErr(err)
@@ -25,8 +25,8 @@ func GetApiTokens() []types.Token {
 
 func GetUser(name string) types.User {
 	sql_get_user := `
-		SELECT id,name,password FROM nav_user WHERE name = ?;
-		`
+			SELECT id,name,password FROM nav_user WHERE name = ?;
+			`
 	var user types.User
 	row := database.DB.QueryRow(sql_get_user, name)
 	err := row.Scan(&user.Id, &user.Name, &user.Password)
@@ -36,9 +36,9 @@ func GetUser(name string) types.User {
 
 func AddApiTokenInDB(data types.Token) {
 	sql_add_api_token := `
-		INSERT INTO nav_api_token (id,name,value,disabled)
-		VALUES (?,?,?,?);
-		`
+			INSERT INTO nav_api_token (id,name,value,disabled)
+			VALUES (?,?,?,?);
+			`
 	stmt, err := database.DB.Prepare(sql_add_api_token)
 	utils.CheckErr(err)
 
@@ -49,14 +49,23 @@ func AddApiTokenInDB(data types.Token) {
 }
 
 func UpdateUser(data types.UpdateUserDto) {
+	password := data.Password
+	if !utils.IsBcryptHash(password) {
+		hashed, err := utils.HashPassword(password)
+		if err != nil {
+			utils.CheckErr(err)
+			return
+		}
+		password = hashed
+	}
 	sql_update_user := `
-		UPDATE nav_user
-		SET name = ?, password = ?
-		WHERE id = ?;
-		`
+			UPDATE nav_user
+			SET name = ?, password = ?
+			WHERE id = ?;
+			`
 	stmt, err := database.DB.Prepare(sql_update_user)
 	utils.CheckErr(err)
-	res, err := stmt.Exec(data.Name, data.Password, data.Id)
+	res, err := stmt.Exec(data.Name, password, data.Id)
 	utils.CheckErr(err)
 	_, err = res.RowsAffected()
 	utils.CheckErr(err)

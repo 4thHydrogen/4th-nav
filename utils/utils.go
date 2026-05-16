@@ -13,6 +13,7 @@ import (
 
 	"github.com/mereith/nav/logger"
 	"github.com/mereith/nav/types"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func CheckErr(err error) {
@@ -121,4 +122,23 @@ func FilterHideCates(cates []types.Catelog) []types.Catelog {
 		}
 	}
 	return result
+}
+
+// HashPassword 使用 bcrypt 哈希密码
+func HashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	return string(bytes), err
+}
+
+// CheckPassword 比较密码与哈希，支持 bcrypt 和明文迁移
+func CheckPassword(hashedPassword, password string) bool {
+	if err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password)); err == nil {
+		return true
+	}
+	return false
+}
+
+// IsBcryptHash 判断密码是否已经是 bcrypt 哈希
+func IsBcryptHash(password string) bool {
+	return strings.HasPrefix(password, "$2a$") || strings.HasPrefix(password, "$2b$")
 }

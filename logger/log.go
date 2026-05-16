@@ -17,7 +17,8 @@ type Level int
 
 const (
 	InfoLevel  Level = iota // 0
-	ErrorLevel              // 1
+	WarnLevel               // 1
+	ErrorLevel              // 2
 )
 
 // Logger 结构体
@@ -46,6 +47,13 @@ func (l *MyLogger) Error(format string, args ...interface{}) {
 	}
 }
 
+// Warn 记录警告级别的日志
+func (l *MyLogger) Warn(format string, args ...interface{}) {
+	if l.level <= WarnLevel {
+		l.log("WARN", format, args...)
+	}
+}
+
 // 内部日志记录方法
 func (l *MyLogger) log(level string, format string, args ...interface{}) {
 	timestamp := time.Now().Format("2006-01-02 15:04:05")
@@ -67,4 +75,8 @@ func LogInfo(format string, args ...interface{}) {
 
 func LogError(format string, args ...interface{}) {
 	Logger.Error(format, args...)
+}
+
+func LogWarning(format string, args ...interface{}) {
+	Logger.Warn(format, args...)
 }
