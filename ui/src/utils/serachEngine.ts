@@ -76,7 +76,8 @@ export const generateSearchEngineCard = async (searchString: string): Promise<To
         logo: engine.logo,
         catelog: "",
         sort: 0,
-        hide: false
+        hide: false,
+        viewMode: "icon" as const
       }));
   } catch (error) {
     return [];

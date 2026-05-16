@@ -3,10 +3,10 @@ import type { Tool } from '../types';
 
 describe('Content filtering and grouping logic', () => {
   const mockTools: Tool[] = [
-    { id: 1, name: 'GitHub', url: 'https://github.com', logo: '', catelog: '开发', desc: '', sort: 0, hide: false },
-    { id: 2, name: 'Figma', url: 'https://figma.com', logo: '', catelog: '设计', desc: '', sort: 1, hide: false },
-    { id: 3, name: 'VSCode', url: 'https://code.visualstudio.com', logo: '', catelog: '开发', desc: '', sort: 2, hide: false },
-    { id: 4, name: 'Hidden Tool', url: 'https://hidden.com', logo: '', catelog: '测试', desc: '', sort: 3, hide: true },
+    { id: 1, name: 'GitHub', url: 'https://github.com', logo: '', catelog: '开发', desc: '', sort: 0, hide: false, viewMode: 'icon' },
+    { id: 2, name: 'Figma', url: 'https://figma.com', logo: '', catelog: '设计', desc: '', sort: 1, hide: false, viewMode: 'icon' },
+    { id: 3, name: 'VSCode', url: 'https://code.visualstudio.com', logo: '', catelog: '开发', desc: '', sort: 2, hide: false, viewMode: 'icon' },
+    { id: 4, name: 'Hidden Tool', url: 'https://hidden.com', logo: '', catelog: '测试', desc: '', sort: 3, hide: true, viewMode: 'icon' },
   ];
 
   it('filters tools by category', () => {

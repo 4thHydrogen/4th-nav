@@ -379,6 +379,12 @@ export const Tools: React.FC<ToolsProps> = () => {
                 )}
               />
               <Table.Column
+                title="布局"
+                dataIndex="viewMode"
+                width={70}
+                render={(val: string) => val === "card" ? "卡片" : "图标"}
+              />
+              <Table.Column
                 title={
                   <span>
                     隐藏

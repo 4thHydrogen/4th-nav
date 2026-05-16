@@ -680,7 +680,7 @@ func UpdateSearchEngineSortHandler(c *gin.Context) {
 		})
 		return
 	}
-	
+
 	err = database.UpdateSearchEngineSort(sortData)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -689,9 +689,29 @@ func UpdateSearchEngineSortHandler(c *gin.Context) {
 		})
 		return
 	}
-	
+
 	c.JSON(200, gin.H{
 		"success": true,
 		"message": "更新排序成功",
 	})
+}
+
+func UpdateToolViewModeHandler(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "errorMessage": "无效 ID"})
+		return
+	}
+	var body struct {
+		ViewMode string `json:"viewMode"`
+	}
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "errorMessage": "无效请求"})
+		return
+	}
+	if err := service.UpdateToolViewMode(id, body.ViewMode); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "errorMessage": err.Error()})
+		return
+	}
+	c.JSON(200, gin.H{"success": true, "message": "布局更新成功"})
 }

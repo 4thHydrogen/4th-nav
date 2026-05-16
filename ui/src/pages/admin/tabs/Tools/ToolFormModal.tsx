@@ -111,6 +111,19 @@ const ToolFormModal: React.FC<ToolFormModalProps> = ({
             <Input placeholder="请输入描述" />
           </Form.Item>
           <Form.Item
+            name="viewMode"
+            label="布局"
+            labelCol={{ span: 4 }}
+            initialValue={isEdit ? undefined : "icon"}
+          >
+            <Select
+              options={[
+                { label: "图标", value: "icon" },
+                { label: "卡片", value: "card" },
+              ]}
+            />
+          </Form.Item>
+          <Form.Item
             name="sort"
             required
             label={

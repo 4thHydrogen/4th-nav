@@ -12,6 +12,7 @@ describe('TypeScript types', () => {
       desc: 'A test tool',
       sort: 0,
       hide: false,
+      viewMode: "icon",
     };
     expect(tool.id).toBe(1);
     expect(tool.catelog).toBe('工具');

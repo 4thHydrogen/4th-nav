@@ -10,6 +10,13 @@ import (
 	"github.com/mereith/nav/utils"
 )
 
+func normalizeViewMode(v string) string {
+	if v == "card" {
+		return "card"
+	}
+	return "icon"
+}
+
 func ImportTools(data []types.Tool) {
 	var catelogs []string
 	for _, v := range data {
@@ -17,13 +24,14 @@ func ImportTools(data []types.Tool) {
 		if v.Catelog != "" && strings.TrimSpace(v.Catelog) != "" && !utils.In(v.Catelog, catelogs) {
 			catelogs = append(catelogs, v.Catelog)
 		}
+		viewMode := normalizeViewMode(v.ViewMode)
 		sql_add_tool := `
-			INSERT INTO nav_table (id, name, catelog, url, logo, desc)
-			VALUES (?, ?, ?, ?, ?, ?);
+			INSERT INTO nav_table (id, name, catelog, url, logo, desc, sort, hide, view_mode)
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
 			`
 		stmt, err := database.DB.Prepare(sql_add_tool)
 		utils.CheckErr(err)
-		res, err := stmt.Exec(v.Id, v.Name, v.Catelog, v.Url, v.Logo, v.Desc)
+		res, err := stmt.Exec(v.Id, v.Name, v.Catelog, v.Url, v.Logo, v.Desc, v.Sort, v.Hide, viewMode)
 		utils.CheckErr(err)
 		_, err = res.LastInsertId()
 		utils.CheckErr(err)
@@ -45,13 +53,13 @@ func ImportTools(data []types.Tool) {
 func UpdateTool(data types.UpdateToolDto) {
 	// 除了更新工具本身之外，也要更新 img 表
 	sql_update_tool := `
-		UPDATE nav_table
-		SET name = ?, url = ?, logo = ?, catelog = ?, desc = ?, sort = ?, hide = ?
-		WHERE id = ?;
-		`
+			UPDATE nav_table
+			SET name = ?, url = ?, logo = ?, catelog = ?, desc = ?, sort = ?, hide = ?, view_mode = ?
+			WHERE id = ?;
+			`
 	stmt, err := database.DB.Prepare(sql_update_tool)
 	utils.CheckErr(err)
-	res, err := stmt.Exec(data.Name, data.Url, data.Logo, data.Catelog, data.Desc, data.Sort, data.Hide, data.Id)
+	res, err := stmt.Exec(data.Name, data.Url, data.Logo, data.Catelog, data.Desc, data.Sort, data.Hide, normalizeViewMode(data.ViewMode), data.Id)
 	utils.CheckErr(err)
 	_, err = res.RowsAffected()
 	utils.CheckErr(err)
@@ -76,16 +84,16 @@ func AddTool(data types.AddToolDto) (int64, error) {
 	}()
 
 	sql_add_tool := `
-		INSERT INTO nav_table (name, url, logo, catelog, desc, sort, hide)
-		VALUES (?, ?, ?, ?, ?, ?, ?);
-		`
+			INSERT INTO nav_table (name, url, logo, catelog, desc, sort, hide, view_mode)
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+			`
 	stmt, err := tx.Prepare(sql_add_tool)
 	if err != nil {
 		return 0, err
 	}
 	defer stmt.Close()
 
-	res, err := stmt.Exec(data.Name, data.Url, data.Logo, data.Catelog, data.Desc, data.Sort, data.Hide)
+	res, err := stmt.Exec(data.Name, data.Url, data.Logo, data.Catelog, data.Desc, data.Sort, data.Hide, normalizeViewMode(data.ViewMode))
 	if err != nil {
 		return 0, err
 	}
@@ -111,8 +119,8 @@ func AddTool(data types.AddToolDto) (int64, error) {
 
 func GetAllTool() []types.Tool {
 	sql_get_all := `
-		SELECT id,name,url,logo,catelog,desc,sort,hide FROM nav_table order by sort;
-		`
+			SELECT id,name,url,logo,catelog,desc,sort,hide,view_mode FROM nav_table order by sort;
+			`
 	results := make([]types.Tool, 0)
 	rows, err := database.DB.Query(sql_get_all)
 	utils.CheckErr(err)
@@ -120,7 +128,8 @@ func GetAllTool() []types.Tool {
 		var tool types.Tool
 		var hide interface{}
 		var sort interface{}
-		err = rows.Scan(&tool.Id, &tool.Name, &tool.Url, &tool.Logo, &tool.Catelog, &tool.Desc, &sort, &hide)
+		var viewMode interface{}
+		err = rows.Scan(&tool.Id, &tool.Name, &tool.Url, &tool.Logo, &tool.Catelog, &tool.Desc, &sort, &hide, &viewMode)
 		if hide == nil {
 			tool.Hide = false
 		} else {
@@ -136,6 +145,11 @@ func GetAllTool() []types.Tool {
 			i64 := sort.(int64)
 			tool.Sort = int(i64)
 		}
+		if viewMode == nil || viewMode.(string) == "" {
+			tool.ViewMode = "icon"
+		} else {
+			tool.ViewMode = normalizeViewMode(viewMode.(string))
+		}
 		utils.CheckErr(err)
 		results = append(results, tool)
 	}
@@ -145,8 +159,8 @@ func GetAllTool() []types.Tool {
 
 func GetToolLogoUrlById(id int) string {
 	sql_get_tool := `
-		SELECT logo FROM nav_table WHERE id=?;
-		`
+			SELECT logo FROM nav_table WHERE id=?;
+			`
 	rows, err := database.DB.Query(sql_get_tool, id)
 	utils.CheckErr(err)
 	var tool types.Tool
@@ -161,12 +175,13 @@ func GetToolLogoUrlById(id int) string {
 
 func UpdateToolIcon(id int64, logo string) {
 	sql_update_tool := `
-		UPDATE nav_table SET logo=? WHERE id=?;
-		`
+			UPDATE nav_table SET logo=? WHERE id=?;
+			`
 	_, err := database.DB.Exec(sql_update_tool, logo, id)
 	utils.CheckErr(err)
 	UpdateImg(logo)
 }
+
 func UpdateToolsSort(updates []types.UpdateToolsSortDto) error {
 	tx, err := database.DB.Begin()
 	if err != nil {
@@ -190,4 +205,13 @@ func UpdateToolsSort(updates []types.UpdateToolsSortDto) error {
 	}
 
 	return tx.Commit()
+}
+
+func UpdateToolViewMode(id int, viewMode string) error {
+	viewMode = normalizeViewMode(viewMode)
+	_, err := database.DB.Exec(
+		`UPDATE nav_table SET view_mode = ? WHERE id = ?;`,
+		viewMode, id,
+	)
+	return err
 }

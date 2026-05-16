@@ -1,16 +1,19 @@
 import "./index.css";
-import CardV2 from "../CardV2";
 import SearchBar from "../SearchBar";
 import { Loading } from "../Loading";
 import { Helmet } from "react-helmet";
-import { useCallback, useEffect, useMemo } from "react";
-import TagSelector from "../TagSelector";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import GithubLink from "../GithubLink";
 import DarkSwitch from "../DarkSwitch";
 import { toggleJumpTarget } from "../../utils/setting";
 import Background from "../Background";
-import CategoryNav from "../CategoryNav";
-import type { Tool, CardProps as CardPropsType } from "../../types";
+import LeftCategoryNav from "../LeftCategoryNav";
+import DesktopCategorySection from "../DesktopCategorySection";
+import ToolContextMenu from "../ToolContextMenu";
+import ToolItem from "../ToolItem";
+import TimeDateWidget from "../TimeDateWidget";
+import type { Tool, ToolViewMode } from "../../types";
+import { fetchUpdateToolViewMode } from "../../utils/api";
 import {
   useContentData,
   useSearch,
@@ -19,17 +22,21 @@ import {
   useBackgroundEffect,
 } from "./hooks";
 
+interface ContextMenuState {
+  visible: boolean;
+  x: number;
+  y: number;
+  tool: Tool | null;
+}
+
 const Content = () => {
-  const { data, loading, loadData } = useContentData();
+  const { data, loading, loadData, setData } = useContentData();
   const {
-    currTag,
     val,
     searchString,
     filteredData,
     groupedData,
-    handleSetCurrTag,
     handleSetSearch,
-    handleMiddleClickTag,
     resetSearch,
     restoreTag,
     setVal,
@@ -41,6 +48,13 @@ const Content = () => {
     data?.setting?.enableBackground === true
   );
   const { visibleCategory, scrollToCategory } = useCategoryObserver(groupedData);
+
+  const [contextMenu, setContextMenu] = useState<ContextMenuState>({
+    visible: false,
+    x: 0,
+    y: 0,
+    tool: null,
+  });
 
   useEffect(() => {
     loadData().then((r) => {
@@ -54,34 +68,64 @@ const Content = () => {
   }, [data]);
 
   const isGroupedMode = groupedData !== null && Object.keys(groupedData).length > 0;
+  const isSearching = searchString.trim() !== "";
+  const noImageMode = data?.siteConfig?.noImageMode || false;
 
-  const cardProps = useCallback(
-    (item: Tool, index: number): CardPropsType => ({
-      title: item.name,
-      url: item.url,
-      des: item.desc,
-      logo: item.logo,
-      catelog: item.catelog,
-      index,
-      isSearching: searchString.trim() !== "",
-      noImageMode: data?.siteConfig?.noImageMode || false,
-      compactMode: data?.siteConfig?.compactMode || false,
-      onClick: () => {
-        resetSearch();
-        if (item.url === "toggleJumpTarget") {
-          toggleJumpTarget();
-          loadData();
-        }
-      },
-    }),
-    [searchString, data?.siteConfig?.noImageMode, data?.siteConfig?.compactMode, resetSearch, loadData]
+  const handleToolClick = useCallback(
+    (tool: Tool) => {
+      resetSearch();
+      if (tool.url === "toggleJumpTarget") {
+        toggleJumpTarget();
+        loadData();
+      }
+    },
+    [resetSearch, loadData]
   );
 
-  const renderCardsV2 = useCallback(() => {
-    return filteredData.map((item, index) => (
-      <CardV2 key={item.id} {...cardProps(item, index)} />
-    ));
-  }, [filteredData, cardProps]);
+  const handleContextMenu = useCallback((e: React.MouseEvent, tool: Tool) => {
+    e.preventDefault();
+    setContextMenu({
+      visible: true,
+      x: e.clientX,
+      y: e.clientY,
+      tool,
+    });
+  }, []);
+
+  const closeContextMenu = useCallback(() => {
+    setContextMenu((prev) => ({ ...prev, visible: false }));
+  }, []);
+
+  const handleViewModeChange = useCallback(
+    async (tool: Tool, nextMode: ToolViewMode) => {
+      const prevMode = tool.viewMode;
+      setData((prev) =>
+        prev
+          ? {
+              ...prev,
+              tools: prev.tools.map((t) =>
+                t.id === tool.id ? { ...t, viewMode: nextMode } : t
+              ),
+            }
+          : prev
+      );
+      try {
+        await fetchUpdateToolViewMode(tool.id, nextMode);
+      } catch {
+        setData((prev) =>
+          prev
+            ? {
+                ...prev,
+                tools: prev.tools.map((t) =>
+                  t.id === tool.id ? { ...t, viewMode: prevMode } : t
+                ),
+              }
+            : prev
+        );
+      }
+    },
+    [setData]
+  );
 
   return (
     <>
@@ -94,64 +138,74 @@ const Content = () => {
         <link rel="icon" href={data?.setting?.favicon ?? "favicon.ico"} />
         <title>{data?.setting?.title ?? "Van Nav"}</title>
       </Helmet>
-      <div className="topbar">
-        <div className="content">
-          <SearchBar
-            searchString={val}
-            setSearchText={(t) => {
-              setVal(t);
-              handleSetSearch(t);
-            }}
-          />
-          <TagSelector
-            tags={data?.catelogs ?? ["全部工具"]}
-            currTag={currTag}
-            onTagChange={handleSetCurrTag}
-            onMiddleClick={handleMiddleClickTag}
-          />
-        </div>
-      </div>
-      <div className="content-wraper">
-        {loading ? (
-          <div className="content cards" key="loading">
-            <Loading />
+
+      <main className="desktop-page">
+        <section className="desktop-hero">
+          <div className="desktop-hero-inner">
+            <TimeDateWidget />
+            <div className="desktop-search-shell">
+              <SearchBar
+                searchString={val}
+                setSearchText={(t) => {
+                  setVal(t);
+                  handleSetSearch(t);
+                }}
+              />
+            </div>
           </div>
-        ) : isGroupedMode ? (
-          <div
-            className="content grouped-content"
-            key={currTag}
-            style={{ "--grid-columns": data?.siteConfig?.columnsPerRow || 3 } as React.CSSProperties}
-          >
-            {Object.entries(groupedData).flatMap(([category, items]) => [
-              <div
-                key={`header-${category}`}
-                id={`category-${category}`}
-                className="category-group-header"
-              >
-                {category}
-              </div>,
-              ...items.map((item: Tool, index: number) => (
-                <CardV2 key={item.id} {...cardProps(item, index)} />
-              )),
-            ])}
+        </section>
+
+        <section className={`desktop-workspace ${isGroupedMode && !isSearching ? "" : "desktop-workspace-flat"}`}>
+          {isGroupedMode && !isSearching && (
+            <LeftCategoryNav
+              categories={Object.keys(groupedData)}
+              activeCategory={visibleCategory}
+              onNavigate={scrollToCategory}
+            />
+          )}
+
+          <div className="desktop-content-shell">
+            {loading ? (
+              <div className="desktop-loading-shell" key="loading">
+                <Loading />
+              </div>
+            ) : isGroupedMode && !isSearching ? (
+              Object.entries(groupedData).map(([category, items]) => (
+                <DesktopCategorySection
+                  key={category}
+                  category={category}
+                  items={items}
+                  isSearching={false}
+                  noImageMode={noImageMode}
+                  onToolContextMenu={handleContextMenu}
+                  onToolClick={handleToolClick}
+                />
+              ))
+            ) : (
+              <div className="desktop-tool-grid desktop-tool-grid-flat">
+                {filteredData.map((item, index) => (
+                  <ToolItem
+                    key={item.id}
+                    tool={item}
+                    index={index}
+                    isSearching={isSearching}
+                    noImageMode={noImageMode}
+                    onContextMenu={handleContextMenu}
+                    onClick={() => handleToolClick(item)}
+                  />
+                ))}
+              </div>
+            )}
           </div>
-        ) : (
-          <div
-            className={`content cards ${data?.siteConfig?.compactMode ? "compact-grid" : ""}`}
-            key={currTag}
-            style={{ "--grid-columns": data?.siteConfig?.columnsPerRow || 3 } as React.CSSProperties}
-          >
-            {renderCardsV2()}
-          </div>
-        )}
-      </div>
-      {isGroupedMode && (
-        <CategoryNav
-          categories={Object.keys(groupedData!)}
-          activeCategory={visibleCategory}
-          onNavigate={scrollToCategory}
-        />
-      )}
+        </section>
+      </main>
+
+      <ToolContextMenu
+        state={contextMenu}
+        onClose={closeContextMenu}
+        onViewModeChange={handleViewModeChange}
+      />
+
       <div className="record-wraper">
         <a href="https://beian.miit.gov.cn" target="_blank" rel="noreferrer">
           {data?.setting?.govRecord ?? ""}

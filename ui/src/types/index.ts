@@ -1,5 +1,7 @@
 // Entity types — mirror Go backend types/types.go
 
+export type ToolViewMode = "icon" | "card";
+
 export interface Tool {
   id: number;
   name: string;
@@ -9,6 +11,7 @@ export interface Tool {
   desc: string;
   sort: number;
   hide: boolean;
+  viewMode: ToolViewMode;
 }
 
 export interface Catelog {
@@ -109,6 +112,7 @@ export interface AddToolDto {
   desc: string;
   sort: number;
   hide: boolean;
+  viewMode: ToolViewMode;
 }
 
 export interface UpdateToolDto extends AddToolDto {

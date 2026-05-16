@@ -132,10 +132,10 @@ func HashPassword(password string) (string, error) {
 
 // CheckPassword 比较密码与哈希，支持 bcrypt 和明文迁移
 func CheckPassword(hashedPassword, password string) bool {
-	if err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password)); err == nil {
-		return true
+	if IsBcryptHash(hashedPassword) {
+		return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password)) == nil
 	}
-	return false
+	return hashedPassword == password
 }
 
 // IsBcryptHash 判断密码是否已经是 bcrypt 哈希

@@ -21,7 +21,7 @@ export function useContentData() {
     }
   }, []);
 
-  return { data, loading, loadData };
+  return { data, loading, loadData, setData };
 }
 
 export function useSearch(data: ContentData | null) {
