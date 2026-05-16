@@ -12,6 +12,9 @@ type Setting struct {
 	HideGithub           bool   `json:"hideGithub"`
 	HideToggleJumpTarget bool   `json:"hideToggleJumpTarget"`
 	JumpTargetBlank      bool   `json:"jumpTargetBlank"`
+	BackgroundUrl        string `json:"backgroundUrl"`
+	EnableBackground     bool   `json:"enableBackground"`
+	EnableGlassmorphism  bool   `json:"enableGlassmorphism"`
 }
 
 type Token struct {
@@ -63,7 +66,8 @@ type SearchEngine struct {
 
 // 网站配置模型
 type SiteConfig struct {
-	Id          int  `json:"id"`
-	NoImageMode bool `json:"noImageMode"`
-	CompactMode bool `json:"compactMode"`
+	Id            int  `json:"id"`
+	NoImageMode   bool `json:"noImageMode"`
+	CompactMode   bool `json:"compactMode"`
+	ColumnsPerRow int  `json:"columnsPerRow"`
 }

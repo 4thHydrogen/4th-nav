@@ -95,3 +95,76 @@ body.dark-mode .card-tag {
     background-color: #121212;
   }
 }
+
+/* 毛玻璃效果 */
+body.glassmorphism .card-box {
+  background: rgba(255, 255, 255, 0.15) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+body.glassmorphism .card-box:hover {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+body.glassmorphism .topbar {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+body.glassmorphism input {
+  background: rgba(255, 255, 255, 0.15) !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  color: #fff;
+}
+body.glassmorphism .select-tag {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.8);
+}
+body.glassmorphism .select-tag:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+}
+body.glassmorphism .select-tag-active {
+  background: rgba(255, 255, 255, 0.3) !important;
+  border: 1px solid rgba(255, 255, 255, 0.35) !important;
+  color: #fff;
+}
+body.glassmorphism .card-right-title {
+  color: #fff;
+}
+body.glassmorphism .card-right-bottom {
+  color: rgba(255, 255, 255, 0.7);
+}
+body.glassmorphism .card-tag {
+  background: rgba(255, 255, 255, 0.15) !important;
+  color: rgba(255, 255, 255, 0.7);
+}
+body.glassmorphism .record-wraper a {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* 暗色 + 毛玻璃 */
+body.dark-mode.glassmorphism .card-box {
+  background: rgba(0, 0, 0, 0.3) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+body.dark-mode.glassmorphism input {
+  background: rgba(0, 0, 0, 0.3) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  color: rgba(255, 255, 255, 0.7);
+}
+body.dark-mode.glassmorphism .select-tag {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.7);
+}
+body.dark-mode.glassmorphism .select-tag:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+body.dark-mode.glassmorphism .select-tag-active {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+}

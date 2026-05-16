@@ -8,19 +8,21 @@ import (
 
 func GetSetting() types.Setting {
 	sql_get_user := `
-		SELECT id,favicon,title,govRecord,logo192,logo512,hideAdmin,hideGithub,hideToggleJumpTarget,jumpTargetBlank 
-		FROM nav_setting 
-		ORDER BY id ASC 
+		SELECT id,favicon,title,govRecord,logo192,logo512,hideAdmin,hideGithub,hideToggleJumpTarget,jumpTargetBlank,backgroundUrl,enableBackground,enableGlassmorphism
+		FROM nav_setting
+		ORDER BY id ASC
 		LIMIT 1;
 		`
 	var setting types.Setting
 	row := database.DB.QueryRow(sql_get_user, 0)
-	// 建立一个空变量
 	var hideGithub interface{}
 	var hideAdmin interface{}
 	var hideToggleJumpTarget interface{}
 	var jumpTargetBlank interface{}
-	err := row.Scan(&setting.Id, &setting.Favicon, &setting.Title, &setting.GovRecord, &setting.Logo192, &setting.Logo512, &hideAdmin, &hideGithub, &hideToggleJumpTarget, &jumpTargetBlank)
+	var backgroundUrl interface{}
+	var enableBackground interface{}
+	var enableGlassmorphism interface{}
+	err := row.Scan(&setting.Id, &setting.Favicon, &setting.Title, &setting.GovRecord, &setting.Logo192, &setting.Logo512, &hideAdmin, &hideGithub, &hideToggleJumpTarget, &jumpTargetBlank, &backgroundUrl, &enableBackground, &enableGlassmorphism)
 	if err != nil {
 		logger.LogError("获取配置失败: %s", err)
 		return types.Setting{
@@ -34,6 +36,9 @@ func GetSetting() types.Setting {
 			HideGithub:           false,
 			HideToggleJumpTarget: false,
 			JumpTargetBlank:      true,
+			BackgroundUrl:        "",
+			EnableBackground:     false,
+			EnableGlassmorphism:  false,
 		}
 	}
 	if hideGithub == nil {
@@ -75,13 +80,39 @@ func GetSetting() types.Setting {
 		}
 	}
 
+	if backgroundUrl == nil {
+		setting.BackgroundUrl = ""
+	} else {
+		setting.BackgroundUrl = backgroundUrl.(string)
+	}
+
+	if enableBackground == nil {
+		setting.EnableBackground = false
+	} else {
+		if enableBackground.(int64) == 0 {
+			setting.EnableBackground = false
+		} else {
+			setting.EnableBackground = true
+		}
+	}
+
+	if enableGlassmorphism == nil {
+		setting.EnableGlassmorphism = false
+	} else {
+		if enableGlassmorphism.(int64) == 0 {
+			setting.EnableGlassmorphism = false
+		} else {
+			setting.EnableGlassmorphism = true
+		}
+	}
+
 	return setting
 }
 
 func UpdateSetting(data types.Setting) error {
 	sql_update_setting := `
 		UPDATE nav_setting
-		SET favicon = ?, title = ?, govRecord = ?, logo192 = ?, logo512 = ?, hideAdmin = ?, hideGithub = ?, hideToggleJumpTarget = ?, jumpTargetBlank = ?
+		SET favicon = ?, title = ?, govRecord = ?, logo192 = ?, logo512 = ?, hideAdmin = ?, hideGithub = ?, hideToggleJumpTarget = ?, jumpTargetBlank = ?, backgroundUrl = ?, enableBackground = ?, enableGlassmorphism = ?
 		WHERE id = (SELECT id FROM nav_setting ORDER BY id ASC LIMIT 1);
 		`
 
@@ -89,7 +120,7 @@ func UpdateSetting(data types.Setting) error {
 	if err != nil {
 		return err
 	}
-	res, err := stmt.Exec(data.Favicon, data.Title, data.GovRecord, data.Logo192, data.Logo512, data.HideAdmin, data.HideGithub, data.HideToggleJumpTarget, data.JumpTargetBlank)
+	res, err := stmt.Exec(data.Favicon, data.Title, data.GovRecord, data.Logo192, data.Logo512, data.HideAdmin, data.HideGithub, data.HideToggleJumpTarget, data.JumpTargetBlank, data.BackgroundUrl, data.EnableBackground, data.EnableGlassmorphism)
 	if err != nil {
 		return err
 	}

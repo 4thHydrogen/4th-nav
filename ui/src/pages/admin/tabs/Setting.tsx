@@ -163,6 +163,19 @@ export const Setting: React.FC<SettingProps> = (props) => {
             <Form.Item label="隐藏跳转方式卡片" name="hideToggleJumpTarget" tooltip="默认展示，开启后将在前台隐藏跳转方式卡片" >
               <Switch defaultChecked={Boolean(store?.setting?.hideToggleJumpTarget)} />
             </Form.Item>
+            <Form.Item
+              label="背景图片 URL"
+              name="backgroundUrl"
+              tooltip="输入图片 URL 作为页面背景。支持 bing 关键字自动获取每日 Bing 壁纸"
+            >
+              <Input placeholder="例如: bing 或 https://example.com/bg.jpg" />
+            </Form.Item>
+            <Form.Item label="启用背景图片" name="enableBackground" tooltip="开启后页面将显示背景图片">
+              <Switch defaultChecked={Boolean(store?.setting?.enableBackground)} />
+            </Form.Item>
+            <Form.Item label="启用毛玻璃效果" name="enableGlassmorphism" tooltip="开启后卡片和导航栏将呈现毛玻璃半透明效果">
+              <Switch defaultChecked={Boolean(store?.setting?.enableGlassmorphism)} />
+            </Form.Item>
             <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
               <Button type="primary" htmlType="submit">
                 提交
@@ -184,6 +197,17 @@ export const Setting: React.FC<SettingProps> = (props) => {
             </Form.Item>
             <Form.Item label="精简模式" name="compactMode" tooltip="开启后卡片只显示标题和logo，如果同时开启无图模式则只显示标题">
               <Switch defaultChecked={Boolean(store?.siteConfig?.compactMode)} />
+            </Form.Item>
+            <Form.Item label="每行项目数" name="columnsPerRow" tooltip="设置桌面端每行显示的工具卡片数量">
+              <Select
+                options={[
+                  { label: "2 列", value: 2 },
+                  { label: "3 列（默认）", value: 3 },
+                  { label: "4 列", value: 4 },
+                  { label: "5 列", value: 5 },
+                  { label: "6 列", value: 6 },
+                ]}
+              />
             </Form.Item>
             <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
               <Button type="primary" htmlType="submit">

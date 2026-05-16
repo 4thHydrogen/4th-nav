@@ -182,7 +182,23 @@ func InitDB() {
 	if !columnExists("nav_site_config", "compactMode") {
 		DB.Exec(`ALTER TABLE nav_site_config ADD COLUMN compactMode BOOLEAN NOT NULL DEFAULT 0;`)
 	}
-	
+
+	// 网站配置表结构升级 - 添加columnsPerRow列
+	if !columnExists("nav_site_config", "columnsPerRow") {
+		DB.Exec(`ALTER TABLE nav_site_config ADD COLUMN columnsPerRow INTEGER NOT NULL DEFAULT 3;`)
+	}
+
+	// 设置表结构升级 - 添加背景图片和毛玻璃相关字段
+	if !columnExists("nav_setting", "backgroundUrl") {
+		DB.Exec(`ALTER TABLE nav_setting ADD COLUMN backgroundUrl TEXT;`)
+	}
+	if !columnExists("nav_setting", "enableBackground") {
+		DB.Exec(`ALTER TABLE nav_setting ADD COLUMN enableBackground BOOLEAN NOT NULL DEFAULT 0;`)
+	}
+	if !columnExists("nav_setting", "enableGlassmorphism") {
+		DB.Exec(`ALTER TABLE nav_setting ADD COLUMN enableGlassmorphism BOOLEAN NOT NULL DEFAULT 0;`)
+	}
+
 	// 如果不存在，就初始化默认搜索引擎
 	sql_get_search_engine := `
 		SELECT COUNT(*) FROM nav_search_engine;

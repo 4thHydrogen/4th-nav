@@ -293,7 +293,7 @@
   .github-link-box {
     right: 11px;
     bottom: 14px;
-    
+
   }
   .github-link-box svg {
     width: 27px;
@@ -350,7 +350,7 @@
 
   .content {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(var(--grid-columns, 3), 1fr);
     grid-gap: 15px;
     justify-content: center;
     margin: 0 5vw;
@@ -499,7 +499,7 @@
   }
   .content {
     display: grid;
-    grid-template-columns: repeat(3, minmax(299.67px, 350px));
+    grid-template-columns: repeat(var(--grid-columns, 3), minmax(299.67px, 350px));
     grid-gap: 20px;
     justify-content: center;
     margin: 0 5vw;
@@ -731,4 +731,46 @@ body.dark-mode .content.compact-grid .card-box:hover {
   box-shadow: 0 2px 8px rgba(255,255,255,0.1);
 }
 
+/* 分组显示样式 */
+.grouped-content {
+  padding-top: 10px;
+  padding-bottom: 250px;
+}
+
+.category-group-header {
+  grid-column: 1 / -1;
+  scroll-margin-top: 20px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #272e3b;
+  padding: 6px 0;
+  margin: 12px 0 0;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.06);
+}
+
+body.dark-mode .category-group-header {
+  color: rgba(255, 255, 255, 0.8);
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+body.glassmorphism .category-group-header {
+  color: #fff;
+  border-bottom-color: rgba(255, 255, 255, 0.2);
+}
+
+@media (max-width: 1060px) {
+  .grouped-content {
+    /* 小屏下无侧边栏，无需额外处理 */
+  }
+}
+
+/* 分类切换淡入动画 */
+@keyframes contentFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.content-wraper > .content {
+  animation: contentFadeIn 0.2s ease-out;
+}
 

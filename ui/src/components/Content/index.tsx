@@ -12,6 +12,8 @@ import DarkSwitch from "../DarkSwitch";
 import { isLogin } from "../../utils/check";
 import { generateSearchEngineCard } from "../../utils/serachEngine";
 import { toggleJumpTarget } from "../../utils/setting";
+import Background from "../Background";
+import CategoryNav from "../CategoryNav";
 
 const mutiSearch = (s, t) => {
   const source = (s as string).toLowerCase();
@@ -28,6 +30,7 @@ const Content = (props: any) => {
   const [searchString, setSearchString] = useState("");
   const [val, setVal] = useState("");
   const [searchEngineCards, setSearchEngineCards] = useState<any[]>([]);
+  const [visibleCategory, setVisibleCategory] = useState<string>("");
 
   const filteredDataRef = useRef<any>([]);
 
@@ -35,7 +38,20 @@ const Content = (props: any) => {
     const hide = data?.setting?.hideGithub === true
     return !hide;
   }, [data])
-  
+
+  const enableGlassmorphism = useMemo(() => {
+    return data?.setting?.enableGlassmorphism === true;
+  }, [data?.setting?.enableGlassmorphism]);
+
+  useEffect(() => {
+    const body = document.querySelector("body");
+    if (!body) return;
+    body.classList.toggle("glassmorphism", enableGlassmorphism);
+    return () => {
+      body.classList.remove("glassmorphism");
+    };
+  }, [enableGlassmorphism]);
+
   const loadData = useCallback(async () => {
     try {
       setLoading(true);
@@ -53,7 +69,7 @@ const Content = (props: any) => {
       setLoading(false);
     }
   }, [setData, setLoading, setCurrTag]);
-  
+
   useEffect(() => {
     loadData();
   }, [loadData]);
@@ -65,7 +81,6 @@ const Content = (props: any) => {
         const cards = await generateSearchEngineCard(searchString);
         setSearchEngineCards(cards);
       } catch (error) {
-        console.error('加载搜索引擎卡片失败:', error);
         setSearchEngineCards([]);
       }
     };
@@ -138,9 +153,72 @@ const Content = (props: any) => {
     }
   }, [data, currTag, searchString, searchEngineCards]);
 
+  // 分组数据：仅当"全部工具"且无搜索时按分类分组
+  const groupedData = useMemo(() => {
+    if (currTag !== "全部工具" || searchString.trim() !== "") return null;
+    const groups: Record<string, any[]> = {};
+    const categoryOrder = data?.catelogs ?? [];
+    filteredData.forEach(item => {
+      const cat = item.catelog || "未分类";
+      if (!groups[cat]) groups[cat] = [];
+      groups[cat].push(item);
+    });
+    // 按分类顺序排序
+    const ordered: Record<string, any[]> = {};
+    categoryOrder.forEach((cat: string) => {
+      if (cat === "全部工具") return;
+      if (groups[cat]) {
+        ordered[cat] = groups[cat];
+      }
+    });
+    // 添加不在分类列表中的分组
+    Object.keys(groups).forEach(cat => {
+      if (!ordered[cat]) {
+        ordered[cat] = groups[cat];
+      }
+    });
+    return ordered;
+  }, [currTag, searchString, filteredData, data?.catelogs]);
+
   useEffect(() => {
     filteredDataRef.current = filteredData
   }, [filteredData])
+
+  // IntersectionObserver 追踪当前可见分类
+  useEffect(() => {
+    if (!groupedData) {
+      setVisibleCategory("");
+      return;
+    }
+    const categories = Object.keys(groupedData);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const cat = entry.target.id.replace("category-", "");
+            setVisibleCategory(cat);
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: "-80px 0px -50% 0px", root: document.querySelector(".content-wraper") }
+    );
+    categories.forEach(cat => {
+      const el = document.getElementById(`category-${cat}`);
+      if (el) observer.observe(el);
+    });
+    // 默认设置第一个分类为可见
+    if (categories.length > 0) {
+      setVisibleCategory(categories[0]);
+    }
+    return () => observer.disconnect();
+  }, [groupedData]);
+
+  const scrollToCategory = useCallback((category: string) => {
+    const el = document.getElementById(`category-${category}`);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, []);
 
   useEffect(() => {
     if (searchString.trim() === "") {
@@ -154,29 +232,29 @@ const Content = (props: any) => {
     // eslint-disable-next-line
   }, [searchString])
 
+  const cardProps = (item: any, index: number) => ({
+    title: item.name,
+    url: item.url,
+    des: item.desc,
+    logo: item.logo,
+    key: item.id,
+    catelog: item.catelog,
+    index: index,
+    isSearching: searchString.trim() !== "",
+    noImageMode: data?.siteConfig?.noImageMode || false,
+    compactMode: data?.siteConfig?.compactMode || false,
+    onClick: () => {
+      resetSearch();
+      if (item.url === "toggleJumpTarget") {
+        toggleJumpTarget();
+        loadData();
+      }
+    },
+  });
+
   const renderCardsV2 = useCallback(() => {
     return filteredData.map((item, index) => {
-      return (
-        <CardV2
-          title={item.name}
-          url={item.url}
-          des={item.desc}
-          logo={item.logo}
-          key={item.id}
-          catelog={item.catelog}
-          index={index}
-          isSearching={searchString.trim() !== ""}
-          noImageMode={data?.siteConfig?.noImageMode || false}
-          compactMode={data?.siteConfig?.compactMode || false}
-          onClick={() => {
-            resetSearch();
-            if (item.url === "toggleJumpTarget") {
-              toggleJumpTarget();
-              loadData();
-            }
-          }}
-        />
-      );
+      return <CardV2 {...cardProps(item, index)} />;
     });
     // eslint-disable-next-line
   }, [filteredData, searchString, data?.siteConfig?.noImageMode, data?.siteConfig?.compactMode]);
@@ -201,11 +279,16 @@ const Content = (props: any) => {
         resetSearch();
       }
     }
-
   };
+
+  const isGroupedMode = groupedData !== null && Object.keys(groupedData).length > 0;
 
   return (
     <>
+      <Background
+        url={data?.setting?.backgroundUrl ?? ""}
+        enabled={data?.setting?.enableBackground === true}
+      />
       <Helmet>
         <meta charSet="utf-8" />
         <link
@@ -234,10 +317,46 @@ const Content = (props: any) => {
         </div>
       </div>
       <div className="content-wraper">
-        <div className={`content cards ${data?.siteConfig?.compactMode ? 'compact-grid' : ''}`}>
-          {loading ? <Loading></Loading> : renderCardsV2()}
-        </div>
+        {loading ? (
+          <div className="content cards" key="loading">
+            <Loading></Loading>
+          </div>
+        ) : isGroupedMode ? (
+          <div
+            className="content grouped-content"
+            key={currTag}
+            style={{ '--grid-columns': data?.siteConfig?.columnsPerRow || 3 } as React.CSSProperties}
+          >
+            {Object.entries(groupedData).flatMap(([category, items]) => [
+              <div
+                key={`header-${category}`}
+                id={`category-${category}`}
+                className="category-group-header"
+              >
+                {category}
+              </div>,
+              ...items.map((item: any, index: number) => (
+                <CardV2 {...cardProps(item, index)} />
+              ))
+            ])}
+          </div>
+        ) : (
+          <div
+            className={`content cards ${data?.siteConfig?.compactMode ? 'compact-grid' : ''}`}
+            key={currTag}
+            style={{ '--grid-columns': data?.siteConfig?.columnsPerRow || 3 } as React.CSSProperties}
+          >
+            {renderCardsV2()}
+          </div>
+        )}
       </div>
+      {isGroupedMode && (
+        <CategoryNav
+          categories={Object.keys(groupedData!)}
+          activeCategory={visibleCategory}
+          onNavigate={scrollToCategory}
+        />
+      )}
       <div className="record-wraper">
         <a href="https://beian.miit.gov.cn" target="_blank" rel="noreferrer">{data?.setting?.govRecord ?? ""}</a>
       </div>

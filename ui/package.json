@@ -24,17 +24,14 @@
     "react-dom": "^18.2.0",
     "react-helmet": "^6.1.0",
     "react-router-dom": "^7.0.2",
-    "react-scripts": "5.0.1",
     "typescript": "^5.7.2",
     "web-vitals": "^4.2.4"
   },
-  "proxy": "http://localhost:6412",
   "scripts": {
-    "start": "PORT=2333 DANGEROUSLY_DISABLE_HOST_CHECK=true react-scripts start",
-    "start-win": "set \"PORT=2333\" && set \"DANGEROUSLY_DISABLE_HOST_CHECK=true\" && react-scripts start",
-    "build": "react-scripts build && workbox generateSW workbox-config.js",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "dev": "vite",
+    "start": "vite",
+    "build": "vite build && workbox generateSW workbox-config.js",
+    "preview": "vite preview"
   },
   "eslintConfig": {
     "extends": [
@@ -55,9 +52,11 @@
     ]
   },
   "devDependencies": {
+    "@vitejs/plugin-react": "^6.0.2",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.16",
+    "vite": "^8.0.13",
     "workbox-cli": "^7.3.0"
   }
 }
