@@ -73,6 +73,19 @@ const Content = (props: any) => {
     loadSearchEngineCards();
   }, [searchString]);
 
+  const handleMiddleClickTag = useCallback((tag: string) => {
+    if (!data.tools) return;
+    data.tools
+      .filter((item: any) => {
+        if (item.url === "admin" || item.url === "toggleJumpTarget") return false;
+        if (tag === "全部工具") return true;
+        return item.catelog === tag;
+      })
+      .forEach((item: any) => {
+        window.open(item.url, "_blank");
+      });
+  }, [data.tools]);
+
   const handleSetCurrTag = (tag: string) => {
     setCurrTag(tag);
     // 管理后台不记录了
@@ -216,6 +229,7 @@ const Content = (props: any) => {
             tags={data?.catelogs ?? ["全部工具"]}
             currTag={currTag}
             onTagChange={handleSetCurrTag}
+            onMiddleClick={handleMiddleClickTag}
           />
         </div>
       </div>

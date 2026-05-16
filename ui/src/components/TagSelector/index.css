@@ -10,6 +10,10 @@
   background-color: #969696;
   color: #ffffff;
 }
+.select-tag:active:hover {
+  opacity: 0.8;
+  transform: scale(0.95);
+}
 .select-tag-active {
   color: #ffffff;
   background-color: #7c7c7c;
