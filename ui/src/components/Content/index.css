@@ -836,15 +836,13 @@ body.glassmorphism .category-group-header {
 .desktop-workspace {
   width: min(1280px, 100%);
   margin: 0 auto;
-  display: grid;
-  grid-template-columns: 112px minmax(0, 1fr);
-  gap: 26px;
-  align-items: start;
+  padding-left: 72px;
+  box-sizing: border-box;
 }
 
 .desktop-workspace-flat {
-  grid-template-columns: minmax(0, 1fr);
   width: min(1080px, 100%);
+  padding-left: 0;
 }
 
 .desktop-content-shell {
@@ -906,8 +904,7 @@ body.glassmorphism .desktop-search-shell input::placeholder {
   }
 
   .desktop-workspace {
-    grid-template-columns: 100px minmax(0, 1fr);
-    gap: 18px;
+    padding-left: 64px;
   }
 
   .desktop-content-shell {
@@ -941,7 +938,7 @@ body.glassmorphism .desktop-search-shell input::placeholder {
   .desktop-workspace,
   .desktop-workspace-flat {
     width: 100%;
-    grid-template-columns: 1fr;
+    padding-left: 0;
   }
 
   .desktop-content-shell {
