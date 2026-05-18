@@ -1,0 +1,32 @@
+.settings-button {
+  position: fixed;
+  left: 12px;
+  bottom: 16px;
+  width: 37px;
+  height: 37px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--widget-text-muted);
+  background: var(--widget-bg, rgba(255, 255, 255, 0.72));
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--widget-border, rgba(15, 23, 42, 0.08));
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  z-index: 300;
+}
+
+.settings-button:hover {
+  background: var(--widget-bg-hover);
+  color: var(--widget-text);
+  transform: rotate(30deg);
+}
+
+@media (max-width: 768px) {
+  .settings-button {
+    display: none;
+  }
+}

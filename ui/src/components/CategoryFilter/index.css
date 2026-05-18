@@ -1,3 +1,15 @@
+/* ====== Trigger zone (always at left edge) ====== */
+.category-filter-trigger {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 16px;
+  height: 100vh;
+  z-index: 399;
+  cursor: pointer;
+}
+
+/* ====== Sidebar ====== */
 .category-filter {
   position: fixed;
   left: 0;
@@ -13,10 +25,44 @@
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   border-right: 1px solid var(--widget-border, rgba(15, 23, 42, 0.08));
-  box-shadow: 2px 0 16px rgba(15, 23, 42, 0.06);
   z-index: 400;
+  transition: transform 200ms ease-out, box-shadow 200ms ease-out;
+  will-change: transform;
 }
 
+/* ====== Collapsed state ====== */
+.category-filter.is-collapsed {
+  transform: translateX(-84px);
+  pointer-events: none;
+  box-shadow: none;
+}
+
+.category-filter.is-collapsed::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 45%;
+  width: 3px;
+  height: 24px;
+  background: var(--widget-interactive-border, rgba(99, 102, 241, 0.5));
+  border-radius: 2px 0 0 2px;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+}
+
+.category-filter-trigger:hover ~ .category-filter.is-collapsed::after {
+  opacity: 1;
+  height: 32px;
+}
+
+/* ====== Expanded state ====== */
+.category-filter.is-expanded {
+  transform: translateX(0);
+  box-shadow: 2px 0 16px rgba(15, 23, 42, 0.06);
+  pointer-events: auto;
+}
+
+/* ====== Chips ====== */
 .category-filter-chips {
   flex: 1;
   width: 100%;
@@ -60,59 +106,19 @@
   border-radius: 0 8px 8px 0;
 }
 
-.category-filter-settings {
-  width: 36px;
-  height: 36px;
-  margin-top: 8px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--widget-text-muted);
-  background: var(--widget-icon-bg);
-  cursor: pointer;
-  transition: all 0.15s ease;
-  text-decoration: none;
+/* ====== Pin hint ====== */
+.category-filter-pin-hint {
+  font-size: 10px;
+  color: var(--widget-text-faint);
+  text-align: center;
+  padding: 4px 0;
+  white-space: nowrap;
 }
 
-.category-filter-settings:hover {
-  background: var(--widget-icon-bg-hover);
-  color: var(--widget-text);
-  transform: rotate(30deg);
-}
-
+/* ====== Mobile — hidden ====== */
 @media (max-width: 768px) {
-  .category-filter {
-    position: static;
-    width: 100%;
-    height: auto;
-    flex-direction: row;
-    padding: 8px 12px;
-    border-right: none;
-    border-bottom: 1px solid var(--widget-border, rgba(15, 23, 42, 0.08));
-    box-shadow: none;
-  }
-
-  .category-filter-chips {
-    flex-direction: row;
-    overflow-x: auto;
-    gap: 6px;
-    width: 100%;
-  }
-
-  .category-filter-chip {
-    white-space: nowrap;
-    flex-shrink: 0;
-    padding: 6px 12px;
-    font-size: 12px;
-  }
-
-  .category-filter-chip.active {
-    border-left: none;
-    border-radius: 8px;
-  }
-
-  .category-filter-settings {
-    display: none;
+  .category-filter,
+  .category-filter-trigger {
+    display: none !important;
   }
 }

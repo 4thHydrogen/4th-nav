@@ -14,6 +14,8 @@ import TimeDateWidget from "../TimeDateWidget";
 import DockBar from "../DockBar";
 import WidgetGrid from "../WidgetGrid";
 import CategoryFilter from "../CategoryFilter";
+import MobileCategoryMenu from "../MobileCategoryMenu";
+import SettingsButton from "../SettingsButton";
 import type { SearchEngine, Tool } from "../../types";
 import {
   useContentQuery,
@@ -256,6 +258,15 @@ const Content = () => {
             onClearFilters={clearFilters}
           />
         )}
+        {!isSearching && (
+          <MobileCategoryMenu
+            categories={categories}
+            selectedCategories={selectedCategories}
+            onToggleCategory={toggleCategory}
+            onClearFilters={clearFilters}
+          />
+        )}
+        <SettingsButton />
 
         <section className="desktop-workspace">
           <div className="desktop-content-shell">
