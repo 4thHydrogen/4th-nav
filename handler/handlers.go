@@ -726,6 +726,27 @@ func UpdateToolViewModeHandler(c *gin.Context) {
 	c.JSON(200, gin.H{"success": true, "message": "布局更新成功"})
 }
 
+func UpdateFolderSettingsHandler(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "errorMessage": "无效 ID"})
+		return
+	}
+	var body struct {
+		FolderViewMode string `json:"folderViewMode"`
+		FolderItemSize int    `json:"folderItemSize"`
+	}
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "errorMessage": "无效请求"})
+		return
+	}
+	if err := service.UpdateFolderSettings(id, body.FolderViewMode, body.FolderItemSize); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "errorMessage": err.Error()})
+		return
+	}
+	c.JSON(200, gin.H{"success": true, "message": "文件夹设置更新成功"})
+}
+
 func MoveToolToFolderHandler(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {

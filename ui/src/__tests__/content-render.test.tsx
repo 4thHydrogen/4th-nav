@@ -123,6 +123,8 @@ const buildTool = (overrides: Partial<Tool> = {}): Tool => ({
   bgColor: "",
   gridX: -1,
   gridY: -1,
+  folderViewMode: "grid",
+  folderItemSize: 28,
   ...overrides,
 });
 

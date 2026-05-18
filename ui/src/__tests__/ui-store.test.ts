@@ -18,6 +18,8 @@ const mockTool: Tool = {
   bgColor: "",
   gridX: -1,
   gridY: -1,
+  folderViewMode: "grid",
+  folderItemSize: 28,
 };
 
 const mockFolder: Tool = {

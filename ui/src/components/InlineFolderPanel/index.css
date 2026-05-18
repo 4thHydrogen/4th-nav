@@ -1,6 +1,4 @@
 .inline-folder-panel {
-  grid-column: 1 / -1;
-  width: 100%;
   border-radius: 16px;
   background: var(--widget-panel-bg);
   backdrop-filter: blur(18px);
@@ -20,6 +18,31 @@
 .inline-folder-title {
   font-size: 14px;
   font-weight: 600;
+  color: var(--widget-text);
+}
+
+.inline-folder-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.inline-folder-settings-btn {
+  background: var(--widget-icon-bg);
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--widget-text-muted);
+  transition: background 0.15s, color 0.15s;
+}
+
+.inline-folder-settings-btn:hover {
+  background: var(--widget-icon-bg-hover);
   color: var(--widget-text);
 }
 
@@ -61,4 +84,21 @@
 
 .inline-folder-grid > .tool-item-icon {
   width: auto;
+}
+
+.inline-folder-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.inline-folder-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.inline-folder-list::-webkit-scrollbar-thumb {
+  background: var(--widget-scrollbar);
+  border-radius: 2px;
 }

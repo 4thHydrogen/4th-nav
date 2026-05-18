@@ -44,8 +44,10 @@ type UpdateToolDto struct {
 	ParentId *int   `json:"parentId"`
 	Size     string `json:"size"`
 	BgColor  string `json:"bgColor"`
-	GridX    int    `json:"gridX"`
-	GridY    int    `json:"gridY"`
+	GridX          int    `json:"gridX"`
+	GridY          int    `json:"gridY"`
+	FolderViewMode string `json:"folderViewMode"`
+	FolderItemSize int    `json:"folderItemSize"`
 }
 type AddToolDto struct {
 	Name     string `json:"name"`
@@ -60,8 +62,10 @@ type AddToolDto struct {
 	ParentId *int   `json:"parentId"`
 	Size     string `json:"size"`
 	BgColor  string `json:"bgColor"`
-	GridX    int    `json:"gridX"`
-	GridY    int    `json:"gridY"`
+	GridX          int    `json:"gridX"`
+	GridY          int    `json:"gridY"`
+	FolderViewMode string `json:"folderViewMode"`
+	FolderItemSize int    `json:"folderItemSize"`
 }
 type UpdateToolsSortDto struct {
 	Id   int `json:"id"`

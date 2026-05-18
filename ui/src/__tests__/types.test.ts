@@ -19,6 +19,8 @@ describe('TypeScript types', () => {
       bgColor: "",
       gridX: -1,
       gridY: -1,
+    folderViewMode: 'grid',
+    folderItemSize: 28,
     };
     expect(tool.id).toBe(1);
     expect(tool.catelog).toBe('工具');

@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { ContentData, AdminApiData, Tool, AddToolDto, UpdateToolDto, AddCatelogDto, UpdateCatelogDto, SearchEngine, SortUpdateDto, UpdateUserDto, AddTokenDto, ToolViewMode, DockItem, ToolType, ToolSize, LayoutItemDto } from "../types";
+import type { ContentData, AdminApiData, Tool, AddToolDto, UpdateToolDto, AddCatelogDto, UpdateCatelogDto, SearchEngine, SortUpdateDto, UpdateUserDto, AddTokenDto, ToolViewMode, DockItem, ToolType, ToolSize, LayoutItemDto, FolderViewMode } from "../types";
 
 axios.interceptors.request.use(
     (config) => {
@@ -202,5 +202,10 @@ export const fetchDeleteFolder = async (folderId: number, mode: "move-children-t
 
 export const fetchUpdateLayout = async (items: LayoutItemDto[]) => {
     const { data } = await axios.put(`/api/admin/layout`, { items });
+    return data;
+};
+
+export const fetchUpdateFolderSettings = async (id: number, folderViewMode: FolderViewMode, folderItemSize: number) => {
+    const { data } = await axios.put(`/api/admin/tool/${id}/folderSettings`, { folderViewMode, folderItemSize });
     return data;
 };

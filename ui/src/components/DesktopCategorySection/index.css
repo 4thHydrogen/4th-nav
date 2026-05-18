@@ -53,3 +53,13 @@
     font-size: 12px;
   }
 }
+
+/* 覆盖式文件夹面板 */
+.desktop-folder-panel-overlay {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 50;
+  min-width: 220px;
+  max-width: 360px;
+}

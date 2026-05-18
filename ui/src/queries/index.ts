@@ -11,8 +11,9 @@ import {
   fetchMoveToolToFolder,
   fetchAddTool,
   fetchUpdateLayout,
+  fetchUpdateFolderSettings,
 } from "../utils/api";
-import type { ContentData, ToolViewMode, LayoutItemDto } from "../types";
+import type { ContentData, ToolViewMode, LayoutItemDto, FolderViewMode } from "../types";
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -105,6 +106,8 @@ export function useMergeToFolder() {
         bgColor: "",
         gridX: -1,
         gridY: -1,
+        folderViewMode: "grid",
+        folderItemSize: 28,
       });
       if (folder?.id) {
         await fetchMoveToolToFolder(vars.toolId1, folder.id);
@@ -118,5 +121,29 @@ export function useMergeToFolder() {
 export function useUpdateLayout() {
   return useMutation({
     mutationFn: (items: LayoutItemDto[]) => fetchUpdateLayout(items),
+  });
+}
+
+export function useUpdateFolderSettings() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (vars: { id: number; folderViewMode: FolderViewMode; folderItemSize: number }) =>
+      fetchUpdateFolderSettings(vars.id, vars.folderViewMode, vars.folderItemSize),
+    onMutate: async ({ id, folderViewMode, folderItemSize }) => {
+      await qc.cancelQueries({ queryKey: contentKey });
+      const prev = qc.getQueryData<ContentData>(contentKey);
+      if (prev) {
+        qc.setQueryData<ContentData>(contentKey, {
+          ...prev,
+          tools: prev.tools.map((t) =>
+            t.id === id ? { ...t, folderViewMode, folderItemSize } : t
+          ),
+        });
+      }
+      return { prev };
+    },
+    onError: (_err, _vars, ctx) => {
+      if (ctx?.prev) qc.setQueryData(contentKey, ctx.prev);
+    },
   });
 }

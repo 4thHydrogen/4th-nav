@@ -19,6 +19,23 @@ func normalizeViewMode(v string) string {
 	return "icon"
 }
 
+func normalizeFolderViewMode(v string) string {
+	if v == "list" {
+		return "list"
+	}
+	return "grid"
+}
+
+func normalizeFolderItemSize(v int) int {
+	if v < 20 {
+		return 20
+	}
+	if v > 48 {
+		return 48
+	}
+	return v
+}
+
 func normalizeToolType(v string) string {
 	if v == "folder" {
 		return "folder"
@@ -64,7 +81,7 @@ func ImportTools(data []types.Tool) {
 			`
 		stmt, err := database.DB.Prepare(sql_add_tool)
 		utils.CheckErr(err)
-		res, err := stmt.Exec(v.Id, v.Name, v.Catelog, v.Url, v.Logo, v.Desc, v.Sort, v.Hide, viewMode, toolType, v.ParentId, size, v.BgColor, v.GridX, v.GridY)
+		res, err := stmt.Exec(v.Id, v.Name, v.Catelog, v.Url, v.Logo, v.Desc, v.Sort, v.Hide, viewMode, toolType, v.ParentId, size, v.BgColor, v.GridX, v.GridY, normalizeFolderViewMode(v.FolderViewMode), normalizeFolderItemSize(v.FolderItemSize))
 		utils.CheckErr(err)
 		_, err = res.LastInsertId()
 		utils.CheckErr(err)
@@ -98,7 +115,7 @@ func UpdateTool(data types.UpdateToolDto) {
 		`
 	stmt, err := database.DB.Prepare(sql_update_tool)
 	utils.CheckErr(err)
-	res, err := stmt.Exec(data.Name, data.Url, data.Logo, data.Catelog, data.Desc, data.Sort, data.Hide, normalizeViewMode(data.ViewMode), normalizeToolType(data.Type), data.ParentId, normalizeToolSize(data.Size), data.BgColor, data.GridX, data.GridY, data.Id)
+	res, err := stmt.Exec(data.Name, data.Url, data.Logo, data.Catelog, data.Desc, data.Sort, data.Hide, normalizeViewMode(data.ViewMode), normalizeToolType(data.Type), data.ParentId, normalizeToolSize(data.Size), data.BgColor, data.GridX, data.GridY, normalizeFolderViewMode(data.FolderViewMode), normalizeFolderItemSize(data.FolderItemSize), data.Id)
 	utils.CheckErr(err)
 	_, err = res.RowsAffected()
 	utils.CheckErr(err)
@@ -130,7 +147,7 @@ func AddTool(data types.AddToolDto) (int64, error) {
 	}
 	defer stmt.Close()
 
-	res, err := stmt.Exec(data.Name, data.Url, data.Logo, data.Catelog, data.Desc, data.Sort, data.Hide, normalizeViewMode(data.ViewMode), normalizeToolType(data.Type), data.ParentId, normalizeToolSize(data.Size), data.BgColor, normalizeGrid(data.GridX), normalizeGrid(data.GridY))
+	res, err := stmt.Exec(data.Name, data.Url, data.Logo, data.Catelog, data.Desc, data.Sort, data.Hide, normalizeViewMode(data.ViewMode), normalizeToolType(data.Type), data.ParentId, normalizeToolSize(data.Size), data.BgColor, normalizeGrid(data.GridX), normalizeGrid(data.GridY), normalizeFolderViewMode(data.FolderViewMode), normalizeFolderItemSize(data.FolderItemSize))
 	if err != nil {
 		return 0, err
 	}
@@ -155,7 +172,7 @@ func AddTool(data types.AddToolDto) (int64, error) {
 
 func GetAllTool() []types.Tool {
 	sql_get_all := `
-		SELECT id,name,url,logo,catelog,` + "`desc`" + `,sort,hide,view_mode,type,parent_id,size,bg_color,grid_x,grid_y FROM nav_table order by sort;
+		SELECT id,name,url,logo,catelog,` + "`desc`" + `,sort,hide,view_mode,type,parent_id,size,bg_color,grid_x,grid_y,folder_view_mode,folder_item_size FROM nav_table order by sort;
 		`
 	results := make([]types.Tool, 0)
 	rows, err := database.DB.Query(sql_get_all)
@@ -284,6 +301,14 @@ func UpdateToolViewMode(id int, viewMode string) error {
 	_, err := database.DB.Exec(
 		`UPDATE nav_table SET view_mode = ? WHERE id = ?;`,
 		viewMode, id,
+	)
+	return err
+}
+
+func UpdateFolderSettings(id int, folderViewMode string, folderItemSize int) error {
+	_, err := database.DB.Exec(
+		`UPDATE nav_table SET folder_view_mode = ?, folder_item_size = ? WHERE id = ?;`,
+		normalizeFolderViewMode(folderViewMode), normalizeFolderItemSize(folderItemSize), id,
 	)
 	return err
 }

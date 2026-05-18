@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -8,7 +8,7 @@ import {
 } from "@dnd-kit/core";
 import { motion, AnimatePresence } from "framer-motion";
 import "./index.css";
-import type { Tool } from "../../types";
+import type { Tool, FolderViewMode } from "../../types";
 import {
   useGridLayout,
   gridToPixels,
@@ -19,6 +19,7 @@ import WidgetTool from "../WidgetTool";
 import WidgetFolder from "../WidgetFolder";
 import InlineFolderPanel from "../InlineFolderPanel";
 import { useUIStore } from "../../stores/ui";
+import { useUpdateFolderSettings } from "../../queries";
 
 interface WidgetGridProps {
   tools: Tool[];
@@ -72,8 +73,6 @@ const DraggableItem = ({ tool, style, isDropTarget, isDragging, children }: Drag
   );
 };
 
-const INLINE_PANEL_ROWS = 3;
-
 const WidgetGrid = ({
   tools,
   allTools,
@@ -98,6 +97,7 @@ const WidgetGrid = ({
   } = useGridLayout(tools);
 
   const { expandedFolderId, setExpandedFolderId } = useUIStore();
+  const updateFolderSettings = useUpdateFolderSettings();
 
   const toolsMap = useMemo(() => {
     const m = new Map<string, Tool>();
@@ -191,26 +191,32 @@ const WidgetGrid = ({
     return styles;
   }, [layout, width, cols, rowHeight, margin]);
 
-  const inlinePanelStyle = useMemo(() => {
-    if (expandedFolderId == null || width === 0) return null;
-    const folderLayout = layout.find((l) => l.i === String(expandedFolderId));
-    if (!folderLayout) return null;
-    const panelTop = (folderLayout.y + folderLayout.h) * (rowHeight + margin[1]);
-    return {
-      left: 0,
-      top: panelTop,
-      width,
-      height: INLINE_PANEL_ROWS * rowHeight + (INLINE_PANEL_ROWS - 1) * margin[1],
-    };
-  }, [expandedFolderId, layout, width, cols, rowHeight, margin]);
+  const [overlayPos, setOverlayPos] = useState<{ top: number; left: number } | null>(null);
+
+  useEffect(() => {
+    if (expandedFolderId == null || width === 0) {
+      setOverlayPos(null);
+      return;
+    }
+    const folderEl = document.querySelector(`[data-grid-id="${expandedFolderId}"]`);
+    const gridEl = gridRef.current;
+    if (!folderEl || !gridEl) return;
+    const folderRect = folderEl.getBoundingClientRect();
+    const gridRect = gridEl.getBoundingClientRect();
+    const top = folderRect.bottom - gridRect.top + 4;
+    const left = folderRect.left - gridRect.left;
+    setOverlayPos({ top, left });
+  }, [expandedFolderId, width, layout, gridRef]);
 
   const expandedFolder = expandedFolderId != null ? toolsMap.get(String(expandedFolderId)) : null;
   const expandedChildren = expandedFolderId != null ? (childrenMap[expandedFolderId] ?? []) : [];
 
-  const effectiveHeight = useMemo(() => {
-    if (!inlinePanelStyle) return totalHeight;
-    return Math.max(totalHeight, inlinePanelStyle.top + inlinePanelStyle.height + margin[1]);
-  }, [totalHeight, inlinePanelStyle]);
+  const handleUpdateFolderSettings = useCallback(
+    (id: number, folderViewMode: FolderViewMode, folderItemSize: number) => {
+      updateFolderSettings.mutate({ id, folderViewMode, folderItemSize });
+    },
+    [updateFolderSettings]
+  );
 
   return (
     <DndContext
@@ -234,7 +240,7 @@ const WidgetGrid = ({
             className="widget-grid-container"
             style={{
               position: "relative" as const,
-              height: effectiveHeight,
+              height: totalHeight,
               "--cell-width": `${cellWidth}px`,
               "--row-height": `${rowHeight}px`,
               "--cell-gap-x": `${margin[0]}px`,
@@ -274,21 +280,22 @@ const WidgetGrid = ({
             })}
 
             <AnimatePresence>
-              {inlinePanelStyle && expandedFolder && (
+              {overlayPos && expandedFolder && (
                 <motion.div
                   ref={panelRef}
                   key={`panel-${expandedFolderId}`}
                   className="widget-grid-inline-panel"
-                  initial={false}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.18, ease: "easeOut" }}
+                  initial={{ opacity: 0, scale: 0.96 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.96 }}
+                  transition={{ duration: 0.15, ease: "easeOut" }}
                   style={{
                     position: "absolute",
-                    left: inlinePanelStyle.left,
-                    top: inlinePanelStyle.top,
-                    width: inlinePanelStyle.width,
-                    height: inlinePanelStyle.height,
+                    left: overlayPos.left,
+                    top: overlayPos.top,
+                    width: "fit-content",
+                    minWidth: 200,
+                    maxWidth: width - overlayPos.left,
                     zIndex: 50,
                   }}
                   onClick={(e) => e.stopPropagation()}
@@ -303,6 +310,7 @@ const WidgetGrid = ({
                     noImageMode={noImageMode}
                     onOpenTool={onToolClick}
                     onClose={() => setExpandedFolderId(null)}
+                    onUpdateFolderSettings={handleUpdateFolderSettings}
                   />
                 </motion.div>
               )}

@@ -3,6 +3,7 @@
 export type ToolViewMode = "icon" | "card";
 export type ToolType = "icon" | "folder";
 export type ToolSize = `${number}x${number}`;
+export type FolderViewMode = "grid" | "list";
 
 export interface Tool {
   id: number;
@@ -20,6 +21,8 @@ export interface Tool {
   bgColor: string;
   gridX: number;
   gridY: number;
+  folderViewMode: FolderViewMode;
+  folderItemSize: number;
 }
 
 export interface Catelog {
@@ -144,6 +147,8 @@ export interface AddToolDto {
   bgColor: string;
   gridX: number;
   gridY: number;
+  folderViewMode: FolderViewMode;
+  folderItemSize: number;
 }
 
 export interface UpdateToolDto extends AddToolDto {

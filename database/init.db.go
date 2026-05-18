@@ -135,6 +135,13 @@ func InitDB() {
 	if !columnExists("nav_table", "grid_y") {
 		DB.Exec(`ALTER TABLE nav_table ADD COLUMN grid_y INTEGER NOT NULL DEFAULT -1;`)
 	}
+// 文件夹视图模式字段
+		if !columnExists("nav_table", "folder_view_mode") {
+			DB.Exec(`ALTER TABLE nav_table ADD COLUMN folder_view_mode TEXT NOT NULL DEFAULT 'grid';`)
+		}
+		if !columnExists("nav_table", "folder_item_size") {
+			DB.Exec(`ALTER TABLE nav_table ADD COLUMN folder_item_size INTEGER NOT NULL DEFAULT 28;`)
+		}
 
 	// 分类表
 	sql_create_table = `

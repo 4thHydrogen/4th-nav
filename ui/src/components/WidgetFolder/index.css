@@ -168,3 +168,61 @@
   line-height: 1.3;
   pointer-events: none;
 }
+
+/* 列表模式折叠态预览 */
+.widget-folder-list-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  width: 100%;
+  overflow: hidden;
+}
+
+.widget-folder-list-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 4px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.widget-folder-list-item-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  overflow: hidden;
+  background: var(--widget-icon-bg);
+}
+
+.widget-folder-list-item-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 2px;
+}
+
+.widget-folder-list-item-char {
+  font-size: 8px;
+  font-weight: 600;
+  color: var(--widget-text-muted);
+}
+
+.widget-folder-list-item-name {
+  font-size: 10px;
+  color: var(--widget-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.widget-folder-list-overflow {
+  text-align: center;
+  font-size: 10px;
+  color: var(--widget-text-muted);
+  padding: 1px 0;
+  user-select: none;
+}

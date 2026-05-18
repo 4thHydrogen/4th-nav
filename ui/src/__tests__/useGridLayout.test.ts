@@ -606,6 +606,8 @@ function makeTool(
     bgColor: "",
     gridX,
     gridY,
+    folderViewMode: "grid",
+    folderItemSize: 28,
   };
 }
 

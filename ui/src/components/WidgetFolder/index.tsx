@@ -20,20 +20,39 @@ const WidgetFolder = ({ folder, childrenTools, onOpen, onOpenChild, onContextMen
   const totalSlots = w * h;
   const isSmall = totalSlots <= 1;
   const isEmpty = childrenTools.length === 0;
-  const fits = childrenTools.length <= totalSlots && !isSmall;
   const mouseDownPos = useRef<{ x: number; y: number } | null>(null);
 
-  const interactiveItems = fits
-    ? childrenTools
-    : isSmall
-      ? []
-      : childrenTools.slice(0, totalSlots - 1);
-  const emptySlotCount = fits ? totalSlots - childrenTools.length : 0;
-  const overflowItems = fits || isSmall
-    ? isSmall ? childrenTools : []
-    : childrenTools.slice(totalSlots - 1);
-
   const bgColor = folder.bgColor || undefined;
+  const isListMode = folder.folderViewMode === "list";
+  const itemSize = folder.folderItemSize || 28;
+
+  // 列表模式下计算可显示条目数
+  const listVisibleItems = useMemo(() => {
+    if (!isListMode) return [];
+    // 文件夹内部可用高度 ≈ h * cell高度 (减去 label 和 padding)
+    const folderInnerHeight = h * 72 - 24; // 粗略估算
+    const maxItems = Math.floor(folderInnerHeight / itemSize);
+    const visibleCount = Math.max(0, maxItems - 1); // 留空间给 label
+    return childrenTools.slice(0, visibleCount);
+  }, [isListMode, childrenTools, h, itemSize]);
+
+  const listHasOverflow = isListMode && listVisibleItems.length < childrenTools.length;
+
+  const interactiveItems = (() => {
+    if (isListMode) return [];
+    const fits = childrenTools.length <= totalSlots && !isSmall;
+    return fits ? childrenTools : isSmall ? [] : childrenTools.slice(0, totalSlots - 1);
+  })();
+  const emptySlotCount = (() => {
+    if (isListMode) return 0;
+    const fits = childrenTools.length <= totalSlots && !isSmall;
+    return fits ? totalSlots - childrenTools.length : 0;
+  })();
+  const overflowItems = (() => {
+    if (isListMode) return [];
+    const fits = childrenTools.length <= totalSlots && !isSmall;
+    return fits || isSmall ? isSmall ? childrenTools : [] : childrenTools.slice(totalSlots - 1);
+  })();
 
   return (
     <div className="widget-folder-outer" style={{ "--grid-w": w, "--grid-h": h } as React.CSSProperties}>
@@ -67,6 +86,13 @@ const WidgetFolder = ({ folder, childrenTools, onOpen, onOpenChild, onContextMen
         {isEmpty ? (
           <div className="widget-folder-empty">
             <Folder size={20} />
+          </div>
+        ) : isListMode ? (
+          <div className="widget-folder-list-preview">
+            {listVisibleItems.map((child) => (
+              <FolderListPreviewItem key={child.id} tool={child} itemSize={itemSize} />
+            ))}
+            {listHasOverflow && <div className="widget-folder-list-overflow">...</div>}
           </div>
         ) : (
           <div
@@ -109,10 +135,26 @@ const WidgetFolder = ({ folder, childrenTools, onOpen, onOpenChild, onContextMen
   );
 };
 
-/**
- * 子图标 — 复用 WidgetTool 视觉规格（40px icon），用 <a href> 实现导航
- * 与外部散落图标体验一致：点击打开网页、中键新标签页、右键弹出 child 自己的菜单
- */
+function FolderListPreviewItem({ tool, itemSize }: { tool: Tool; itemSize: number }) {
+  const iconSrc = useMemo(() => {
+    if (isInlineSvg(tool.logo)) return "";
+    return getLogoUrl(tool.logo);
+  }, [tool.logo]);
+
+  return (
+    <div className="widget-folder-list-item" style={{ height: itemSize }}>
+      <span className="widget-folder-list-item-icon" style={{ width: itemSize - 6, height: itemSize - 6 }}>
+        {!tool.logo || !iconSrc ? (
+          <span className="widget-folder-list-item-char">{tool.name.charAt(0).toUpperCase()}</span>
+        ) : (
+          <img src={iconSrc} alt="" loading="lazy" draggable={false} />
+        )}
+      </span>
+      <span className="widget-folder-list-item-name">{tool.name}</span>
+    </div>
+  );
+}
+
 function ChildIcon({
   tool,
   onOpenChild,

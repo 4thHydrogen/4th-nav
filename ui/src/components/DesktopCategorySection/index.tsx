@@ -1,8 +1,9 @@
 import { useState, useCallback, useMemo, useEffect, useRef } from "react";
-import type { Tool } from "../../types";
+import type { Tool, FolderViewMode } from "../../types";
 import ToolItem from "../ToolItem";
 import FolderItem from "../FolderItem";
 import InlineFolderPanel from "../InlineFolderPanel";
+import { useUpdateFolderSettings } from "../../queries";
 import "./index.css";
 
 interface DesktopCategorySectionProps {
@@ -26,6 +27,7 @@ const DesktopCategorySection = ({
 }: DesktopCategorySectionProps) => {
   const [expandedFolderId, setExpandedFolderId] = useState<number | null>(null);
   const sectionRef = useRef<HTMLElement>(null);
+  const updateFolderSettings = useUpdateFolderSettings();
 
   const childrenMap = useMemo(() => {
     const map: Record<number, Tool[]> = {};
@@ -52,6 +54,13 @@ const DesktopCategorySection = ({
       setExpandedFolderId(null);
     },
     [onToolClick]
+  );
+
+  const handleUpdateFolderSettings = useCallback(
+    (id: number, folderViewMode: FolderViewMode, folderItemSize: number) => {
+      updateFolderSettings.mutate({ id, folderViewMode, folderItemSize });
+    },
+    [updateFolderSettings]
   );
 
   useEffect(() => {
@@ -83,28 +92,28 @@ const DesktopCategorySection = ({
         const isExpanded = expandedFolderId === item.id;
 
         elements.push(
-          <FolderItem
-            key={`folder-${item.id}`}
-            folder={item}
-            childrenTools={children}
-            expanded={isExpanded}
-            onClick={() => handleFolderClick(item.id)}
-            onContextMenu={onToolContextMenu}
-          />
-        );
-
-        if (isExpanded) {
-          elements.push(
-            <InlineFolderPanel
-              key={`panel-${item.id}`}
+          <div key={`folder-${item.id}`} style={{ position: "relative" }}>
+            <FolderItem
               folder={item}
-              items={children}
-              noImageMode={noImageMode}
-              onOpenTool={handleOpenChildTool}
-              onClose={handleClosePanel}
+              childrenTools={children}
+              expanded={isExpanded}
+              onClick={() => handleFolderClick(item.id)}
+              onContextMenu={onToolContextMenu}
             />
-          );
-        }
+            {isExpanded && (
+              <div className="desktop-folder-panel-overlay">
+                <InlineFolderPanel
+                  folder={item}
+                  items={children}
+                  noImageMode={noImageMode}
+                  onOpenTool={handleOpenChildTool}
+                  onClose={handleClosePanel}
+                  onUpdateFolderSettings={handleUpdateFolderSettings}
+                />
+              </div>
+            )}
+          </div>
+        );
       } else {
         elements.push(
           <ToolItem

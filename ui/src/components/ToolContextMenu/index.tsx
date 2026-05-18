@@ -93,21 +93,9 @@ const ToolContextMenu = ({
     if (!name?.trim()) return;
     try {
       await fetchUpdateTool({
+        ...tool,
         id: tool.id,
         name: name.trim(),
-        url: tool.url,
-        logo: tool.logo,
-        catelog: tool.catelog,
-        desc: tool.desc,
-        sort: tool.sort,
-        hide: tool.hide,
-        viewMode: tool.viewMode,
-        type: tool.type,
-        parentId: tool.parentId,
-        size: tool.size,
-        bgColor: tool.bgColor,
-        gridX: tool.gridX,
-        gridY: tool.gridY,
       });
       onRefresh?.();
     } catch {
@@ -129,21 +117,9 @@ const ToolContextMenu = ({
   const handleSetSize = async (size: ToolSize) => {
     try {
       await fetchUpdateTool({
+        ...tool,
         id: tool.id,
-        name: tool.name,
-        url: tool.url,
-        logo: tool.logo,
-        catelog: tool.catelog,
-        desc: tool.desc,
-        sort: tool.sort,
-        hide: tool.hide,
-        viewMode: tool.viewMode,
-        type: tool.type,
-        parentId: tool.parentId,
         size,
-        bgColor: tool.bgColor,
-        gridX: tool.gridX,
-        gridY: tool.gridY,
       });
       onRefresh?.();
     } catch {
@@ -171,6 +147,8 @@ const ToolContextMenu = ({
         bgColor: "",
         gridX: -1,
         gridY: -1,
+        folderViewMode: "grid",
+        folderItemSize: 28,
       });
       if (folder?.id) {
         await fetchMoveToolToFolder(tool.id, folder.id);

@@ -3,10 +3,10 @@ import type { Tool } from '../types';
 
 describe('Content filtering and grouping logic', () => {
   const mockTools: Tool[] = [
-    { id: 1, name: 'GitHub', url: 'https://github.com', logo: '', catelog: '开发', desc: '', sort: 0, hide: false, viewMode: 'icon', type: 'icon', parentId: null, size: '1x1', bgColor: '', gridX: -1, gridY: -1 },
-    { id: 2, name: 'Figma', url: 'https://figma.com', logo: '', catelog: '设计', desc: '', sort: 1, hide: false, viewMode: 'icon', type: 'icon', parentId: null, size: '1x1', bgColor: '', gridX: -1, gridY: -1 },
-    { id: 3, name: 'VSCode', url: 'https://code.visualstudio.com', logo: '', catelog: '开发', desc: '', sort: 2, hide: false, viewMode: 'icon', type: 'icon', parentId: null, size: '1x1', bgColor: '', gridX: -1, gridY: -1 },
-    { id: 4, name: 'Hidden Tool', url: 'https://hidden.com', logo: '', catelog: '测试', desc: '', sort: 3, hide: true, viewMode: 'icon', type: 'icon', parentId: null, size: '1x1', bgColor: '', gridX: -1, gridY: -1 },
+    { id: 1, name: 'GitHub', url: 'https://github.com', logo: '', catelog: '开发', desc: '', sort: 0, hide: false, viewMode: 'icon', type: 'icon', parentId: null, size: '1x1', bgColor: '', gridX: -1, gridY: -1, folderViewMode: 'grid', folderItemSize: 28 },
+    { id: 2, name: 'Figma', url: 'https://figma.com', logo: '', catelog: '设计', desc: '', sort: 1, hide: false, viewMode: 'icon', type: 'icon', parentId: null, size: '1x1', bgColor: '', gridX: -1, gridY: -1, folderViewMode: 'grid', folderItemSize: 28 },
+    { id: 3, name: 'VSCode', url: 'https://code.visualstudio.com', logo: '', catelog: '开发', desc: '', sort: 2, hide: false, viewMode: 'icon', type: 'icon', parentId: null, size: '1x1', bgColor: '', gridX: -1, gridY: -1, folderViewMode: 'grid', folderItemSize: 28 },
+    { id: 4, name: 'Hidden Tool', url: 'https://hidden.com', logo: '', catelog: '测试', desc: '', sort: 3, hide: true, viewMode: 'icon', type: 'icon', parentId: null, size: '1x1', bgColor: '', gridX: -1, gridY: -1, folderViewMode: 'grid', folderItemSize: 28 },
   ];
 
   it('filters tools by category', () => {

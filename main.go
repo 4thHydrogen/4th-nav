@@ -106,6 +106,7 @@ func main() {
 			admin.PUT("/tool/:id", handler.UpdateToolHandler)
 			admin.PUT("/tool/:id/viewMode", handler.UpdateToolViewModeHandler)
 			admin.PUT("/tool/:id/parent", handler.MoveToolToFolderHandler)
+			admin.PUT("/tool/:id/folderSettings", handler.UpdateFolderSettingsHandler)
 			admin.DELETE("/folder/:id", handler.DeleteFolderHandler)
 			admin.PUT("/layout", handler.UpdateLayoutHandler)
 			admin.PUT("/tools/sort", handler.UpdateToolsSortHandler)
