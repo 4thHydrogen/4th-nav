@@ -1,7 +1,39 @@
 
-.search input{
+.search {
+  width: 100%;
+}
 
-    width: 100%;
-    transition: all .3s;
-  
+.search-wraper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.search-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: var(--widget-text-muted);
+  pointer-events: none;
+}
+
+.search input {
+  flex: 1;
+  width: 100%;
+  transition: all .3s;
+  outline: none;
+}
+
+.search input:focus {
+  box-shadow: 0 0 0 2px var(--widget-interactive-border, rgba(99, 102, 241, 0.5));
+}
+
+.search-hint {
+  font-size: 11px;
+  color: var(--widget-text-faint);
+  background: var(--widget-icon-bg);
+  padding: 2px 8px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  user-select: none;
 }

@@ -13,6 +13,12 @@ describe('TypeScript types', () => {
       sort: 0,
       hide: false,
       viewMode: "icon",
+      type: "icon",
+      parentId: null,
+      size: "1x1",
+      bgColor: "",
+      gridX: -1,
+      gridY: -1,
     };
     expect(tool.id).toBe(1);
     expect(tool.catelog).toBe('工具');
@@ -43,6 +49,7 @@ describe('TypeScript types', () => {
       backgroundUrl: 'bing',
       enableBackground: true,
       enableGlassmorphism: false,
+      pexelsApiKey: "",
     };
     expect(setting.enableBackground).toBe(true);
     expect(setting.backgroundUrl).toBe('bing');
@@ -64,6 +71,7 @@ describe('TypeScript types', () => {
       catelogs: ['全部工具', '开发工具', '设计工具'],
       setting: {} as Setting,
       siteConfig: {} as SiteConfig,
+      dockItems: [],
     };
     expect(data.catelogs).toContain('全部工具');
     expect(data.catelogs[0]).toBe('全部工具');

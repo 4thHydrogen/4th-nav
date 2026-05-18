@@ -1,7 +1,9 @@
 import { useMemo, useState, useEffect } from "react";
 import "./index.css";
-import { getLogoUrl } from "../../utils/check";
+import { getLogoUrl, isInlineSvg } from "../../utils/check";
+import { sanitizeSvg } from "../../utils/sanitize";
 import { getJumpTarget } from "../../utils/setting";
+import { getNameColor } from "../../utils/name-color";
 import type { Tool, ToolViewMode } from "../../types";
 
 interface ToolItemProps {
@@ -20,31 +22,41 @@ const ToolItem = ({ tool, index, isSearching, noImageMode, onContextMenu, onClic
   const [imageError, setImageError] = useState(false);
   const [showLoading, setShowLoading] = useState(true);
 
-  const imageSrc = useMemo(() => {
-    return tool.url === "admin" ? tool.logo : getLogoUrl(tool.logo);
-  }, [tool.logo, tool.url]);
-
   useEffect(() => {
     setImageLoaded(false);
     setImageError(false);
     setShowLoading(true);
     const timeout = setTimeout(() => setShowLoading(false), 10000);
     return () => clearTimeout(timeout);
-  }, [imageSrc]);
+  }, [tool.logo]);
 
   const iconEl = useMemo(() => {
     if (imageError) {
       return (
-        <div className="tool-item-icon-fallback">
+        <div
+          className="tool-item-icon-fallback tool-item-icon-fallback-colored"
+          style={{ backgroundColor: getNameColor(tool.name) }}
+        >
           {tool.name.charAt(0).toUpperCase()}
         </div>
       );
     }
+
+    if (isInlineSvg(tool.logo)) {
+      return (
+        <span
+          className="tool-item-inline-svg"
+          dangerouslySetInnerHTML={{ __html: sanitizeSvg(tool.logo) }}
+        />
+      );
+    }
+
+    const imgSrc = tool.url === "admin" ? tool.logo : getLogoUrl(tool.logo);
     return (
       <>
         {showLoading && !imageLoaded && <div className="tool-item-spinner" />}
         <img
-          src={imageSrc}
+          src={imgSrc}
           alt={tool.name}
           loading="lazy"
           onLoad={() => { setImageLoaded(true); setShowLoading(false); }}
@@ -53,13 +65,13 @@ const ToolItem = ({ tool, index, isSearching, noImageMode, onContextMenu, onClic
         />
       </>
     );
-  }, [imageSrc, tool.name, imageLoaded, imageError, showLoading]);
+  }, [tool.logo, tool.url, tool.name, imageLoaded, imageError, showLoading]);
 
   const showNumIndex = index < 10 && isSearching;
 
   return (
     <a
-      href={tool.url === "toggleJumpTarget" ? undefined : tool.url}
+      href={tool.url}
       onClick={onClick}
       onContextMenu={(e) => onContextMenu(e, tool)}
       target={getJumpTarget() === "blank" ? "_blank" : "_self"}

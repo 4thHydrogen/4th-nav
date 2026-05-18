@@ -1,15 +1,15 @@
 import { useRef, useCallback } from "react";
 
-export const useDebounce = (fn: any, delay: number) => {
-  const { current } = useRef<{ time: any }>({ time: null });
+export const useDebounce = <T extends (...args: unknown[]) => void>(fn: T, delay: number) => {
+  const { current } = useRef<{ time: ReturnType<typeof setTimeout> | null }>({ time: null });
   return useCallback(
-    (...args: any[]) => {
+    (...args: Parameters<T>) => {
       if (current.time) {
         clearTimeout(current.time);
         current.time = null;
       }
       current.time = setTimeout(() => {
-        fn.apply(this, args);
+        fn(...args);
         clearTimeout(current.time);
         current.time = null;
       }, delay);

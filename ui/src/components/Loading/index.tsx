@@ -1,5 +1,5 @@
 import "./index.css";
-export const Loading = (props: any) => {
+export const Loading = () => {
   return (
     <div className="loading span-3">
       <div className="lds-ring">

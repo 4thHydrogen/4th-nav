@@ -15,6 +15,7 @@ type Setting struct {
 	BackgroundUrl        string `json:"backgroundUrl"`
 	EnableBackground     bool   `json:"enableBackground"`
 	EnableGlassmorphism  bool   `json:"enableGlassmorphism"`
+	PexelsApiKey         string `json:"pexelsApiKey"`
 }
 
 type Token struct {
@@ -36,15 +37,21 @@ type Img struct {
 }
 
 type Tool struct {
-	Id       int    `json:"id"`
-	Name     string `json:"name"`
-	Url      string `json:"url"`
-	Logo     string `json:"logo"`
-	Catelog  string `json:"catelog"`
-	Desc     string `json:"desc"`
-	Sort     int    `json:"sort"`
-	Hide     bool   `json:"hide"`
-	ViewMode string `json:"viewMode"`
+	Id       int     `json:"id"`
+	Name     string  `json:"name"`
+	Url      string  `json:"url"`
+	Logo     string  `json:"logo"`
+	Catelog  string  `json:"catelog"`
+	Desc     string  `json:"desc"`
+	Sort     int     `json:"sort"`
+	Hide     bool    `json:"hide"`
+	ViewMode string  `json:"viewMode"`
+	Type     string  `json:"type"`
+	ParentId *int    `json:"parentId"`
+	Size     string  `json:"size"`
+	BgColor  string  `json:"bgColor"`
+	GridX    int     `json:"gridX"`
+	GridY    int     `json:"gridY"`
 }
 
 type Catelog struct {
@@ -71,4 +78,5 @@ type SiteConfig struct {
 	NoImageMode   bool `json:"noImageMode"`
 	CompactMode   bool `json:"compactMode"`
 	ColumnsPerRow int  `json:"columnsPerRow"`
+	IconSize      int  `json:"iconSize"`
 }

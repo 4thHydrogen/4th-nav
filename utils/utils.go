@@ -1,10 +1,9 @@
 package utils
 
 import (
-	"crypto/tls"
 	"database/sql"
 	"encoding/base64"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"runtime/debug"
@@ -49,9 +48,7 @@ func GetImgBase64FromUrl(url string) string {
 	}
 	req.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.88 Safari/537.36")
 	client := &http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		},
+		Timeout: 10 * time.Second,
 	}
 	res, err := client.Do(req)
 	if err != nil {
@@ -61,7 +58,7 @@ func GetImgBase64FromUrl(url string) string {
 	defer res.Body.Close()
 
 	// 读取获取的[]byte数据
-	data, _ := ioutil.ReadAll(res.Body)
+	data, _ := io.ReadAll(res.Body)
 
 	imageBase64 := base64.StdEncoding.EncodeToString(data)
 	return imageBase64

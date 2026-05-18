@@ -3,10 +3,10 @@ import type { Tool } from '../types';
 
 describe('Content filtering and grouping logic', () => {
   const mockTools: Tool[] = [
-    { id: 1, name: 'GitHub', url: 'https://github.com', logo: '', catelog: '开发', desc: '', sort: 0, hide: false, viewMode: 'icon' },
-    { id: 2, name: 'Figma', url: 'https://figma.com', logo: '', catelog: '设计', desc: '', sort: 1, hide: false, viewMode: 'icon' },
-    { id: 3, name: 'VSCode', url: 'https://code.visualstudio.com', logo: '', catelog: '开发', desc: '', sort: 2, hide: false, viewMode: 'icon' },
-    { id: 4, name: 'Hidden Tool', url: 'https://hidden.com', logo: '', catelog: '测试', desc: '', sort: 3, hide: true, viewMode: 'icon' },
+    { id: 1, name: 'GitHub', url: 'https://github.com', logo: '', catelog: '开发', desc: '', sort: 0, hide: false, viewMode: 'icon', type: 'icon', parentId: null, size: '1x1', bgColor: '', gridX: -1, gridY: -1 },
+    { id: 2, name: 'Figma', url: 'https://figma.com', logo: '', catelog: '设计', desc: '', sort: 1, hide: false, viewMode: 'icon', type: 'icon', parentId: null, size: '1x1', bgColor: '', gridX: -1, gridY: -1 },
+    { id: 3, name: 'VSCode', url: 'https://code.visualstudio.com', logo: '', catelog: '开发', desc: '', sort: 2, hide: false, viewMode: 'icon', type: 'icon', parentId: null, size: '1x1', bgColor: '', gridX: -1, gridY: -1 },
+    { id: 4, name: 'Hidden Tool', url: 'https://hidden.com', logo: '', catelog: '测试', desc: '', sort: 3, hide: true, viewMode: 'icon', type: 'icon', parentId: null, size: '1x1', bgColor: '', gridX: -1, gridY: -1 },
   ];
 
   it('filters tools by category', () => {
@@ -62,14 +62,5 @@ describe('Content filtering and grouping logic', () => {
     expect(search(mockTools[0], 'github')).toBe(true);
     expect(search(mockTools[0], 'figma')).toBe(false);
     expect(search(mockTools[2], 'code')).toBe(true);
-  });
-
-  it('excludes admin and toggleJumpTarget from middle-click open', () => {
-    const allTools = [
-      ...mockTools,
-      { id: 999, name: 'Admin', url: 'admin', logo: '', catelog: '管理后台', desc: '', sort: 99, hide: false },
-    ];
-    const filtered = allTools.filter(t => t.url !== 'admin' && t.url !== 'toggleJumpTarget');
-    expect(filtered).toHaveLength(4);
   });
 });

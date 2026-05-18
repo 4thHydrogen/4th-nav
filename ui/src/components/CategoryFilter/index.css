@@ -1,0 +1,118 @@
+.category-filter {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 88px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 6px;
+  box-sizing: border-box;
+  background: var(--widget-bg, rgba(255, 255, 255, 0.72));
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-right: 1px solid var(--widget-border, rgba(15, 23, 42, 0.08));
+  box-shadow: 2px 0 16px rgba(15, 23, 42, 0.06);
+  z-index: 400;
+}
+
+.category-filter-chips {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.category-filter-chips::-webkit-scrollbar {
+  display: none;
+}
+
+.category-filter-chip {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--widget-text-muted);
+  border-radius: 8px;
+  padding: 10px 6px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+}
+
+.category-filter-chip:hover {
+  background: var(--widget-icon-bg-hover);
+  color: var(--widget-text);
+}
+
+.category-filter-chip.active {
+  background: var(--widget-interactive);
+  color: var(--widget-interactive-text);
+  border-left: 3px solid var(--widget-interactive-border);
+  border-radius: 0 8px 8px 0;
+}
+
+.category-filter-settings {
+  width: 36px;
+  height: 36px;
+  margin-top: 8px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--widget-text-muted);
+  background: var(--widget-icon-bg);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-decoration: none;
+}
+
+.category-filter-settings:hover {
+  background: var(--widget-icon-bg-hover);
+  color: var(--widget-text);
+  transform: rotate(30deg);
+}
+
+@media (max-width: 768px) {
+  .category-filter {
+    position: static;
+    width: 100%;
+    height: auto;
+    flex-direction: row;
+    padding: 8px 12px;
+    border-right: none;
+    border-bottom: 1px solid var(--widget-border, rgba(15, 23, 42, 0.08));
+    box-shadow: none;
+  }
+
+  .category-filter-chips {
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 6px;
+    width: 100%;
+  }
+
+  .category-filter-chip {
+    white-space: nowrap;
+    flex-shrink: 0;
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+
+  .category-filter-chip.active {
+    border-left: none;
+    border-radius: 8px;
+  }
+
+  .category-filter-settings {
+    display: none;
+  }
+}

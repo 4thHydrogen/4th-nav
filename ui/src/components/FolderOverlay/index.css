@@ -1,0 +1,96 @@
+.folder-overlay-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: var(--z-overlay, 900);
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: folder-overlay-fade-in 0.2s ease;
+}
+
+.folder-overlay-panel {
+  background: var(--widget-overlay-bg);
+  backdrop-filter: blur(20px);
+  border-radius: 16px;
+  border: 1px solid var(--widget-overlay-border);
+  width: 90vw;
+  max-width: 600px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  animation: folder-overlay-scale-in 0.2s ease;
+  box-shadow: var(--widget-overlay-shadow);
+}
+
+.folder-overlay-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--widget-border);
+}
+
+.folder-overlay-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--widget-text);
+}
+
+.folder-overlay-close {
+  background: none;
+  border: none;
+  color: var(--widget-text-faint);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s, background 0.15s;
+}
+
+.folder-overlay-close:hover {
+  color: var(--widget-text);
+  background: var(--widget-icon-bg);
+}
+
+.folder-overlay-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(76px, 1fr));
+  gap: 12px;
+  padding: 20px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.folder-overlay-grid::-webkit-scrollbar {
+  width: 4px;
+}
+
+.folder-overlay-grid::-webkit-scrollbar-thumb {
+  background: var(--widget-scrollbar);
+  border-radius: 2px;
+}
+
+.folder-overlay-empty {
+  padding: 40px;
+  text-align: center;
+  color: var(--widget-text-faint);
+  font-size: 14px;
+}
+
+@keyframes folder-overlay-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes folder-overlay-scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}

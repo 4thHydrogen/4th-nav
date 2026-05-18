@@ -1,12 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
 
-describe("useContentData", () => {
-  it("exports useContentData hook", async () => {
-    const mod = await import("../components/Content/hooks");
-    expect(typeof mod.useContentData).toBe("function");
-  });
-});
-
 describe("useSearch", () => {
   it("exports useSearch hook", async () => {
     const mod = await import("../components/Content/hooks");

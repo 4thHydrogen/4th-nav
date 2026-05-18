@@ -5,7 +5,7 @@ vi.mock('../utils/api', () => ({
 }));
 
 import { fetchGetEnabledSearchEngines } from '../utils/api';
-import { generateSearchEngineCard, clearSearchEngineCache } from '../utils/serachEngine';
+import { generateSearchEngineCard, clearSearchEngineCache } from '../utils/searchEngine';
 
 const mockEngines = [
   { id: 1, name: '百度', baseUrl: 'https://www.baidu.com/s', queryParam: 'wd', logo: 'baidu.ico', sort: 1, enabled: true },

@@ -1,6 +1,8 @@
 // Entity types — mirror Go backend types/types.go
 
 export type ToolViewMode = "icon" | "card";
+export type ToolType = "icon" | "folder";
+export type ToolSize = `${number}x${number}`;
 
 export interface Tool {
   id: number;
@@ -12,6 +14,12 @@ export interface Tool {
   sort: number;
   hide: boolean;
   viewMode: ToolViewMode;
+  type: ToolType;
+  parentId: number | null;
+  size: ToolSize;
+  bgColor: string;
+  gridX: number;
+  gridY: number;
 }
 
 export interface Catelog {
@@ -35,6 +43,7 @@ export interface Setting {
   backgroundUrl: string;
   enableBackground: boolean;
   enableGlassmorphism: boolean;
+  pexelsApiKey: string;
 }
 
 export interface SiteConfig {
@@ -42,6 +51,7 @@ export interface SiteConfig {
   noImageMode: boolean;
   compactMode: boolean;
   columnsPerRow: number;
+  iconSize?: number;
 }
 
 export interface SearchEngine {
@@ -100,6 +110,18 @@ export interface ContentData {
   catelogs: string[];
   setting: Setting;
   siteConfig: SiteConfig;
+  dockItems: DockItem[];
+}
+
+export interface DockItem {
+  id: number;
+  sort: number;
+  toolId: number;
+  name: string;
+  url: string;
+  logo: string;
+  catelog: string;
+  desc: string;
 }
 
 // DTO types
@@ -113,6 +135,12 @@ export interface AddToolDto {
   sort: number;
   hide: boolean;
   viewMode: ToolViewMode;
+  type: ToolType;
+  parentId: number | null;
+  size: ToolSize;
+  bgColor: string;
+  gridX: number;
+  gridY: number;
 }
 
 export interface UpdateToolDto extends AddToolDto {
@@ -142,6 +170,14 @@ export interface AddTokenDto {
 export interface SortUpdateDto {
   id: number;
   sort: number;
+}
+
+export interface LayoutItemDto {
+  id: number;
+  gridX: number;
+  gridY: number;
+  w: number;
+  h: number;
 }
 
 // Component prop types

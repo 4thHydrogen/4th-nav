@@ -105,6 +105,9 @@ func main() {
 			admin.DELETE("/tool/:id", handler.DeleteToolHandler)
 			admin.PUT("/tool/:id", handler.UpdateToolHandler)
 			admin.PUT("/tool/:id/viewMode", handler.UpdateToolViewModeHandler)
+			admin.PUT("/tool/:id/parent", handler.MoveToolToFolderHandler)
+			admin.DELETE("/folder/:id", handler.DeleteFolderHandler)
+			admin.PUT("/layout", handler.UpdateLayoutHandler)
 			admin.PUT("/tools/sort", handler.UpdateToolsSortHandler)
 
 			admin.POST("/catelog", handler.AddCatelogHandler)
@@ -117,6 +120,12 @@ func main() {
 			admin.PUT("/searchEngine/:id", handler.UpdateSearchEngineHandler)
 			admin.DELETE("/searchEngine/:id", handler.DeleteSearchEngineHandler)
 			admin.PUT("/searchEngines/sort", handler.UpdateSearchEngineSortHandler)
+
+			// Dock 栏管理路由
+			admin.GET("/dock", handler.GetDockItemsHandler)
+			admin.POST("/dock", handler.AddDockItemHandler)
+			admin.DELETE("/dock/:id", handler.RemoveDockItemHandler)
+			admin.PUT("/dock/sort", handler.UpdateDockSortHandler)
 		}
 	}
 	logger.LogInfo("应用启动成功，网址: http://localhost:%s", *port)

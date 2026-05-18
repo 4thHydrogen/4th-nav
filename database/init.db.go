@@ -114,6 +114,28 @@ func InitDB() {
 		DB.Exec(`ALTER TABLE nav_table ADD COLUMN view_mode TEXT NOT NULL DEFAULT 'icon';`)
 	}
 
+	// tools数据表结构升级 - 文件夹功能
+	if !columnExists("nav_table", "type") {
+		DB.Exec(`ALTER TABLE nav_table ADD COLUMN type TEXT NOT NULL DEFAULT 'icon';`)
+	}
+	if !columnExists("nav_table", "parent_id") {
+		DB.Exec(`ALTER TABLE nav_table ADD COLUMN parent_id INTEGER NULL;`)
+	}
+	if !columnExists("nav_table", "size") {
+		DB.Exec(`ALTER TABLE nav_table ADD COLUMN size TEXT NOT NULL DEFAULT '1x1';`)
+	}
+	if !columnExists("nav_table", "bg_color") {
+		DB.Exec(`ALTER TABLE nav_table ADD COLUMN bg_color TEXT NULL;`)
+	}
+
+	// 网格布局位置字段
+	if !columnExists("nav_table", "grid_x") {
+		DB.Exec(`ALTER TABLE nav_table ADD COLUMN grid_x INTEGER NOT NULL DEFAULT -1;`)
+	}
+	if !columnExists("nav_table", "grid_y") {
+		DB.Exec(`ALTER TABLE nav_table ADD COLUMN grid_y INTEGER NOT NULL DEFAULT -1;`)
+	}
+
 	// 分类表
 	sql_create_table = `
 		CREATE TABLE IF NOT EXISTS nav_catelog (
@@ -172,6 +194,18 @@ func InitDB() {
 	_, err = DB.Exec(sql_create_table)
 	utils.CheckErr(err)
 
+	// Dock 栏表
+	sql_create_table = `
+		CREATE TABLE IF NOT EXISTS dock_items (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			tool_id INTEGER NOT NULL,
+			sort INTEGER NOT NULL DEFAULT 0,
+			FOREIGN KEY (tool_id) REFERENCES nav_table(id)
+		);
+		`
+	_, err = DB.Exec(sql_create_table)
+	utils.CheckErr(err)
+
 	// 网站配置表
 	sql_create_table = `
 		CREATE TABLE IF NOT EXISTS nav_site_config (
@@ -193,6 +227,11 @@ func InitDB() {
 		DB.Exec(`ALTER TABLE nav_site_config ADD COLUMN columnsPerRow INTEGER NOT NULL DEFAULT 3;`)
 	}
 
+	// 网站配置表结构升级 - 添加iconSize列
+	if !columnExists("nav_site_config", "iconSize") {
+		DB.Exec(`ALTER TABLE nav_site_config ADD COLUMN iconSize INTEGER NOT NULL DEFAULT 0;`)
+	}
+
 	// 设置表结构升级 - 添加背景图片和毛玻璃相关字段
 	if !columnExists("nav_setting", "backgroundUrl") {
 		DB.Exec(`ALTER TABLE nav_setting ADD COLUMN backgroundUrl TEXT;`)
@@ -202,6 +241,10 @@ func InitDB() {
 	}
 	if !columnExists("nav_setting", "enableGlassmorphism") {
 		DB.Exec(`ALTER TABLE nav_setting ADD COLUMN enableGlassmorphism BOOLEAN NOT NULL DEFAULT 0;`)
+	}
+	// 设置表结构升级 - 添加 Pexels API Key
+	if !columnExists("nav_setting", "pexelsApiKey") {
+		DB.Exec(`ALTER TABLE nav_setting ADD COLUMN pexelsApiKey TEXT;`)
 	}
 
 	// 如果不存在，就初始化默认搜索引擎

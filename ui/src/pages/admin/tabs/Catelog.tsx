@@ -13,7 +13,7 @@ import {
   Tooltip,
   Switch,
 } from "antd";
-import { QuestionCircleOutlined } from "@ant-design/icons";
+import { CircleHelp } from "lucide-react";
 import { useCallback, useState } from "react";
 import {
   fetchAddCateLog,
@@ -33,7 +33,7 @@ export const Catelog: React.FC<CatelogProps> = (props) => {
     async (id: number) => {
       try {
         await fetchDeleteCatelog(id);
-        message.success("删除成分类功!");
+        message.success("删除分类成功!");
       } catch (err) {
         message.warning("删除分类失败!");
       } finally {
@@ -120,7 +120,7 @@ export const Catelog: React.FC<CatelogProps> = (props) => {
               <span>
                 排序
                 <Tooltip title="升序，按数字从小到大排序">
-                  <QuestionCircleOutlined style={{ marginLeft: "5px" }} />
+                  <CircleHelp size={14} style={{ marginLeft: "5px" }} />
                 </Tooltip>
               </span>
             }
@@ -132,7 +132,7 @@ export const Catelog: React.FC<CatelogProps> = (props) => {
               <span>
                 隐藏
                 <Tooltip title="开启后只有登录后才会展示该工具分类">
-                  <QuestionCircleOutlined style={{ marginLeft: "5px" }} />
+                  <CircleHelp size={14} style={{ marginLeft: "5px" }} />
                 </Tooltip>
               </span>
             }
@@ -195,7 +195,7 @@ export const Catelog: React.FC<CatelogProps> = (props) => {
             label={
               <span>
                 <Tooltip title="升序，按数字从小到大排序">
-                  <QuestionCircleOutlined style={{ marginLeft: "5px" }} />
+                  <CircleHelp size={14} style={{ marginLeft: "5px" }} />
                 </Tooltip>
                 &nbsp;排序
               </span>
@@ -215,7 +215,7 @@ export const Catelog: React.FC<CatelogProps> = (props) => {
             label={
               <span>
                 <Tooltip title="开启后只有登录后才会展示该工具">
-                  <QuestionCircleOutlined style={{ marginLeft: "5px" }} />
+                  <CircleHelp size={14} style={{ marginLeft: "5px" }} />
                 </Tooltip>
                 &nbsp;隐藏
               </span>
@@ -252,7 +252,7 @@ export const Catelog: React.FC<CatelogProps> = (props) => {
               label={
                 <span>
                   <Tooltip title="升序，按数字从小到大排序">
-                    <QuestionCircleOutlined style={{ marginLeft: "5px" }} />
+                    <CircleHelp size={14} style={{ marginLeft: "5px" }} />
                   </Tooltip>
                   &nbsp;排序
                 </span>
@@ -267,7 +267,7 @@ export const Catelog: React.FC<CatelogProps> = (props) => {
               label={
                 <span>
                   <Tooltip title="开启后只有登录后才会展示该工具">
-                    <QuestionCircleOutlined style={{ marginLeft: "5px" }} />
+                    <CircleHelp size={14} style={{ marginLeft: "5px" }} />
                   </Tooltip>
                   &nbsp;隐藏
                 </span>
