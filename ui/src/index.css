@@ -65,26 +65,6 @@ body.dark-mode {
   background-color: #121212;
   color: rgba(255, 255, 255, 0.6);
 }
-body.dark-mode .github-link-box svg,
-body.dark-mode .theme-switch-box svg {
-  fill: white;
-}
-body.dark-mode .github-link-box svg:hover,
-body.dark-mode .theme-switch-box svg:hover {
-  fill: #f1f1f1;
-}
-body.dark-mode .select-tag-active {
-  background-color: #383838;
-  border: 1px solid #383838;
-}
-body.dark-mode .select-tag {
-  border: 1px solid #121212;
-  color: rgba(255, 255, 255, 0.6);
-}
-body.dark-mode .select-tag:hover {
-  background-color: #424242;
-  border: 1px solid #424242;
-}
 body.dark-mode input {
   background-color: #222222;
   border: 1px solid #222222;
@@ -98,33 +78,6 @@ body.dark-mode input:focus,
 body.dark-mode input:focus-visible {
   background-color: #3d3d3d;
   border: 1px solid #3d3d3d;
-}
-body.dark-mode .card-box {
-  background-color: #222222;
-}
-body.dark-mode .card-box:hover {
-  box-shadow: 2px 2px 12px 0px #292929;
-}
-body.dark-mode .card-right-title {
-  color: rgba(255, 255, 255, 0.6);
-}
-body.dark-mode .card-right-bottom {
-  color: rgba(255, 255, 255, 0.6);
-}
-body.dark-mode .card-tag {
-  background-color: #383838;
-  color: rgba(255, 255, 255, 0.6);
-}
-
-@media (max-width: 1060px) and (min-width: 700px) {
-  body.dark-mode span.card-tag {
-    background-color: #222222;
-  }
-}
-@media (max-width: 700px) {
-  body.dark-mode a.card-box {
-    background-color: #121212;
-  }
 }
 
 /* ===== 背景图片模式 ===== */
@@ -159,15 +112,6 @@ body.has-background.dark-mode input {
 }
 
 /* ===== 毛玻璃效果 ===== */
-body.glassmorphism .card-box {
-  background: var(--glass-bg-card);
-  backdrop-filter: var(--blur-md);
-  -webkit-backdrop-filter: var(--blur-md);
-  border: 1px solid var(--glass-border-card);
-}
-body.glassmorphism .card-box:hover {
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-}
 body.glassmorphism .topbar {
   background: var(--glass-bg-topbar);
   backdrop-filter: var(--blur-md);
@@ -178,55 +122,8 @@ body.glassmorphism input {
   border: 1px solid var(--glass-border-input);
   color: #fff;
 }
-body.glassmorphism .select-tag {
-  background: var(--glass-bg-tag);
-  border: 1px solid var(--glass-border-tag);
-  color: rgba(255, 255, 255, 0.8);
-}
-body.glassmorphism .select-tag:hover {
-  background: rgba(255, 255, 255, 0.25);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: #fff;
-}
-body.glassmorphism .select-tag-active {
-  background: rgba(255, 255, 255, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  color: #fff;
-}
-body.glassmorphism .card-right-title {
-  color: #fff;
-}
-body.glassmorphism .card-right-bottom {
-  color: rgba(255, 255, 255, 0.7);
-}
-body.glassmorphism .card-tag {
-  background: rgba(255, 255, 255, 0.15);
-  color: rgba(255, 255, 255, 0.7);
-}
-body.glassmorphism .record-wraper a {
-  color: rgba(255, 255, 255, 0.5);
-}
-
-/* 暗色 + 毛玻璃 */
-body.dark-mode.glassmorphism .card-box {
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
 body.dark-mode.glassmorphism input {
   background: rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.15);
   color: rgba(255, 255, 255, 0.7);
-}
-body.dark-mode.glassmorphism .select-tag {
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: rgba(255, 255, 255, 0.7);
-}
-body.dark-mode.glassmorphism .select-tag:hover {
-  background: rgba(255, 255, 255, 0.15);
-  color: #fff;
-}
-body.dark-mode.glassmorphism .select-tag-active {
-  background: rgba(255, 255, 255, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.25);
 }

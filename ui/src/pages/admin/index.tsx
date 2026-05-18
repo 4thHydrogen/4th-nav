@@ -1,45 +1,38 @@
 import { useState, useEffect } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { ExitIcon, StarFilledIcon } from '@radix-ui/react-icons';
+import { LogOut, Star, Home, Settings, Package, LayoutGrid, Search } from 'lucide-react';
 import { MenuItem, Sidebar } from './components/sidebar';
 import "./index.css"
-import {
-  HomeIcon,
-  GearIcon,
-  BackpackIcon,
-  TableIcon,
-  MagnifyingGlassIcon,
-} from '@radix-ui/react-icons';
 import { useOnce } from '../../utils/useOnce';
 
 const menuItems: MenuItem[] = [
   {
     key: 'tools',
-    icon: <BackpackIcon className="w-5 h-5" />,
+    icon: <Package className="w-5 h-5" />,
     label: '工具管理',
     path: '/admin/tools'
   },
   {
     key: 'categories',
-    icon: <TableIcon className="w-5 h-5" />,
+    icon: <LayoutGrid className="w-5 h-5" />,
     label: '分类管理',
     path: '/admin/categories'
   },
   {
     key: 'search-engines',
-    icon: <MagnifyingGlassIcon className="w-5 h-5" />,
+    icon: <Search className="w-5 h-5" />,
     label: '搜索引擎管理',
     path: '/admin/search-engines'
   },
   {
     key: 'api-token',
-    icon: <StarFilledIcon className="w-5 h-5" />,
+    icon: <Star className="w-5 h-5" />,
     label: 'API Token',
     path: '/admin/api-token'
   },
   {
     key: 'settings',
-    icon: <GearIcon className="w-5 h-5" />,
+    icon: <Settings className="w-5 h-5" />,
     label: '系统设置',
     path: '/admin/settings'
   }
@@ -86,14 +79,14 @@ export const AdminPage = () => {
                 to="/"
                 className="flex items-center px-3 py-2 text-sm text-gray-700 hover:text-gray-900"
               >
-                <HomeIcon className="w-4 h-4 mr-2" />
+                <Home size={16} className="mr-2" />
                 返回主页
               </Link>
               <button
                 onClick={handleLogout}
                 className="flex items-center px-3 py-2 text-sm text-gray-700 hover:text-gray-900"
               >
-                <ExitIcon className="w-4 h-4 mr-2" />
+                <LogOut size={16} className="mr-2" />
                 退出登录
               </button>
             </div>

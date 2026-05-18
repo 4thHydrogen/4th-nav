@@ -8,7 +8,7 @@ import (
 
 func GetSetting() types.Setting {
 	sql_get_user := `
-		SELECT id,favicon,title,govRecord,logo192,logo512,hideAdmin,hideGithub,hideToggleJumpTarget,jumpTargetBlank,backgroundUrl,enableBackground,enableGlassmorphism
+		SELECT id,favicon,title,govRecord,logo192,logo512,hideAdmin,hideGithub,hideToggleJumpTarget,jumpTargetBlank,backgroundUrl,enableBackground,enableGlassmorphism,pexelsApiKey
 		FROM nav_setting
 		ORDER BY id ASC
 		LIMIT 1;
@@ -22,7 +22,8 @@ func GetSetting() types.Setting {
 	var backgroundUrl interface{}
 	var enableBackground interface{}
 	var enableGlassmorphism interface{}
-	err := row.Scan(&setting.Id, &setting.Favicon, &setting.Title, &setting.GovRecord, &setting.Logo192, &setting.Logo512, &hideAdmin, &hideGithub, &hideToggleJumpTarget, &jumpTargetBlank, &backgroundUrl, &enableBackground, &enableGlassmorphism)
+	var pexelsApiKey interface{}
+		err := row.Scan(&setting.Id, &setting.Favicon, &setting.Title, &setting.GovRecord, &setting.Logo192, &setting.Logo512, &hideAdmin, &hideGithub, &hideToggleJumpTarget, &jumpTargetBlank, &backgroundUrl, &enableBackground, &enableGlassmorphism, &pexelsApiKey)
 	if err != nil {
 		logger.LogError("获取配置失败: %s", err)
 		return types.Setting{
@@ -85,6 +86,11 @@ func GetSetting() types.Setting {
 	} else {
 		setting.BackgroundUrl = backgroundUrl.(string)
 	}
+	if pexelsApiKey == nil {
+		setting.PexelsApiKey = ""
+	} else {
+		setting.PexelsApiKey = pexelsApiKey.(string)
+	}
 
 	if enableBackground == nil {
 		setting.EnableBackground = false
@@ -112,7 +118,7 @@ func GetSetting() types.Setting {
 func UpdateSetting(data types.Setting) error {
 	sql_update_setting := `
 		UPDATE nav_setting
-		SET favicon = ?, title = ?, govRecord = ?, logo192 = ?, logo512 = ?, hideAdmin = ?, hideGithub = ?, hideToggleJumpTarget = ?, jumpTargetBlank = ?, backgroundUrl = ?, enableBackground = ?, enableGlassmorphism = ?
+		SET favicon = ?, title = ?, govRecord = ?, logo192 = ?, logo512 = ?, hideAdmin = ?, hideGithub = ?, hideToggleJumpTarget = ?, jumpTargetBlank = ?, backgroundUrl = ?, enableBackground = ?, enableGlassmorphism = ?, pexelsApiKey = ?
 		WHERE id = (SELECT id FROM nav_setting ORDER BY id ASC LIMIT 1);
 		`
 
@@ -120,7 +126,7 @@ func UpdateSetting(data types.Setting) error {
 	if err != nil {
 		return err
 	}
-	res, err := stmt.Exec(data.Favicon, data.Title, data.GovRecord, data.Logo192, data.Logo512, data.HideAdmin, data.HideGithub, data.HideToggleJumpTarget, data.JumpTargetBlank, data.BackgroundUrl, data.EnableBackground, data.EnableGlassmorphism)
+	res, err := stmt.Exec(data.Favicon, data.Title, data.GovRecord, data.Logo192, data.Logo512, data.HideAdmin, data.HideGithub, data.HideToggleJumpTarget, data.JumpTargetBlank, data.BackgroundUrl, data.EnableBackground, data.EnableGlassmorphism, data.PexelsApiKey)
 	if err != nil {
 		return err
 	}

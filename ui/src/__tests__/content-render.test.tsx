@@ -2,11 +2,50 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { ContentData, Tool } from "../types";
+Object.defineProperty(window, "matchMedia", {
+  writable: true,
+  value: vi.fn().mockImplementation((query: string) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  })),
+});
+
+const queryMocks = vi.hoisted(() => ({
+  useContentQuery: vi.fn(),
+  useRefreshContent: vi.fn(),
+  useUpdateViewMode: vi.fn(),
+  useAddToDock: vi.fn(),
+  useMoveToFolder: vi.fn(),
+  useMergeToFolder: vi.fn(),
+}));
+
+vi.mock("../queries", () => queryMocks);
+
+const storeState = {
+  contextMenu: { visible: false, x: 0, y: 0, tool: null },
+  openContextMenu: vi.fn(),
+  closeContextMenu: vi.fn(),
+  openFolder: null,
+  setOpenFolder: vi.fn(),
+  selectedCategories: new Set<string>(),
+  toggleCategory: vi.fn(),
+  clearFilters: vi.fn(),
+  searchValue: "",
+  setSearchValue: vi.fn(),
+};
+
+vi.mock("../stores/ui", () => ({
+  useUIStore: () => storeState,
+}));
 
 const hooksMock = vi.hoisted(() => ({
-  useContentData: vi.fn(),
   useSearch: vi.fn(),
-  useCategoryObserver: vi.fn(),
   useKeyboardNavigation: vi.fn(),
   useBackgroundEffect: vi.fn(),
 }));
@@ -31,27 +70,6 @@ vi.mock("../components/TimeDateWidget", () => ({
   default: () => <div data-testid="time-date-widget">12:30</div>,
 }));
 
-vi.mock("../components/LeftCategoryNav", () => ({
-  default: ({ categories, activeCategory }: { categories: string[]; activeCategory: string }) => (
-    <nav data-testid="left-category-nav" data-active={activeCategory}>
-      {categories.map((category) => (
-        <button key={category}>{category}</button>
-      ))}
-    </nav>
-  ),
-}));
-
-vi.mock("../components/DesktopCategorySection", () => ({
-  default: ({ category, items }: { category: string; items: Tool[] }) => (
-    <section data-testid="desktop-category-section" aria-label={category}>
-      <h2>{category}</h2>
-      {items.map((item) => (
-        <span key={item.id}>{item.name}</span>
-      ))}
-    </section>
-  ),
-}));
-
 vi.mock("../components/ToolItem", () => ({
   default: ({ tool }: { tool: Tool }) => <a>{tool.name}</a>,
 }));
@@ -60,12 +78,33 @@ vi.mock("../components/ToolContextMenu", () => ({
   default: () => <div data-testid="tool-context-menu" />,
 }));
 
-vi.mock("../components/GithubLink", () => ({
-  default: () => <div data-testid="github-link" />,
+vi.mock("../components/FloatingActions", () => ({
+  default: () => <div data-testid="floating-actions" />,
 }));
 
-vi.mock("../components/DarkSwitch", () => ({
-  default: () => <button data-testid="dark-switch" />,
+
+vi.mock("../components/WidgetGrid", () => ({
+  default: () => <div data-testid="widget-grid" />,
+}));
+
+vi.mock("../components/CategoryFilter", () => ({
+  default: () => <div data-testid="category-filter" />,
+}));
+
+vi.mock("../components/DockBar", () => ({
+  default: () => <div data-testid="dock-bar" />,
+}));
+
+vi.mock("../components/FolderOverlay", () => ({
+  default: () => <div data-testid="folder-overlay" />,
+}));
+
+vi.mock("../components/Loading", () => ({
+  Loading: () => <div data-testid="loading" />,
+}));
+
+vi.mock("react-helmet", () => ({
+  Helmet: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 
 const buildTool = (overrides: Partial<Tool> = {}): Tool => ({
@@ -78,6 +117,12 @@ const buildTool = (overrides: Partial<Tool> = {}): Tool => ({
   sort: 0,
   hide: false,
   viewMode: "icon",
+  type: "icon",
+  parentId: null,
+  size: "1x1",
+  bgColor: "",
+  gridX: -1,
+  gridY: -1,
   ...overrides,
 });
 
@@ -98,6 +143,7 @@ const buildData = (): ContentData => ({
     backgroundUrl: "",
     enableBackground: false,
     enableGlassmorphism: false,
+    pexelsApiKey: "",
   },
   siteConfig: {
     id: 1,
@@ -105,41 +151,33 @@ const buildData = (): ContentData => ({
     compactMode: false,
     columnsPerRow: 6,
   },
+  dockItems: [],
 });
 
 describe("Content desktop workspace rendering", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    hooksMock.useContentData.mockReturnValue({
+    queryMocks.useContentQuery.mockReturnValue({
       data: buildData(),
-      loading: false,
-      loadData: vi.fn().mockResolvedValue(buildData()),
-      setData: vi.fn(),
+      isLoading: false,
     });
-    hooksMock.useKeyboardNavigation.mockReturnValue(undefined);
-    hooksMock.useBackgroundEffect.mockReturnValue(undefined);
-    hooksMock.useCategoryObserver.mockReturnValue({
-      visibleCategory: "Common",
-      scrollToCategory: vi.fn(),
-    });
-  });
-
-  it("renders the desktop workspace shell in grouped mode", async () => {
-    const groupedData = {
-      Common: [buildTool({ id: 1, name: "Docs", catelog: "Common" })],
-      Dev: [buildTool({ id: 2, name: "Console", catelog: "Dev" })],
-    };
+    queryMocks.useRefreshContent.mockReturnValue(vi.fn());
+    queryMocks.useUpdateViewMode.mockReturnValue({ mutate: vi.fn() });
+    queryMocks.useAddToDock.mockReturnValue({ mutate: vi.fn() });
+    queryMocks.useMoveToFolder.mockReturnValue({ mutate: vi.fn() });
+    queryMocks.useMergeToFolder.mockReturnValue({ mutate: vi.fn() });
     hooksMock.useSearch.mockReturnValue({
-      val: "",
       searchString: "",
       filteredData: [],
-      groupedData,
       handleSetSearch: vi.fn(),
       resetSearch: vi.fn(),
       restoreTag: vi.fn(),
-      setVal: vi.fn(),
     });
+    hooksMock.useKeyboardNavigation.mockReturnValue(undefined);
+    hooksMock.useBackgroundEffect.mockReturnValue(undefined);
+  });
 
+  it("renders the desktop workspace shell", async () => {
     const Content = (await import("../components/Content")).default;
     const { container } = render(<Content />);
 
@@ -149,29 +187,20 @@ describe("Content desktop workspace rendering", () => {
     expect(container.querySelector(".desktop-content-shell")).not.toBeNull();
     expect(screen.getByTestId("time-date-widget")).toBeInTheDocument();
     expect(screen.getByLabelText("homepage-search")).toBeInTheDocument();
-    expect(screen.getByTestId("left-category-nav")).toHaveAttribute("data-active", "Common");
-    expect(screen.getAllByTestId("desktop-category-section")).toHaveLength(2);
   });
 
   it("renders a flat result grid while searching", async () => {
     hooksMock.useSearch.mockReturnValue({
-      val: "git",
       searchString: "git",
       filteredData: [buildTool({ id: 9, name: "GitHub" })],
-      groupedData: {
-        Common: [buildTool({ id: 1, name: "Docs" })],
-      },
       handleSetSearch: vi.fn(),
       resetSearch: vi.fn(),
       restoreTag: vi.fn(),
-      setVal: vi.fn(),
     });
 
     const Content = (await import("../components/Content")).default;
     const { container } = render(<Content />);
 
-    expect(screen.queryByTestId("left-category-nav")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("desktop-category-section")).not.toBeInTheDocument();
     expect(container.querySelector(".desktop-tool-grid-flat")).not.toBeNull();
     expect(screen.getByText("GitHub")).toBeInTheDocument();
   });

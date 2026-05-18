@@ -4,6 +4,18 @@
 
 > 新增了 [API 文档](https://van-nav-api.mereith.dev)，用 AI 生成的，如果不准确请提 Issue 哦。
 
+<br />
+
+```
+  # 后端
+  go run .
+
+  # 前端 dev
+  cd ui
+  pnpm dev
+
+```
+
 ## 预览
 
 ### PC
@@ -52,7 +64,7 @@
 docker run -d --name tools --restart always -p 6412:6412 -v /path/to/your/data:/app/data mereith/van-nav:latest
 ```
 
-打开浏览器 [http://localhost:6412](http://localhost:6412) 即可访问。
+打开浏览器 <http://localhost:6412> 即可访问。
 
 - 默认端口 6412
 - 默认账号密码 admin admin 第一次运行后请进入后台修改
@@ -62,7 +74,7 @@ docker run -d --name tools --restart always -p 6412:6412 -v /path/to/your/data:/
 
 下载 release 文件夹里面对应平台的二进制文件，直接运行即可。
 
-打开浏览器 [http://localhost:6412](http://localhost:6412) 即可访问。
+打开浏览器 <http://localhost:6412> 即可访问。
 
 - 默认端口 6412 动时添加 `-port <port>` 参数可指定运行端口。
 - 默认账号密码 admin admin ，第一次运行后请进入后台修改
@@ -106,7 +118,6 @@ server {
 可以注册成系统服务，开机启动。
 
 1. 复制二进制文件到 `/usr/local/bin` 目录下，并加上执行权限
-
 2. 新建 `VanNav.serivce` 文件于 `/usr/lib/systemd/system` 目录下:
 
 ```
@@ -130,7 +141,7 @@ StandardError=syslog
 WantedBy=multi-user.target
 ```
 
-3. 执行:
+1. 执行:
 
 ```
 sudo systemctl daemon-reload && sudo systemctl enable --now VanNav.service
@@ -192,3 +203,4 @@ sudo systemctl daemon-reload && sudo systemctl enable --now VanNav.service
 - [ ] 网站状态检测
 - [x] 支持后台设置默认跳转方式
 - [x] 支持指定监听端口
+

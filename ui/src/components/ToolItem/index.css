@@ -3,17 +3,16 @@
   text-decoration: none;
   position: relative;
   border-radius: 8px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
   cursor: pointer;
-  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
 }
 
-.tool-item:hover {
+.tool-item-card:hover {
   transform: translateY(-3px);
   box-shadow: 0 18px 36px rgba(15, 23, 42, 0.12);
 }
 
-.tool-item:active {
+.tool-item-card:active {
   transform: translateY(0);
 }
 
@@ -21,47 +20,52 @@
 
 .tool-item-icon {
   width: 100%;
-  min-height: 118px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
   text-align: center;
-  border-radius: 8px;
-  padding: 14px 10px 12px;
+  border-radius: 12px;
+  padding: 12px 8px 10px;
   box-sizing: border-box;
-  background: rgba(255, 255, 255, 0.74);
-  border: 1px solid rgba(15, 23, 42, 0.06);
+  transition: transform 0.15s ease;
+}
+
+.tool-item-icon:hover {
+  transform: translateY(-3px) scale(1.02);
+}
+
+.tool-item-icon:active {
+  transform: translateY(0) scale(0.98);
 }
 
 .tool-item-icon .tool-item-icon-wrap {
-  width: 56px;
-  height: 56px;
-  border-radius: 8px;
+  width: var(--icon-size, 48px);
+  height: var(--icon-size, 48px);
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.80);
-  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+  background: var(--widget-bg, #fff);
 }
 
 .tool-item-icon .tool-item-icon-wrap img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 8px;
 }
 
 .tool-item-icon .tool-item-title {
   margin-top: 10px;
   max-width: 94px;
   font-size: 12px;
+  font-weight: 500;
   line-height: 1.4;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  color: var(--text-primary);
+  color: var(--widget-text, var(--text-primary));
 }
 
 .tool-item-icon .tool-item-info {
@@ -79,8 +83,9 @@
   border-radius: 8px;
   padding: 16px;
   box-sizing: border-box;
-  background: rgba(255, 255, 255, 0.80);
-  border: 1px solid rgba(15, 23, 42, 0.06);
+  background: var(--widget-bg, rgba(255, 255, 255, 0.80));
+  border: 1px solid var(--widget-border, rgba(15, 23, 42, 0.06));
+  overflow: hidden;
 }
 
 .tool-item-card .tool-item-icon-wrap {
@@ -93,7 +98,7 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.80);
+  background: var(--widget-bg, rgba(255, 255, 255, 0.80));
   box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
 }
 
@@ -112,7 +117,7 @@
 .tool-item-card .tool-item-title {
   font-size: 14px;
   font-weight: 600;
-  color: var(--text-primary);
+  color: var(--widget-text, var(--text-primary));
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -121,8 +126,8 @@
 .tool-item-card .tool-item-category {
   display: inline-block;
   font-size: 11px;
-  color: var(--text-tag, #878a95);
-  background: rgba(244, 247, 250, 0.92);
+  color: var(--widget-badge-text, #878a95);
+  background: var(--widget-badge-bg, rgba(244, 247, 250, 0.92));
   padding: 2px 8px;
   border-radius: 8px;
   margin-top: 4px;
@@ -131,13 +136,26 @@
 .tool-item-card .tool-item-desc {
   margin-top: 4px;
   font-size: 12px;
-  color: var(--text-muted, #86909c);
+  color: var(--widget-text-muted, #86909c);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 /* ====== shared ====== */
+
+.tool-item-inline-svg {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tool-item-inline-svg svg {
+  width: 100%;
+  height: 100%;
+}
 
 .tool-item-icon-fallback {
   width: 100%;
@@ -147,15 +165,21 @@
   justify-content: center;
   font-size: 20px;
   font-weight: 600;
-  background: rgba(244, 247, 250, 0.92);
-  color: var(--text-secondary);
+  background: var(--widget-icon-bg, rgba(244, 247, 250, 0.92));
+  color: var(--widget-text-muted, var(--text-secondary));
+  border-radius: inherit;
+}
+
+.tool-item-icon-fallback-colored {
+  color: #fff;
+  background: var(--fallback-bg, #6366f1);
 }
 
 .tool-item-spinner {
   width: 20px;
   height: 20px;
-  border: 2px solid var(--bg-input-hover, #e5e6eb);
-  border-top-color: var(--text-secondary);
+  border: 2px solid var(--widget-border, #e5e6eb);
+  border-top-color: var(--widget-text-muted, var(--text-secondary));
   border-radius: 50%;
   animation: tool-item-spin 0.8s linear infinite;
   position: absolute;
@@ -175,7 +199,7 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: var(--text-primary, #272e3b);
+  background: var(--widget-text, #272e3b);
   color: #fff;
   font-size: 11px;
   display: flex;
@@ -184,96 +208,17 @@
   z-index: 1;
 }
 
-/* ====== dark mode ====== */
-
-.dark-mode .tool-item-icon,
-.dark-mode .tool-item-card {
-  background: rgba(34, 36, 42, 0.82);
-  border-color: rgba(255, 255, 255, 0.08);
-}
-
-.dark-mode .tool-item:hover {
-  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.32);
-}
-
-.dark-mode .tool-item-icon .tool-item-icon-wrap,
-.dark-mode .tool-item-card .tool-item-icon-wrap {
-  background: rgba(255, 255, 255, 0.08);
-  box-shadow: none;
-}
-
-.dark-mode .tool-item-icon-fallback {
-  background: #333;
-  color: rgba(255, 255, 255, 0.5);
-}
-
-.dark-mode .tool-item-icon .tool-item-title,
-.dark-mode .tool-item-card .tool-item-title {
-  color: rgba(255, 255, 255, 0.85);
-}
-
-.dark-mode .tool-item-card .tool-item-desc {
-  color: rgba(255, 255, 255, 0.5);
-}
-
-.dark-mode .tool-item-card .tool-item-category {
-  background: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.5);
-}
-
-.dark-mode .tool-item-index {
-  background: rgba(255, 255, 255, 0.9);
-  color: #222;
-}
-
-/* ====== glassmorphism ====== */
-
-.glassmorphism .tool-item-icon,
-.glassmorphism .tool-item-card {
-  background: var(--glass-bg-card, rgba(255, 255, 255, 0.16));
-  border: 1px solid var(--glass-border-card, rgba(255, 255, 255, 0.18));
-  backdrop-filter: var(--blur-md, blur(20px));
-  -webkit-backdrop-filter: var(--blur-md, blur(20px));
-}
-
-.glassmorphism .tool-item-icon .tool-item-icon-wrap,
-.glassmorphism .tool-item-card .tool-item-icon-wrap {
-  background: rgba(255, 255, 255, 0.18);
-  box-shadow: none;
-}
-
-.glassmorphism .tool-item-icon .tool-item-title,
-.glassmorphism .tool-item-card .tool-item-title {
-  color: rgba(255, 255, 255, 0.95);
-}
-
-.glassmorphism .tool-item-card .tool-item-desc {
-  color: rgba(255, 255, 255, 0.6);
-}
-
-.glassmorphism .tool-item-card .tool-item-category {
-  background: rgba(255, 255, 255, 0.15);
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.glassmorphism .tool-item-icon-fallback {
-  background: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.6);
-}
-
 /* ====== responsive ====== */
 
 @media (max-width: 768px) {
   .tool-item-icon {
-    min-height: 98px;
     padding: 10px 6px;
-    border-radius: 8px;
   }
 
   .tool-item-icon .tool-item-icon-wrap {
     width: 44px;
     height: 44px;
-    border-radius: 8px;
+    border-radius: 10px;
   }
 
   .tool-item-icon .tool-item-title {
@@ -283,7 +228,6 @@
 
   .tool-item-card {
     padding: 12px 14px;
-    border-radius: 8px;
   }
 
   .tool-item-card .tool-item-icon-wrap {

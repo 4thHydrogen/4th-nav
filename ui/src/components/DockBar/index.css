@@ -1,0 +1,98 @@
+.dock-bar {
+  position: fixed;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  padding: 6px 14px 8px;
+  border-radius: 18px;
+  background: transparent;
+  z-index: var(--z-dock, 500);
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.dock-bar.dock-empty {
+  display: none;
+}
+
+.dock-bar.dock-empty-hint {
+  cursor: default;
+}
+
+.dock-empty-text {
+  color: var(--widget-text-muted, rgba(120, 130, 150, 0.7));
+  font-size: 12px;
+  padding: 4px 12px;
+  white-space: nowrap;
+}
+
+.dock-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+  transform-origin: bottom center;
+  position: relative;
+  user-select: none;
+}
+
+.dock-item:hover {
+  transform: scale(1.3);
+}
+
+.dock-item img {
+  width: var(--icon-size, 48px);
+  height: var(--icon-size, 48px);
+  border-radius: 12px;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.dock-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.78);
+  color: #fff;
+  font-size: 12px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s, transform 0.15s;
+  margin-bottom: 6px;
+}
+
+.dock-item:hover .dock-tooltip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.dock-item.dragging {
+  opacity: 0.4;
+}
+
+.dock-item.drag-over-left {
+  margin-left: 16px;
+}
+
+.dock-item.drag-over-right {
+  margin-right: 16px;
+}
+
+@media (max-width: 768px) {
+  .dock-bar {
+    bottom: 8px;
+    padding: 4px 8px 6px;
+    gap: 6px;
+  }
+
+  .dock-item img {
+    border-radius: 9px;
+  }
+}

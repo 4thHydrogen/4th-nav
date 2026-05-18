@@ -21,20 +21,11 @@ export const decodeTheme = (t: "auto" | "light" | "dark") => {
     return t;
   }
 };
-export const applyTheme = (t: string, source: string, disableLog: boolean) => {
-  if (t.includes("light")) {
-    const bodyEl = document.querySelector("body")!;
-    bodyEl.classList.toggle("dark-mode", false);
-    if (!disableLog) {
-    }
-  } else {
-    const bodyEl = document.querySelector("body")!;
-    bodyEl.classList.toggle("dark-mode", true);
-    if (!disableLog) {
-    }
-  }
+export const applyTheme = (t: string, _source: string, _disableLog: boolean) => {
+  const isDark = t.includes("dark");
+  document.body.classList.toggle("dark-mode", isDark);
 };
-export const initTheme = () => {
+export const initTheme = (): "auto" | "light" | "dark" => {
   if (typeof localStorage == "undefined") {
     return "auto";
   }

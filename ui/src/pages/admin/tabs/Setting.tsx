@@ -166,9 +166,16 @@ export const Setting: React.FC<SettingProps> = (props) => {
             <Form.Item
               label="背景图片 URL"
               name="backgroundUrl"
-              tooltip="输入图片 URL 作为页面背景。支持 bing 关键字自动获取每日 Bing 壁纸"
+              tooltip="输入图片 URL 作为页面背景。支持 bing 关键字自动获取每日 Bing 壁纸；支持 pexels 关键字获取主题感知背景（需配置 Pexels API Key）；也可输入 pexels:关键词 自定义搜索内容"
             >
-              <Input placeholder="例如: bing 或 https://example.com/bg.jpg" />
+              <Input placeholder="例如: bing、pexels、pexels:ocean 或 https://example.com/bg.jpg" />
+            </Form.Item>
+            <Form.Item
+              label="Pexels API Key"
+              name="pexelsApiKey"
+              tooltip="在 pexels.com/api 免费申请。配置后背景图片 URL 输入 pexels 即可根据主题自动获取亮/暗色调背景图"
+            >
+              <Input.Password placeholder="请输入 Pexels API Key" />
             </Form.Item>
             <Form.Item label="启用背景图片" name="enableBackground" tooltip="开启后页面将显示背景图片">
               <Switch defaultChecked={Boolean(store?.setting?.enableBackground)} />
@@ -206,6 +213,15 @@ export const Setting: React.FC<SettingProps> = (props) => {
                   { label: "4 列", value: 4 },
                   { label: "5 列", value: 5 },
                   { label: "6 列", value: 6 },
+                ]}
+              />
+            </Form.Item>
+            <Form.Item label="图标密度" name="density" tooltip="控制桌面端图标的显示密度，图标大小会自动适应">
+              <Select
+                options={[
+                  { label: "紧凑", value: "compact" },
+                  { label: "标准（默认）", value: "standard" },
+                  { label: "宽松", value: "relaxed" },
                 ]}
               />
             </Form.Item>

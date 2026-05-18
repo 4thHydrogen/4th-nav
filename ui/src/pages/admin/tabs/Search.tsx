@@ -11,7 +11,7 @@ import {
   Switch,
   Spin,
 } from 'antd';
-import { DragOutlined, DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
+import { GripVertical, Trash2, Pencil, Plus } from 'lucide-react';
 import { DndContext } from '@dnd-kit/core';
 import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -110,7 +110,7 @@ const SearchEngineManager: React.FC = () => {
             alignItems: 'center'
           }}
         >
-          <DragOutlined style={{ color: '#999' }} />
+          <GripVertical size={16} className="text-gray-400" />
         </div>
       ),
     },
@@ -157,13 +157,13 @@ const SearchEngineManager: React.FC = () => {
         <Space>
           <Button
             type="text"
-            icon={<EditOutlined />}
+            icon={<Pencil size={14} />}
             onClick={() => handleEdit(record)}
           />
           <Button
             type="text"
             danger
-            icon={<DeleteOutlined />}
+            icon={<Trash2 size={14} />}
             onClick={() => handleDelete(record.id)}
           />
         </Space>
@@ -252,7 +252,7 @@ const SearchEngineManager: React.FC = () => {
   return (
     <div>
       <div style={{ marginBottom: 16 }}>
-        <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
+        <Button type="primary" icon={<Plus size={14} />} onClick={handleAdd}>
           添加搜索引擎
         </Button>
       </div>

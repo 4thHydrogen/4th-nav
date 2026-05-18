@@ -12,7 +12,7 @@ import {
   message,
   Tooltip,
 } from "antd";
-import { QuestionCircleOutlined } from "@ant-design/icons";
+import { CircleHelp } from "lucide-react";
 import React, { useCallback, useState, useEffect } from "react";
 import { getFilter, getOptions, mutiSearch } from "../../../../utils/admin";
 import {
@@ -34,7 +34,7 @@ import {
 } from "@dnd-kit/sortable";
 import { Row, DragHandle, type DataType } from "./DraggableRow";
 import ToolFormModal from "./ToolFormModal";
-import type { UpdateToolDto, AddToolDto, Tool } from "../../../../types";
+import type { UpdateToolDto, AddToolDto, Tool, ToolType } from "../../../../types";
 
 export interface ToolsProps {}
 export const Tools: React.FC<ToolsProps> = () => {
@@ -42,7 +42,9 @@ export const Tools: React.FC<ToolsProps> = () => {
   const [showEdit, setShowEdit] = useState(false);
   const [requestLoading, setRequestLoading] = useState(false);
   const [showAddModel, setShowAddModel] = useState(false);
+  const [showAddFolder, setShowAddFolder] = useState(false);
   const [addForm] = Form.useForm();
+  const [addFolderForm] = Form.useForm();
   const [searchString, setSearchString] = useState("");
   const [catelogName, setCatelogName] = useState("");
   const [updateForm] = Form.useForm();
@@ -85,7 +87,9 @@ export const Tools: React.FC<ToolsProps> = () => {
     async (record: DataType) => {
       setRequestLoading(true);
       try {
-        await fetchAddTool(record as unknown as AddToolDto);
+        // 显式传 gridX/gridY = -1（auto layout），避免 Go 零值绕过 schema 默认导致新工具被钉在 (0,0)
+        const payload = { gridX: -1, gridY: -1, ...record } as unknown as AddToolDto;
+        await fetchAddTool(payload);
         message.success("添加成功! Logo 将在 3 秒后刷新并加载！", 3);
         setTimeout(() => reload(), 3000);
       } catch {
@@ -97,6 +101,35 @@ export const Tools: React.FC<ToolsProps> = () => {
       }
     },
     [reload]
+  );
+
+  const handleCreateFolder = useCallback(
+    async (record: DataType) => {
+      setRequestLoading(true);
+      const payload = {
+        gridX: -1,
+        gridY: -1,
+        ...record,
+        type: "folder" as const,
+        url: "",
+        logo: "",
+        parentId: null,
+        size: record.size || "1x1",
+        bgColor: record.bgColor || "",
+      };
+      try {
+        await fetchAddTool(payload as unknown as AddToolDto);
+        message.success("文件夹创建成功！");
+      } catch {
+        message.warning("创建失败!");
+      } finally {
+        setRequestLoading(false);
+        setShowAddFolder(false);
+        addFolderForm.resetFields();
+        reload();
+      }
+    },
+    [reload, addFolderForm]
   );
 
   const handleImport = useCallback(
@@ -271,6 +304,13 @@ export const Tools: React.FC<ToolsProps> = () => {
           <Button type="primary" onClick={() => setShowAddModel(true)}>
             添加
           </Button>
+          <Button onClick={() => {
+            addFolderForm.resetFields();
+            addFolderForm.setFieldsValue({ type: "folder", sort: 1, hide: false, size: "1x1" });
+            setShowAddFolder(true);
+          }}>
+            添加文件夹
+          </Button>
           <Button type="primary" onClick={reload}>
             刷新
           </Button>
@@ -385,11 +425,27 @@ export const Tools: React.FC<ToolsProps> = () => {
                 render={(val: string) => val === "card" ? "卡片" : "图标"}
               />
               <Table.Column
+                title="类型"
+                dataIndex="type"
+                width={60}
+                render={(val: string) => val === "folder" ? "文件夹" : "工具"}
+              />
+              <Table.Column
+                title="所属文件夹"
+                dataIndex="parentId"
+                width={90}
+                render={(val: number | null) => {
+                  if (val == null) return "-";
+                  const folder = store?.tools?.find((t: Tool) => t.id === val);
+                  return folder ? folder.name : `#${val}`;
+                }}
+              />
+              <Table.Column
                 title={
                   <span>
                     隐藏
                     <Tooltip title="开启后只有登录后才会展示该工具">
-                      <QuestionCircleOutlined style={{ marginLeft: "5px" }} />
+                      <CircleHelp size={14} style={{ marginLeft: "5px" }} />
                     </Tooltip>
                   </span>
                 }
@@ -413,12 +469,18 @@ export const Tools: React.FC<ToolsProps> = () => {
                     >
                       修改
                     </Button>
-                    <Popconfirm
-                      onConfirm={() => handleDelete(record.id)}
-                      title={`确定要删除 ${record.name} 吗？`}
-                    >
-                      <Button type="link">删除</Button>
-                    </Popconfirm>
+                    {record.type === "folder" ? (
+                      <Button type="link" onClick={() => handleDelete(record.id)}>
+                        删除
+                      </Button>
+                    ) : (
+                      <Popconfirm
+                        onConfirm={() => handleDelete(record.id)}
+                        title={`确定要删除 ${record.name} 吗？`}
+                      >
+                        <Button type="link">删除</Button>
+                      </Popconfirm>
+                    )}
                   </Space>
                 )}
               />
@@ -432,6 +494,7 @@ export const Tools: React.FC<ToolsProps> = () => {
         loading={requestLoading}
         form={addForm}
         categories={store?.catelogs || []}
+        existingTools={store?.tools || []}
         onOk={() => handleCreate(addForm.getFieldsValue())}
         onCancel={() => {
           setShowAddModel(false);
@@ -445,8 +508,20 @@ export const Tools: React.FC<ToolsProps> = () => {
         loading={requestLoading}
         form={updateForm}
         categories={store?.catelogs || []}
+        existingTools={store?.tools || []}
         onOk={() => handleUpdate(updateForm.getFieldsValue())}
         onCancel={() => setShowEdit(false)}
+      />
+      <ToolFormModal
+        open={showAddFolder}
+        mode="add"
+        loading={requestLoading}
+        form={addFolderForm}
+        categories={store?.catelogs || []}
+        existingTools={store?.tools || []}
+        onOk={() => handleCreateFolder(addFolderForm.getFieldsValue())}
+        onCancel={() => { setShowAddFolder(false); addFolderForm.resetFields(); }}
+        afterClose={() => addFolderForm.resetFields()}
       />
     </Card>
   );

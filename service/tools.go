@@ -1,6 +1,8 @@
 package service
 
 import (
+	"fmt"
+	"strconv"
 	"strings"
 	"sync"
 
@@ -17,21 +19,52 @@ func normalizeViewMode(v string) string {
 	return "icon"
 }
 
+func normalizeToolType(v string) string {
+	if v == "folder" {
+		return "folder"
+	}
+	return "icon"
+}
+
+func normalizeToolSize(v string) string {
+	parts := strings.Split(v, "x")
+	if len(parts) != 2 {
+		return "1x1"
+	}
+	w, err1 := strconv.Atoi(parts[0])
+	h, err2 := strconv.Atoi(parts[1])
+	if err1 != nil || err2 != nil || w < 1 || h < 1 || w > 6 || h > 6 {
+		return "1x1"
+	}
+	return fmt.Sprintf("%dx%d", w, h)
+}
+
+// normalizeGrid 把不合法的 gridX/gridY 值（如 Go 零值 0 但未明确指定）规范化为 -1（auto layout）。
+// 用户拖拽产生的位置 (>= 0) 保留；前端 AddTool 未指定位置时一律视为 -1，
+// 防止"新建工具被钉在 (0,0)"的 bug 污染整体布局。
+func normalizeGrid(v int) int {
+	if v < 0 {
+		return -1
+	}
+	return v
+}
+
 func ImportTools(data []types.Tool) {
 	var catelogs []string
 	for _, v := range data {
-		// 过滤掉空分类，只收集有效的分类名称
 		if v.Catelog != "" && strings.TrimSpace(v.Catelog) != "" && !utils.In(v.Catelog, catelogs) {
 			catelogs = append(catelogs, v.Catelog)
 		}
 		viewMode := normalizeViewMode(v.ViewMode)
+		toolType := normalizeToolType(v.Type)
+		size := normalizeToolSize(v.Size)
 		sql_add_tool := `
-			INSERT INTO nav_table (id, name, catelog, url, logo, desc, sort, hide, view_mode)
-			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+			INSERT INTO nav_table (id, name, catelog, url, logo, ` + "`desc`" + `, sort, hide, view_mode, type, parent_id, size, bg_color, grid_x, grid_y)
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 			`
 		stmt, err := database.DB.Prepare(sql_add_tool)
 		utils.CheckErr(err)
-		res, err := stmt.Exec(v.Id, v.Name, v.Catelog, v.Url, v.Logo, v.Desc, v.Sort, v.Hide, viewMode)
+		res, err := stmt.Exec(v.Id, v.Name, v.Catelog, v.Url, v.Logo, v.Desc, v.Sort, v.Hide, viewMode, toolType, v.ParentId, size, v.BgColor, v.GridX, v.GridY)
 		utils.CheckErr(err)
 		_, err = res.LastInsertId()
 		utils.CheckErr(err)
@@ -41,34 +74,38 @@ func ImportTools(data []types.Tool) {
 		addCatelogDto.Name = catelog
 		AddCatelog(addCatelogDto)
 	}
-	// 转存所有图片,异步
 	go func(data []types.Tool) {
+		sem := make(chan struct{}, 4)
+		var wg sync.WaitGroup
 		for _, v := range data {
-			UpdateImg(v.Logo)
+			wg.Add(1)
+			sem <- struct{}{}
+			go func(tool types.Tool) {
+				defer wg.Done()
+				defer func() { <-sem }()
+				UpdateImg(tool.Logo)
+			}(v)
 		}
+		wg.Wait()
 	}(data)
-
 }
 
 func UpdateTool(data types.UpdateToolDto) {
-	// 除了更新工具本身之外，也要更新 img 表
 	sql_update_tool := `
-			UPDATE nav_table
-			SET name = ?, url = ?, logo = ?, catelog = ?, desc = ?, sort = ?, hide = ?, view_mode = ?
-			WHERE id = ?;
-			`
+		UPDATE nav_table
+		SET name = ?, url = ?, logo = ?, catelog = ?, ` + "`desc`" + ` = ?, sort = ?, hide = ?, view_mode = ?, type = ?, parent_id = ?, size = ?, bg_color = ?, grid_x = ?, grid_y = ?
+		WHERE id = ?;
+		`
 	stmt, err := database.DB.Prepare(sql_update_tool)
 	utils.CheckErr(err)
-	res, err := stmt.Exec(data.Name, data.Url, data.Logo, data.Catelog, data.Desc, data.Sort, data.Hide, normalizeViewMode(data.ViewMode), data.Id)
+	res, err := stmt.Exec(data.Name, data.Url, data.Logo, data.Catelog, data.Desc, data.Sort, data.Hide, normalizeViewMode(data.ViewMode), normalizeToolType(data.Type), data.ParentId, normalizeToolSize(data.Size), data.BgColor, data.GridX, data.GridY, data.Id)
 	utils.CheckErr(err)
 	_, err = res.RowsAffected()
 	utils.CheckErr(err)
-	// 更新 img
 	UpdateImg(data.Logo)
 }
 
 func AddTool(data types.AddToolDto) (int64, error) {
-	// 创建一个互斥锁来保护数据库操作
 	var mu sync.Mutex
 	mu.Lock()
 	defer mu.Unlock()
@@ -84,16 +121,16 @@ func AddTool(data types.AddToolDto) (int64, error) {
 	}()
 
 	sql_add_tool := `
-			INSERT INTO nav_table (name, url, logo, catelog, desc, sort, hide, view_mode)
-			VALUES (?, ?, ?, ?, ?, ?, ?, ?);
-			`
+		INSERT INTO nav_table (name, url, logo, catelog, ` + "`desc`" + `, sort, hide, view_mode, type, parent_id, size, bg_color, grid_x, grid_y)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+		`
 	stmt, err := tx.Prepare(sql_add_tool)
 	if err != nil {
 		return 0, err
 	}
 	defer stmt.Close()
 
-	res, err := stmt.Exec(data.Name, data.Url, data.Logo, data.Catelog, data.Desc, data.Sort, data.Hide, normalizeViewMode(data.ViewMode))
+	res, err := stmt.Exec(data.Name, data.Url, data.Logo, data.Catelog, data.Desc, data.Sort, data.Hide, normalizeViewMode(data.ViewMode), normalizeToolType(data.Type), data.ParentId, normalizeToolSize(data.Size), data.BgColor, normalizeGrid(data.GridX), normalizeGrid(data.GridY))
 	if err != nil {
 		return 0, err
 	}
@@ -109,7 +146,6 @@ func AddTool(data types.AddToolDto) (int64, error) {
 	}
 	logger.LogInfo("新增工具: %s", data.Name)
 
-	// 在事务完成后再异步更新图片
 	if data.Logo != "" {
 		UpdateImg(data.Logo)
 	}
@@ -119,8 +155,8 @@ func AddTool(data types.AddToolDto) (int64, error) {
 
 func GetAllTool() []types.Tool {
 	sql_get_all := `
-			SELECT id,name,url,logo,catelog,desc,sort,hide,view_mode FROM nav_table order by sort;
-			`
+		SELECT id,name,url,logo,catelog,` + "`desc`" + `,sort,hide,view_mode,type,parent_id,size,bg_color,grid_x,grid_y FROM nav_table order by sort;
+		`
 	results := make([]types.Tool, 0)
 	rows, err := database.DB.Query(sql_get_all)
 	utils.CheckErr(err)
@@ -129,7 +165,13 @@ func GetAllTool() []types.Tool {
 		var hide interface{}
 		var sort interface{}
 		var viewMode interface{}
-		err = rows.Scan(&tool.Id, &tool.Name, &tool.Url, &tool.Logo, &tool.Catelog, &tool.Desc, &sort, &hide, &viewMode)
+		var toolType interface{}
+		var parentId interface{}
+		var size interface{}
+		var bgColor interface{}
+		var gridX interface{}
+		var gridY interface{}
+		err = rows.Scan(&tool.Id, &tool.Name, &tool.Url, &tool.Logo, &tool.Catelog, &tool.Desc, &sort, &hide, &viewMode, &toolType, &parentId, &size, &bgColor, &gridX, &gridY)
 		if hide == nil {
 			tool.Hide = false
 		} else {
@@ -150,6 +192,37 @@ func GetAllTool() []types.Tool {
 		} else {
 			tool.ViewMode = normalizeViewMode(viewMode.(string))
 		}
+		if toolType == nil || toolType.(string) == "" {
+			tool.Type = "icon"
+		} else {
+			tool.Type = normalizeToolType(toolType.(string))
+		}
+		if parentId == nil {
+			tool.ParentId = nil
+		} else {
+			pid := int(parentId.(int64))
+			tool.ParentId = &pid
+		}
+		if size == nil || size.(string) == "" {
+			tool.Size = "1x1"
+		} else {
+			tool.Size = normalizeToolSize(size.(string))
+		}
+		if bgColor == nil {
+			tool.BgColor = ""
+		} else {
+			tool.BgColor = bgColor.(string)
+		}
+		if gridX == nil {
+			tool.GridX = -1
+		} else {
+			tool.GridX = int(gridX.(int64))
+		}
+		if gridY == nil {
+			tool.GridY = -1
+		} else {
+			tool.GridY = int(gridY.(int64))
+		}
 		utils.CheckErr(err)
 		results = append(results, tool)
 	}
@@ -159,15 +232,14 @@ func GetAllTool() []types.Tool {
 
 func GetToolLogoUrlById(id int) string {
 	sql_get_tool := `
-			SELECT logo FROM nav_table WHERE id=?;
-			`
+		SELECT logo FROM nav_table WHERE id=?;
+		`
 	rows, err := database.DB.Query(sql_get_tool, id)
 	utils.CheckErr(err)
 	var tool types.Tool
 	for rows.Next() {
 		err = rows.Scan(&tool.Logo)
 		utils.CheckErr(err)
-
 	}
 	defer rows.Close()
 	return tool.Logo
@@ -175,8 +247,8 @@ func GetToolLogoUrlById(id int) string {
 
 func UpdateToolIcon(id int64, logo string) {
 	sql_update_tool := `
-			UPDATE nav_table SET logo=? WHERE id=?;
-			`
+		UPDATE nav_table SET logo=? WHERE id=?;
+		`
 	_, err := database.DB.Exec(sql_update_tool, logo, id)
 	utils.CheckErr(err)
 	UpdateImg(logo)
@@ -214,4 +286,84 @@ func UpdateToolViewMode(id int, viewMode string) error {
 		viewMode, id,
 	)
 	return err
+}
+
+func MoveToolToFolder(toolId int, parentId *int) error {
+	_, err := database.DB.Exec(
+		`UPDATE nav_table SET parent_id = ? WHERE id = ?;`,
+		parentId, toolId,
+	)
+	return err
+}
+
+func DeleteFolder(folderId int, mode string) error {
+	tx, err := database.DB.Begin()
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+		}
+	}()
+
+	if mode == "delete-with-children" {
+		_, err = tx.Exec(`DELETE FROM nav_table WHERE parent_id = ?;`, folderId)
+		if err != nil {
+			return err
+		}
+		_, err = tx.Exec(`DELETE FROM dock_items WHERE tool_id IN (SELECT id FROM nav_table WHERE parent_id = ?);`, folderId)
+		if err != nil {
+			return err
+		}
+	} else {
+		_, err = tx.Exec(`UPDATE nav_table SET parent_id = NULL WHERE parent_id = ?;`, folderId)
+		if err != nil {
+			return err
+		}
+	}
+
+	_, err = tx.Exec(`DELETE FROM dock_items WHERE tool_id = ?;`, folderId)
+	if err != nil {
+		return err
+	}
+
+	_, err = tx.Exec(`DELETE FROM nav_table WHERE id = ?;`, folderId)
+	if err != nil {
+		return err
+	}
+
+	return tx.Commit()
+}
+
+func UpdateLayout(data types.UpdateLayoutDto) error {
+	// 空 payload 不应静默 commit — 早返回保证前端能感知到异常
+	if len(data.Items) == 0 {
+		return fmt.Errorf("UpdateLayout: empty items payload")
+	}
+
+	tx, err := database.DB.Begin()
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+		}
+	}()
+
+	stmt, err := tx.Prepare("UPDATE nav_table SET grid_x = ?, grid_y = ? WHERE id = ?")
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	for _, item := range data.Items {
+		_, err = stmt.Exec(item.GridX, item.GridY, item.Id)
+		if err != nil {
+			return err
+		}
+	}
+
+	return tx.Commit()
 }

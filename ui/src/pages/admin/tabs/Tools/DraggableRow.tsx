@@ -1,6 +1,6 @@
 import React, { useContext, useMemo } from "react";
 import { Button } from "antd";
-import { HolderOutlined } from "@ant-design/icons";
+import { GripVertical } from "lucide-react";
 import type { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -25,7 +25,7 @@ export const DragHandle: React.FC = () => {
     <Button
       type="text"
       size="small"
-      icon={<HolderOutlined />}
+      icon={<GripVertical size={14} />}
       style={{ cursor: "move", touchAction: "none" }}
       ref={setActivatorNodeRef}
       {...listeners}

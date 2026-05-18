@@ -186,6 +186,10 @@ func GetAllHandler(c *gin.Context) {
 	}
 	setting := service.GetSetting()
 	siteConfig := service.GetSiteConfig()
+	dockItems, err := service.GetDockItems()
+	if err != nil || dockItems == nil {
+		dockItems = []types.DockItem{}
+	}
 	c.JSON(200, gin.H{
 		"success": true,
 		"data": gin.H{
@@ -193,6 +197,7 @@ func GetAllHandler(c *gin.Context) {
 			"catelogs":   catelogs,
 			"setting":    setting,
 			"siteConfig": siteConfig,
+			"dockItems":  dockItems,
 		},
 	})
 }
@@ -352,6 +357,9 @@ func AddToolHandler(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"success": true,
 		"message": "添加成功",
+		"data": gin.H{
+			"id": id,
+		},
 	})
 }
 
@@ -370,6 +378,8 @@ func DeleteToolHandler(c *gin.Context) {
 	// 删除工具的 logo，如果有
 	numberId, err := strconv.Atoi(id)
 	utils.CheckErr(err)
+	// 同时删除 Dock 中的引用
+	database.DB.Exec(`DELETE FROM dock_items WHERE tool_id = ?`, numberId)
 	url1 := service.GetToolLogoUrlById(numberId)
 	urlEncoded := url.QueryEscape(url1)
 	sql_delete_tool_img := `
@@ -714,4 +724,106 @@ func UpdateToolViewModeHandler(c *gin.Context) {
 		return
 	}
 	c.JSON(200, gin.H{"success": true, "message": "布局更新成功"})
+}
+
+func MoveToolToFolderHandler(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "errorMessage": "无效 ID"})
+		return
+	}
+	var body struct {
+		ParentId *int `json:"parentId"`
+	}
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "errorMessage": "无效请求"})
+		return
+	}
+	if err := service.MoveToolToFolder(id, body.ParentId); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "errorMessage": err.Error()})
+		return
+	}
+	c.JSON(200, gin.H{"success": true, "message": "移动成功"})
+}
+
+func DeleteFolderHandler(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "errorMessage": "无效 ID"})
+		return
+	}
+	mode := c.DefaultQuery("mode", "move-children-to-root")
+	if mode != "move-children-to-root" && mode != "delete-with-children" {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "errorMessage": "无效的删除模式"})
+		return
+	}
+	if err := service.DeleteFolder(id, mode); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "errorMessage": err.Error()})
+		return
+	}
+	c.JSON(200, gin.H{"success": true, "message": "删除文件夹成功"})
+}
+
+// UpdateLayoutHandler 批量更新网格布局位置
+func UpdateLayoutHandler(c *gin.Context) {
+	var data types.UpdateLayoutDto
+	if err := c.ShouldBindJSON(&data); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "errorMessage": err.Error()})
+		return
+	}
+	if err := service.UpdateLayout(data); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "errorMessage": err.Error()})
+		return
+	}
+	c.JSON(200, gin.H{"success": true, "message": "布局更新成功"})
+}
+
+// ==================== Dock 栏相关处理函数 ====================
+
+func GetDockItemsHandler(c *gin.Context) {
+	items, err := service.GetDockItems()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "errorMessage": err.Error()})
+		return
+	}
+	c.JSON(200, gin.H{"success": true, "data": items})
+}
+
+func AddDockItemHandler(c *gin.Context) {
+	var data types.AddDockItemDto
+	if err := c.ShouldBindJSON(&data); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "errorMessage": err.Error()})
+		return
+	}
+	if err := service.AddDockItem(data.ToolID); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "errorMessage": err.Error()})
+		return
+	}
+	c.JSON(200, gin.H{"success": true, "message": "添加到 Dock 成功"})
+}
+
+func RemoveDockItemHandler(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "errorMessage": "无效 ID"})
+		return
+	}
+	if err := service.RemoveDockItem(id); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "errorMessage": err.Error()})
+		return
+	}
+	c.JSON(200, gin.H{"success": true, "message": "从 Dock 移除成功"})
+}
+
+func UpdateDockSortHandler(c *gin.Context) {
+	var updates []types.UpdateDockSortDto
+	if err := c.ShouldBindJSON(&updates); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "errorMessage": err.Error()})
+		return
+	}
+	if err := service.UpdateDockSort(updates); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "errorMessage": err.Error()})
+		return
+	}
+	c.JSON(200, gin.H{"success": true, "message": "Dock 排序更新成功"})
 }
