@@ -14,7 +14,7 @@ import TimeDateWidget from "../TimeDateWidget";
 import DockBar from "../DockBar";
 import WidgetGrid from "../WidgetGrid";
 import CategoryFilter from "../CategoryFilter";
-import type { Tool } from "../../types";
+import type { SearchEngine, Tool } from "../../types";
 import {
   useContentQuery,
   useRefreshContent,
@@ -57,7 +57,9 @@ const Content = () => {
     restoreTag,
   } = useSearch(data);
 
-  useKeyboardNavigation(searchString, filteredData, resetSearch);
+  const [selectedEngine, setSelectedEngine] = useState<SearchEngine | null>(null);
+
+  useKeyboardNavigation(searchString, filteredData, resetSearch, selectedEngine);
   useBackgroundEffect(
     data?.setting?.enableGlassmorphism === true,
     data?.setting?.enableBackground === true
@@ -98,15 +100,20 @@ const Content = () => {
   }, []);
 
   useEffect(() => {
-    const size = data?.siteConfig?.iconSize;
     const el = document.querySelector(".desktop-page") as HTMLElement | null;
     if (!el) return;
-    if (size && size > 0) {
-      el.style.setProperty("--icon-size", `${size}px`);
-    } else {
-      el.style.removeProperty("--icon-size");
-    }
-  }, [data?.siteConfig?.iconSize]);
+    const density = data?.siteConfig?.density || "standard";
+    const params: Record<string, { rowHeight: number; iconSize: number; iconGap: number; margin: string }> = {
+      compact: { rowHeight: 64, iconSize: 38, iconGap: 4, margin: "8px" },
+      standard: { rowHeight: 80, iconSize: 48, iconGap: 6, margin: "12px" },
+      relaxed: { rowHeight: 100, iconSize: 62, iconGap: 8, margin: "16px" },
+    };
+    const p = params[density] || params.standard;
+    el.style.setProperty("--icon-size", `${p.iconSize}px`);
+    el.style.setProperty("--icon-gap", `${p.iconGap}px`);
+    el.style.setProperty("--row-height", `${p.rowHeight}px`);
+    el.style.setProperty("--grid-margin", p.margin);
+  }, [data?.siteConfig?.density]);
 
   const isSearching = searchString.trim() !== "";
   const noImageMode = data?.siteConfig?.noImageMode || false;
@@ -203,6 +210,7 @@ const Content = () => {
                   setSearchValue(t);
                   handleSetSearch(t);
                 }}
+                onSelectedEngineChange={setSelectedEngine}
               />
             </div>
           </div>

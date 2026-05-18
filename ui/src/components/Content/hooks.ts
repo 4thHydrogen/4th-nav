@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { mutiSearch } from "../../utils/admin";
-import type { ContentData, Tool } from "../../types";
+import { generateSearchUrl } from "../../utils/searchEngine";
+import type { ContentData, SearchEngine, Tool } from "../../types";
 
 export function useSearch(data: ContentData | null) {
   const [currTag, setCurrTag] = useState("全部工具");
@@ -100,7 +101,8 @@ export function useCategoryObserver(groupedData: Record<string, Tool[]> | null) 
 export function useKeyboardNavigation(
   searchString: string,
   filteredData: Tool[],
-  resetSearch: (notSetTag?: boolean) => void
+  resetSearch: (notSetTag?: boolean) => void,
+  selectedEngine: SearchEngine | null
 ) {
   const filteredDataRef = useRef<Tool[]>([]);
 
@@ -109,14 +111,20 @@ export function useKeyboardNavigation(
   }, [filteredData]);
 
   const onKeyEnter = useCallback((ev: KeyboardEvent) => {
-    const cards = filteredDataRef.current;
     if (ev.key === "Enter") {
-      if (cards && cards.length) {
-        window.open(cards[0]?.url, "_blank");
+      if (!searchString.trim()) return;
+      if (selectedEngine) {
+        const url = generateSearchUrl(
+          selectedEngine.baseUrl,
+          selectedEngine.queryParam,
+          searchString
+        );
+        window.open(url, "_blank");
         resetSearch();
       }
     }
     if (ev.ctrlKey || ev.metaKey) {
+      const cards = filteredDataRef.current;
       const num = Number(ev.key);
       if (isNaN(num)) return;
       ev.preventDefault();
@@ -126,7 +134,7 @@ export function useKeyboardNavigation(
         resetSearch();
       }
     }
-  }, [resetSearch]);
+  }, [resetSearch, selectedEngine, searchString]);
 
   useEffect(() => {
     if (searchString.trim() === "") {
