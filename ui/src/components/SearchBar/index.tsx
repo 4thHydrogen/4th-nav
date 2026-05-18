@@ -127,7 +127,6 @@ const SearchBar = (props: SearchBarProps) => {
             </ul>
           )}
         </div>
-        <span className="search-hint">/</span>
       </div>
     </div>
   );
