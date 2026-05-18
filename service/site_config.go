@@ -8,7 +8,7 @@ import (
 
 func GetSiteConfig() types.SiteConfig {
 	sql_get_site_config := `
-		SELECT id, noImageMode, compactMode, columnsPerRow, iconSize
+		SELECT id, noImageMode, compactMode, columnsPerRow, iconSize, density
 		FROM nav_site_config
 		ORDER BY id ASC
 		LIMIT 1;
@@ -19,7 +19,8 @@ func GetSiteConfig() types.SiteConfig {
 	var compactMode interface{}
 	var columnsPerRow interface{}
 	var iconSize interface{}
-	err := row.Scan(&siteConfig.Id, &noImageMode, &compactMode, &columnsPerRow, &iconSize)
+	var density interface{}
+	err := row.Scan(&siteConfig.Id, &noImageMode, &compactMode, &columnsPerRow, &iconSize, &density)
 	if err != nil {
 		logger.LogError("获取网站配置失败: %s", err)
 		return types.SiteConfig{
@@ -27,6 +28,7 @@ func GetSiteConfig() types.SiteConfig {
 			NoImageMode:   false,
 			CompactMode:   false,
 			ColumnsPerRow: 3,
+			Density:       "standard",
 		}
 	}
 
@@ -65,13 +67,24 @@ func GetSiteConfig() types.SiteConfig {
 		siteConfig.IconSize = int(iconSize.(int64))
 	}
 
+	if density == nil || density.(string) == "" {
+		siteConfig.Density = "standard"
+	} else {
+		siteConfig.Density = density.(string)
+	}
+
 	return siteConfig
 }
 
 func UpdateSiteConfig(data types.SiteConfig) error {
+	density := data.Density
+	if density == "" {
+		density = "standard"
+	}
+
 	sql_update_site_config := `
 		UPDATE nav_site_config
-		SET noImageMode = ?, compactMode = ?, columnsPerRow = ?, iconSize = ?
+		SET noImageMode = ?, compactMode = ?, columnsPerRow = ?, iconSize = ?, density = ?
 		WHERE id = (SELECT id FROM nav_site_config ORDER BY id ASC LIMIT 1);
 		`
 
@@ -79,7 +92,7 @@ func UpdateSiteConfig(data types.SiteConfig) error {
 	if err != nil {
 		return err
 	}
-	res, err := stmt.Exec(data.NoImageMode, data.CompactMode, data.ColumnsPerRow, data.IconSize)
+	res, err := stmt.Exec(data.NoImageMode, data.CompactMode, data.ColumnsPerRow, data.IconSize, density)
 	if err != nil {
 		return err
 	}

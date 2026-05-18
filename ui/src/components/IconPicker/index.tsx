@@ -132,14 +132,22 @@ function IconFolder({ group, label, icons, baseUrl, keyword, expanded, onToggle,
   );
 }
 
+interface SearchResult {
+  key: string;
+  logo: string;
+  title: string;
+  source: string;
+}
+
 export default function IconPicker({ open, existingLogos, onSelect, onCancel }: IconPickerProps) {
   const uniqueLogos = [...new Set(existingLogos.filter(Boolean))];
   const [staticIcons, setStaticIcons] = useState<StaticIconsData | null>(null);
-  const [keyword, setKeyword] = useState("");
+  const [globalSearch, setGlobalSearch] = useState("");
+  const [tabKeyword, setTabKeyword] = useState("");
   const [expandedFolder, setExpandedFolder] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!open) { setKeyword(""); setExpandedFolder(null); return; }
+    if (!open) { setGlobalSearch(""); setTabKeyword(""); setExpandedFolder(null); return; }
     fetch("/static/icons/icons.json")
       .then(res => res.json())
       .then((data: StaticIconsData) => setStaticIcons(data))
@@ -150,7 +158,72 @@ export default function IconPicker({ open, existingLogos, onSelect, onCancel }: 
     setExpandedFolder(prev => prev === group ? null : group);
   }, []);
 
-  const isSearching = keyword.trim().length > 0;
+  const isSearching = tabKeyword.trim().length > 0;
+
+  // Global search across all icon sources
+  const searchResults = useMemo<SearchResult[]>(() => {
+    const query = globalSearch.trim().toLowerCase();
+    if (!query) return [];
+
+    const results: SearchResult[] = [];
+
+    // Search built-in SVG icons
+    BUILTIN_ICONS.forEach((icon) => {
+      if (icon.name.toLowerCase().includes(query)) {
+        results.push({
+          key: `builtin-${icon.name}`,
+          logo: icon.svg,
+          title: icon.name,
+          source: "基础图标",
+        });
+      }
+    });
+
+    // Search static icons from all groups
+    if (staticIcons) {
+      [...FOLDER_GROUPS, "ungrouped"].forEach((group) => {
+        const icons = staticIcons[group] || [];
+        const groupLabel = GROUP_LABELS[group] || group;
+        icons.forEach((icon) => {
+          if (
+            icon.name.toLowerCase().includes(query) ||
+            icon.file.toLowerCase().includes(query) ||
+            groupLabel.toLowerCase().includes(query)
+          ) {
+            const path = group === "ungrouped"
+              ? `/static/icons/ungrouped/${icon.file}`
+              : `/static/icons/${group}/${icon.file}`;
+            results.push({
+              key: `static-${group}-${icon.file}`,
+              logo: path,
+              title: icon.name,
+              source: groupLabel,
+            });
+          }
+        });
+      });
+    }
+
+    // Search existing logos
+    uniqueLogos.forEach((logo, index) => {
+      const fileName = logo.split("/").pop()?.replace(/\.[^.]+$/, "") || "";
+      if (
+        fileName.toLowerCase().includes(query) ||
+        logo.toLowerCase().includes(query)
+      ) {
+        results.push({
+          key: `existing-${index}`,
+          logo,
+          title: fileName || logo,
+          source: "已有图标",
+        });
+      }
+    });
+
+    return results;
+  }, [globalSearch, staticIcons, uniqueLogos]);
+
+  const hasGlobalSearch = globalSearch.trim().length > 0;
 
   const tabs = [
     {
@@ -161,16 +234,16 @@ export default function IconPicker({ open, existingLogos, onSelect, onCancel }: 
           <Input.Search
             placeholder="搜索图标名称..."
             allowClear
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
+            value={tabKeyword}
+            onChange={(e) => setTabKeyword(e.target.value)}
             style={{ marginBottom: 12 }}
           />
           <div className="icon-picker-folders">
             {FOLDER_GROUPS.map((group) => {
               const icons = staticIcons[group] || [];
               if (isSearching && !icons.some(i =>
-                i.name.toLowerCase().includes(keyword.toLowerCase()) ||
-                i.file.toLowerCase().includes(keyword.toLowerCase())
+                i.name.toLowerCase().includes(tabKeyword.toLowerCase()) ||
+                i.file.toLowerCase().includes(tabKeyword.toLowerCase())
               )) return null;
               return (
                 <IconFolder
@@ -179,7 +252,7 @@ export default function IconPicker({ open, existingLogos, onSelect, onCancel }: 
                   label={GROUP_LABELS[group] || group}
                   icons={icons}
                   baseUrl={`/static/icons/${group}`}
-                  keyword={keyword}
+                  keyword={tabKeyword}
                   expanded={isSearching || expandedFolder === group}
                   onToggle={() => handleToggle(group)}
                   onSelect={onSelect}
@@ -190,7 +263,7 @@ export default function IconPicker({ open, existingLogos, onSelect, onCancel }: 
               (() => {
                 const ungrouped = staticIcons.ungrouped;
                 const filtered = isSearching
-                  ? ungrouped.filter(i => i.name.toLowerCase().includes(keyword.toLowerCase()) || i.file.toLowerCase().includes(keyword.toLowerCase()))
+                  ? ungrouped.filter(i => i.name.toLowerCase().includes(tabKeyword.toLowerCase()) || i.file.toLowerCase().includes(tabKeyword.toLowerCase()))
                   : ungrouped;
                 if (filtered.length === 0) return null;
                 return filtered.map((icon) => (
@@ -250,7 +323,34 @@ export default function IconPicker({ open, existingLogos, onSelect, onCancel }: 
       width={640}
       destroyOnClose
     >
-      <Tabs items={tabs} />
+      <Input.Search
+        placeholder="搜索所有图标..."
+        allowClear
+        value={globalSearch}
+        onChange={(e) => setGlobalSearch(e.target.value)}
+        className="icon-picker-global-search"
+      />
+      {hasGlobalSearch ? (
+        searchResults.length > 0 ? (
+          <div className="icon-picker-search-results">
+            {searchResults.map((result) => (
+              <div key={result.key} className="icon-picker-search-item">
+                <IconCell
+                  logo={result.logo}
+                  onClick={() => onSelect(result.logo)}
+                  title={result.title}
+                />
+                <span className="icon-picker-search-item-label">{result.title}</span>
+                <span className="icon-picker-search-item-source">{result.source}</span>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="icon-picker-empty">未找到匹配的图标</div>
+        )
+      ) : (
+        <Tabs items={tabs} />
+      )}
     </Modal>
   );
 }

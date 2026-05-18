@@ -12,8 +12,6 @@ import type { Tool } from "../../types";
 import {
   useGridLayout,
   gridToPixels,
-  ROW_HEIGHT,
-  MARGIN,
   type GridLayout,
 } from "./useGridLayout";
 import { useGridDrag } from "./useGridDrag";
@@ -95,6 +93,8 @@ const WidgetGrid = ({
     cols,
     totalHeight,
     cellWidth,
+    rowHeight,
+    margin,
   } = useGridLayout(tools);
 
   const { expandedFolderId, setExpandedFolderId } = useUIStore();
@@ -151,6 +151,8 @@ const WidgetGrid = ({
     setExpandedFolderId,
     onMoveToFolder,
     onMergeToFolder,
+    rowHeight,
+    margin: margin as [number, number],
   });
 
   const handleFolderOpen = useCallback(
@@ -184,30 +186,30 @@ const WidgetGrid = ({
   const itemStyles = useMemo(() => {
     const styles = new Map<string, { left: number; top: number; width: number; height: number }>();
     for (const l of layout) {
-      styles.set(l.i, gridToPixels(l, width, cols, ROW_HEIGHT, MARGIN as [number, number]));
+      styles.set(l.i, gridToPixels(l, width, cols, rowHeight, margin));
     }
     return styles;
-  }, [layout, width, cols]);
+  }, [layout, width, cols, rowHeight, margin]);
 
   const inlinePanelStyle = useMemo(() => {
     if (expandedFolderId == null || width === 0) return null;
     const folderLayout = layout.find((l) => l.i === String(expandedFolderId));
     if (!folderLayout) return null;
-    const panelTop = (folderLayout.y + folderLayout.h) * (ROW_HEIGHT + MARGIN[1]);
+    const panelTop = (folderLayout.y + folderLayout.h) * (rowHeight + margin[1]);
     return {
       left: 0,
       top: panelTop,
       width,
-      height: INLINE_PANEL_ROWS * ROW_HEIGHT + (INLINE_PANEL_ROWS - 1) * MARGIN[1],
+      height: INLINE_PANEL_ROWS * rowHeight + (INLINE_PANEL_ROWS - 1) * margin[1],
     };
-  }, [expandedFolderId, layout, width, cols]);
+  }, [expandedFolderId, layout, width, cols, rowHeight, margin]);
 
   const expandedFolder = expandedFolderId != null ? toolsMap.get(String(expandedFolderId)) : null;
   const expandedChildren = expandedFolderId != null ? (childrenMap[expandedFolderId] ?? []) : [];
 
   const effectiveHeight = useMemo(() => {
     if (!inlinePanelStyle) return totalHeight;
-    return Math.max(totalHeight, inlinePanelStyle.top + inlinePanelStyle.height + MARGIN[1]);
+    return Math.max(totalHeight, inlinePanelStyle.top + inlinePanelStyle.height + margin[1]);
   }, [totalHeight, inlinePanelStyle]);
 
   return (
@@ -234,9 +236,9 @@ const WidgetGrid = ({
               position: "relative" as const,
               height: effectiveHeight,
               "--cell-width": `${cellWidth}px`,
-              "--row-height": `${ROW_HEIGHT}px`,
-              "--cell-gap-x": `${MARGIN[0]}px`,
-              "--cell-gap-y": `${MARGIN[1]}px`,
+              "--row-height": `${rowHeight}px`,
+              "--cell-gap-x": `${margin[0]}px`,
+              "--cell-gap-y": `${margin[1]}px`,
             } as React.CSSProperties}
           >
             {tools.map((tool) => {

@@ -232,6 +232,11 @@ func InitDB() {
 		DB.Exec(`ALTER TABLE nav_site_config ADD COLUMN iconSize INTEGER NOT NULL DEFAULT 0;`)
 	}
 
+	// 网站配置表结构升级 - 添加density列
+	if !columnExists("nav_site_config", "density") {
+		DB.Exec(`ALTER TABLE nav_site_config ADD COLUMN density TEXT NOT NULL DEFAULT 'standard';`)
+	}
+
 	// 设置表结构升级 - 添加背景图片和毛玻璃相关字段
 	if !columnExists("nav_setting", "backgroundUrl") {
 		DB.Exec(`ALTER TABLE nav_setting ADD COLUMN backgroundUrl TEXT;`)

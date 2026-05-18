@@ -216,15 +216,12 @@ export const Setting: React.FC<SettingProps> = (props) => {
                 ]}
               />
             </Form.Item>
-            <Form.Item label="图标大小" name="iconSize" tooltip="桌面端图标尺寸，0 表示使用默认值 (44px)">
+            <Form.Item label="图标密度" name="density" tooltip="控制桌面端图标的显示密度，图标大小会自动适应">
               <Select
                 options={[
-                  { label: "默认 (44px)", value: 0 },
-                  { label: "小 (32px)", value: 32 },
-                  { label: "中 (40px)", value: 40 },
-                  { label: "大 (44px)", value: 44 },
-                  { label: "加大 (52px)", value: 52 },
-                  { label: "超大 (60px)", value: 60 },
+                  { label: "紧凑", value: "compact" },
+                  { label: "标准（默认）", value: "standard" },
+                  { label: "宽松", value: "relaxed" },
                 ]}
               />
             </Form.Item>

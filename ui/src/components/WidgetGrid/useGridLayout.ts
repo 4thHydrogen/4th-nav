@@ -8,6 +8,15 @@ export const COLS = { lg: 12, md: 8, sm: 5, xs: 3 };
 export const ROW_HEIGHT = 80;
 export const MARGIN: readonly [number, number] = [12, 12];
 
+function readGridVars(): { rowHeight: number; margin: [number, number] } {
+  const el = document.querySelector(".desktop-page");
+  if (!el) return { rowHeight: ROW_HEIGHT, margin: [...MARGIN] as [number, number] };
+  const style = getComputedStyle(el);
+  const rh = parseFloat(style.getPropertyValue("--row-height")) || ROW_HEIGHT;
+  const gm = parseFloat(style.getPropertyValue("--grid-margin")) || MARGIN[0];
+  return { rowHeight: rh, margin: [gm, gm] };
+}
+
 export interface GridLayout {
   i: string;
   x: number;
@@ -253,6 +262,8 @@ export function useGridLayout(tools: Tool[]) {
   const bp = getBreakpoint(width);
   const cols = COLS[bp];
 
+  const { rowHeight, margin } = useMemo(readGridVars, [tools, width]);
+
   const initialLayout = useMemo(
     // width=0 时（ResizeObserver 还没回调，cols=3 是退化值），跳过 buildLayout
     // 避免基于错误 cols 计算出"全部挤到 x ∈ {0,1,2}"的退化布局
@@ -311,13 +322,13 @@ export function useGridLayout(tools: Tool[]) {
     [saveLayout, isClampMode]
   );
 
-  const cellWidth = cols > 0 ? (width - (cols - 1) * MARGIN[0]) / cols : 0;
+  const cellWidth = cols > 0 ? (width - (cols - 1) * margin[0]) / cols : 0;
 
   const totalHeight = useMemo(() => {
     if (layout.length === 0) return 200;
     const maxY = Math.max(...layout.map((l) => l.y + l.h));
-    return maxY * (ROW_HEIGHT + MARGIN[1]) + MARGIN[1];
-  }, [layout]);
+    return maxY * (rowHeight + margin[1]) + margin[1];
+  }, [layout, rowHeight, margin]);
 
   return {
     layout,
@@ -331,5 +342,7 @@ export function useGridLayout(tools: Tool[]) {
     cellWidth,
     isReady: width > 0,
     isClampMode,
+    rowHeight,
+    margin,
   };
 }

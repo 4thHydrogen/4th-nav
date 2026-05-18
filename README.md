@@ -8,7 +8,7 @@
 
 ```
   # 后端
-  go run main.go
+  go run .
 
   # 前端 dev
   cd ui

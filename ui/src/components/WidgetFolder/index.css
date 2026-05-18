@@ -24,14 +24,16 @@
   -webkit-backdrop-filter: blur(18px);
   border: 1px solid var(--widget-border);
 
-  /* 对齐公式：玻璃边框 = 跨越的 icon 图片区域 */
+  --folder-gap-x: calc(var(--cell-width, 72px) - var(--icon-size, 48px) + var(--cell-gap-x, 12px));
+  --folder-gap-y: calc(var(--row-height, 80px) - var(--icon-size, 48px) + var(--cell-gap-y, 12px));
+
   width: calc(
-    (var(--folder-w, 1) - 1) * (var(--cell-width, 89px) + var(--cell-gap-x, 12px))
-    + var(--icon-size, 44px)
+    var(--grid-w, 1) * var(--icon-size, 48px)
+    + (var(--grid-w, 1) - 1) * var(--folder-gap-x)
   );
   height: calc(
-    (var(--folder-h, 1) - 1) * (var(--row-height, 80px) + var(--cell-gap-y, 12px))
-    + var(--icon-size, 44px)
+    var(--grid-h, 1) * var(--icon-size, 48px)
+    + (var(--grid-h, 1) - 1) * var(--folder-gap-y)
   );
 }
 
@@ -42,11 +44,11 @@
 
 .widget-folder-preview {
   display: grid;
-  gap: 6px;
+  gap: var(--folder-inner-gap, 6px);
   width: 100%;
   height: 100%;
-  grid-template-columns: repeat(var(--folder-w, 1), 1fr);
-  grid-template-rows: repeat(var(--folder-h, 1), 1fr);
+  grid-template-columns: repeat(var(--grid-w, 1), 1fr);
+  grid-template-rows: repeat(var(--grid-h, 1), 1fr);
   justify-items: center;
   align-items: center;
 }
@@ -72,8 +74,8 @@
 }
 
 .widget-folder-child-icon {
-  width: var(--icon-size, 44px);
-  height: var(--icon-size, 44px);
+  width: var(--icon-size, 48px);
+  height: var(--icon-size, 48px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -101,8 +103,8 @@
 }
 
 .widget-folder-slot-empty {
-  width: var(--icon-size, 44px);
-  height: var(--icon-size, 44px);
+  width: var(--icon-size, 48px);
+  height: var(--icon-size, 48px);
   pointer-events: none;
 }
 
@@ -110,8 +112,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: var(--icon-size, 44px);
-  height: var(--icon-size, 44px);
+  width: var(--icon-size, 48px);
+  height: var(--icon-size, 48px);
   pointer-events: none;
   box-sizing: border-box;
 }

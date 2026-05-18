@@ -36,7 +36,7 @@ const WidgetFolder = ({ folder, childrenTools, onOpen, onOpenChild, onContextMen
   const bgColor = folder.bgColor || undefined;
 
   return (
-    <div className="widget-folder-outer" style={{ "--folder-w": w, "--folder-h": h } as React.CSSProperties}>
+    <div className="widget-folder-outer" style={{ "--grid-w": w, "--grid-h": h } as React.CSSProperties}>
       <div
         className="widget-folder"
         style={{ backgroundColor: bgColor }}

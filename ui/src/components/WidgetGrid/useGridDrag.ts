@@ -31,6 +31,8 @@ interface UseGridDragParams {
   setExpandedFolderId: (id: number | null) => void;
   onMoveToFolder: (toolId: number, folderId: number) => void;
   onMergeToFolder: (toolId1: number, toolId2: number) => void;
+  rowHeight?: number;
+  margin?: [number, number];
 }
 
 export interface GridDragResult {
@@ -59,6 +61,8 @@ export function useGridDrag({
   setExpandedFolderId,
   onMoveToFolder,
   onMergeToFolder,
+  rowHeight = ROW_HEIGHT,
+  margin = [...MARGIN] as [number, number],
 }: UseGridDragParams): GridDragResult {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [altHeld, setAltHeld] = useState(false);
@@ -137,13 +141,13 @@ export function useGridDrag({
         const translated = active.rect.current.translated;
         if (!translated) return;
 
-        const cx = translated.left + (itemLayout.w * ((containerRect.width - (cols - 1) * MARGIN[0]) / cols)) / 2;
-        const cy = translated.top + itemLayout.h * ROW_HEIGHT / 2;
+        const cx = translated.left + (itemLayout.w * ((containerRect.width - (cols - 1) * margin[0]) / cols)) / 2;
+        const cy = translated.top + itemLayout.h * rowHeight / 2;
 
         let found: string | null = null;
         for (const [lid, l] of layoutMap) {
           if (lid === id) continue;
-          const px = gridToPixels(l, width, cols, ROW_HEIGHT, MARGIN as [number, number]);
+          const px = gridToPixels(l, width, cols, rowHeight, margin);
           if (
             cx >= px.left &&
             cx <= px.left + px.width &&
@@ -170,8 +174,8 @@ export function useGridDrag({
           containerRect,
           itemLayout.w,
           cols,
-          ROW_HEIGHT,
-          MARGIN as [number, number]
+          rowHeight,
+          margin
         );
 
         // 始终基于 dragStart 时的原始 layout 计算，使被挤开的卡片在用户拖回原位时归位

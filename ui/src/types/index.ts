@@ -51,7 +51,9 @@ export interface SiteConfig {
   noImageMode: boolean;
   compactMode: boolean;
   columnsPerRow: number;
+  /** @deprecated Use density instead */
   iconSize?: number;
+  density?: "compact" | "standard" | "relaxed";
 }
 
 export interface SearchEngine {

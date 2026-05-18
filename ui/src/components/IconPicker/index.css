@@ -172,3 +172,46 @@
   color: var(--text-muted, #86909c);
   padding: 24px 0;
 }
+
+.icon-picker-global-search {
+  margin-bottom: 16px;
+}
+
+.icon-picker-search-results {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 8px;
+  max-height: 420px;
+  overflow-y: auto;
+  padding: 4px;
+}
+
+.icon-picker-search-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 6px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.icon-picker-search-item:hover {
+  background: var(--widget-icon-bg);
+}
+
+.icon-picker-search-item-label {
+  font-size: 11px;
+  color: var(--widget-text);
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 72px;
+}
+
+.icon-picker-search-item-source {
+  font-size: 10px;
+  color: var(--widget-text-faint, #86909c);
+}

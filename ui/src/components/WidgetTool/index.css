@@ -73,8 +73,8 @@
 }
 
 .widget-tool-large .widget-tool-icon {
-  width: 48px;
-  height: 48px;
+  width: calc(var(--grid-w, 1) * var(--icon-size, 48px) + (var(--grid-w, 1) - 1) * var(--icon-gap, 6px));
+  height: calc(var(--grid-h, 1) * var(--icon-size, 48px) + (var(--grid-h, 1) - 1) * var(--icon-gap, 6px));
 }
 
 .widget-tool-large .widget-tool-label {
