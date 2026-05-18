@@ -1,14 +1,20 @@
 .dock-bar {
+  --dock-icon-size: 40px;
+
   position: fixed;
   bottom: 12px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  align-items: flex-end;
-  gap: 10px;
-  padding: 6px 14px 8px;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
   border-radius: 18px;
-  background: transparent;
+  background: var(--widget-bg, rgba(255, 255, 255, 0.72));
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid var(--widget-border, rgba(15, 23, 42, 0.08));
+  box-shadow: var(--widget-overlay-shadow, 0 24px 70px rgba(15, 23, 42, 0.10));
   z-index: var(--z-dock, 500);
   transition: opacity 0.2s, transform 0.2s;
 }
@@ -19,12 +25,26 @@
 
 .dock-bar.dock-empty-hint {
   cursor: default;
+  gap: 8px;
+  padding: 10px 20px;
+}
+
+.dock-empty-icon {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: var(--widget-icon-bg, rgba(15, 23, 42, 0.06));
+  color: var(--widget-text-muted, rgba(120, 130, 150, 0.7));
+  flex-shrink: 0;
 }
 
 .dock-empty-text {
   color: var(--widget-text-muted, rgba(120, 130, 150, 0.7));
   font-size: 12px;
-  padding: 4px 12px;
+  padding: 0;
   white-space: nowrap;
 }
 
@@ -44,8 +64,8 @@
 }
 
 .dock-item img {
-  width: var(--icon-size, 48px);
-  height: var(--icon-size, 48px);
+  width: var(--dock-icon-size, 40px);
+  height: var(--dock-icon-size, 40px);
   border-radius: 12px;
   object-fit: contain;
   pointer-events: none;
@@ -75,14 +95,22 @@
 
 .dock-item.dragging {
   opacity: 0.4;
+  transform: none !important;
+}
+
+/* Disable fish-eye during drag */
+.dock-bar:has(.dock-item.dragging) .dock-item {
+  transform: none !important;
 }
 
 .dock-item.drag-over-left {
-  margin-left: 16px;
+  margin-left: 0;
+  box-shadow: -3px 0 0 0 var(--widget-interactive-border, rgba(99, 102, 241, 0.5));
 }
 
 .dock-item.drag-over-right {
-  margin-right: 16px;
+  margin-right: 0;
+  box-shadow: 3px 0 0 0 var(--widget-interactive-border, rgba(99, 102, 241, 0.5));
 }
 
 @media (max-width: 768px) {
@@ -95,4 +123,17 @@
   .dock-item img {
     border-radius: 9px;
   }
+}
+
+/* ====== Dark mode / Background mode ====== */
+
+body.dark-mode .dock-bar {
+  background: var(--widget-bg, rgba(255, 255, 255, 0.06));
+  border-color: var(--widget-border, rgba(255, 255, 255, 0.08));
+}
+
+body.has-background .dock-bar,
+body.glassmorphism .dock-bar {
+  background: var(--widget-bg, rgba(255, 255, 255, 0.06));
+  border-color: var(--widget-border, rgba(255, 255, 255, 0.08));
 }

@@ -44,6 +44,7 @@ export interface Setting {
   enableBackground: boolean;
   enableGlassmorphism: boolean;
   pexelsApiKey: string;
+  proxy: string;
 }
 
 export interface SiteConfig {

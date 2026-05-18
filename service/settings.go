@@ -8,11 +8,11 @@ import (
 
 func GetSetting() types.Setting {
 	sql_get_user := `
-		SELECT id,favicon,title,govRecord,logo192,logo512,hideAdmin,hideGithub,hideToggleJumpTarget,jumpTargetBlank,backgroundUrl,enableBackground,enableGlassmorphism,pexelsApiKey
-		FROM nav_setting
-		ORDER BY id ASC
-		LIMIT 1;
-		`
+			SELECT id,favicon,title,govRecord,logo192,logo512,hideAdmin,hideGithub,hideToggleJumpTarget,jumpTargetBlank,backgroundUrl,enableBackground,enableGlassmorphism,pexelsApiKey,proxy
+			FROM nav_setting
+			ORDER BY id ASC
+			LIMIT 1;
+			`
 	var setting types.Setting
 	row := database.DB.QueryRow(sql_get_user, 0)
 	var hideGithub interface{}
@@ -23,7 +23,8 @@ func GetSetting() types.Setting {
 	var enableBackground interface{}
 	var enableGlassmorphism interface{}
 	var pexelsApiKey interface{}
-		err := row.Scan(&setting.Id, &setting.Favicon, &setting.Title, &setting.GovRecord, &setting.Logo192, &setting.Logo512, &hideAdmin, &hideGithub, &hideToggleJumpTarget, &jumpTargetBlank, &backgroundUrl, &enableBackground, &enableGlassmorphism, &pexelsApiKey)
+	var proxy interface{}
+	err := row.Scan(&setting.Id, &setting.Favicon, &setting.Title, &setting.GovRecord, &setting.Logo192, &setting.Logo512, &hideAdmin, &hideGithub, &hideToggleJumpTarget, &jumpTargetBlank, &backgroundUrl, &enableBackground, &enableGlassmorphism, &pexelsApiKey, &proxy)
 	if err != nil {
 		logger.LogError("获取配置失败: %s", err)
 		return types.Setting{
@@ -91,6 +92,11 @@ func GetSetting() types.Setting {
 	} else {
 		setting.PexelsApiKey = pexelsApiKey.(string)
 	}
+	if proxy == nil {
+		setting.Proxy = ""
+	} else {
+		setting.Proxy = proxy.(string)
+	}
 
 	if enableBackground == nil {
 		setting.EnableBackground = false
@@ -117,16 +123,16 @@ func GetSetting() types.Setting {
 
 func UpdateSetting(data types.Setting) error {
 	sql_update_setting := `
-		UPDATE nav_setting
-		SET favicon = ?, title = ?, govRecord = ?, logo192 = ?, logo512 = ?, hideAdmin = ?, hideGithub = ?, hideToggleJumpTarget = ?, jumpTargetBlank = ?, backgroundUrl = ?, enableBackground = ?, enableGlassmorphism = ?, pexelsApiKey = ?
-		WHERE id = (SELECT id FROM nav_setting ORDER BY id ASC LIMIT 1);
-		`
+			UPDATE nav_setting
+			SET favicon = ?, title = ?, govRecord = ?, logo192 = ?, logo512 = ?, hideAdmin = ?, hideGithub = ?, hideToggleJumpTarget = ?, jumpTargetBlank = ?, backgroundUrl = ?, enableBackground = ?, enableGlassmorphism = ?, pexelsApiKey = ?, proxy = ?
+			WHERE id = (SELECT id FROM nav_setting ORDER BY id ASC LIMIT 1);
+			`
 
 	stmt, err := database.DB.Prepare(sql_update_setting)
 	if err != nil {
 		return err
 	}
-	res, err := stmt.Exec(data.Favicon, data.Title, data.GovRecord, data.Logo192, data.Logo512, data.HideAdmin, data.HideGithub, data.HideToggleJumpTarget, data.JumpTargetBlank, data.BackgroundUrl, data.EnableBackground, data.EnableGlassmorphism, data.PexelsApiKey)
+	res, err := stmt.Exec(data.Favicon, data.Title, data.GovRecord, data.Logo192, data.Logo512, data.HideAdmin, data.HideGithub, data.HideToggleJumpTarget, data.JumpTargetBlank, data.BackgroundUrl, data.EnableBackground, data.EnableGlassmorphism, data.PexelsApiKey, data.Proxy)
 	if err != nil {
 		return err
 	}

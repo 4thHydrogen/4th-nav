@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"net/url"
 	"regexp"
+	"sort"
+	"strconv"
 	"strings"
 
 	"golang.org/x/net/html"
@@ -22,6 +24,7 @@ type Scraper struct {
 	Url                *url.URL
 	EscapedFragmentUrl *url.URL
 	MaxRedirect        int
+	ProxyURL           string
 }
 
 type Document struct {
@@ -29,13 +32,82 @@ type Document struct {
 	Preview DocumentPreview
 }
 
+type IconCandidate struct {
+	URL   string
+	Sizes string
+	Type  string
+	Rel   string
+}
+
 type DocumentPreview struct {
 	Icon        string
+	Icons       []IconCandidate
 	Name        string
 	Title       string
 	Description string
 	Images      []string
 	Link        string
+}
+
+func iconTypePriority(iconType string) int {
+	t := strings.ToLower(iconType)
+	if strings.Contains(t, "svg") {
+		return 3
+	}
+	if strings.Contains(t, "png") {
+		return 2
+	}
+	return 1
+}
+
+func iconSizeScore(sizes string) int {
+	s := strings.ToLower(sizes)
+	if strings.Contains(s, "any") {
+		return 999
+	}
+	parts := strings.Split(s, "x")
+	if len(parts) == 2 {
+		w, err := strconv.Atoi(strings.TrimSpace(parts[0]))
+		if err == nil {
+			return w
+		}
+	}
+	return 0
+}
+
+func iconExtPriority(u string) int {
+	l := strings.ToLower(u)
+	if strings.Contains(l, ".svg") {
+		return 3
+	}
+	if strings.Contains(l, ".png") {
+		return 2
+	}
+	return 1
+}
+
+func (dp *DocumentPreview) SelectBestIcon() string {
+	if len(dp.Icons) == 0 {
+		return dp.Icon
+	}
+	candidates := make([]IconCandidate, len(dp.Icons))
+	copy(candidates, dp.Icons)
+	sort.SliceStable(candidates, func(i, j int) bool {
+		iTypePri := iconTypePriority(candidates[i].Type)
+		jTypePri := iconTypePriority(candidates[j].Type)
+		if iTypePri != jTypePri {
+			return iTypePri > jTypePri
+		}
+		iExtPri := iconExtPriority(candidates[i].URL)
+		jExtPri := iconExtPriority(candidates[j].URL)
+		if iExtPri != jExtPri {
+			return iExtPri > jExtPri
+		}
+		iSize := iconSizeScore(candidates[i].Sizes)
+		jSize := iconSizeScore(candidates[j].Sizes)
+		return iSize > jSize
+	})
+	return candidates[0].URL
 }
 
 func Scrape(uri string, maxRedirect int) (*Document, error) {
@@ -44,6 +116,10 @@ func Scrape(uri string, maxRedirect int) (*Document, error) {
 		return nil, err
 	}
 	return (&Scraper{Url: u, MaxRedirect: maxRedirect}).Scrape()
+}
+
+func ScrapeWithProxy(u *url.URL, maxRedirect int, proxyURL string) (*Document, error) {
+	return (&Scraper{Url: u, MaxRedirect: maxRedirect, ProxyURL: proxyURL}).Scrape()
 }
 
 func (scraper *Scraper) Scrape() (*Document, error) {
@@ -124,7 +200,16 @@ func (scraper *Scraper) getDocument() (*Document, error) {
 	req.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.88 Safari/537.36")
 	req.Header.Add("Host", scraper.Url.Host)
 
-	client := &http.Client{}
+	var client *http.Client
+	if scraper.ProxyURL != "" {
+		if proxyParsed, err := url.Parse(scraper.ProxyURL); err == nil {
+			client = &http.Client{Transport: &http.Transport{Proxy: http.ProxyURL(proxyParsed)}}
+		} else {
+			client = &http.Client{}
+		}
+	} else {
+		client = &http.Client{}
+	}
 
 	resp, err := client.Do(req)
 	if resp != nil {
@@ -168,11 +253,9 @@ func (scraper *Scraper) parseDocument(doc *Document) error {
 	var hasCanonical bool
 	var canonicalUrl *url.URL
 	doc.Preview.Images = []string{}
-	// saves previews' link in case that <link rel="canonical"> is found after <meta property="og:url">
+	doc.Preview.Icons = []IconCandidate{}
 	link := doc.Preview.Link
-	// set default value to site name if <meta property="og:site_name"> not found
 	doc.Preview.Name = scraper.Url.Host
-	// set default icon to web root if <link rel="icon" href="/favicon.ico"> not found
 	doc.Preview.Icon = fmt.Sprintf("%s://%s%s", scraper.Url.Scheme, scraper.Url.Host, "/favicon.ico")
 	for {
 		tokenType := t.Next()
@@ -196,15 +279,27 @@ func (scraper *Scraper) parseDocument(doc *Document) error {
 			var canonical bool
 			var hasIcon bool
 			var href string
+			var iconSizes string
+			var iconType string
+			var iconRel string
 			for _, attr := range token.Attr {
-				if cleanStr(attr.Key) == "rel" && cleanStr(attr.Val) == "canonical" {
+				k := cleanStr(attr.Key)
+				v := cleanStr(attr.Val)
+				if k == "rel" && v == "canonical" {
 					canonical = true
 				}
-				if cleanStr(attr.Key) == "rel" && strings.Contains(cleanStr(attr.Val), "icon") {
+				if k == "rel" && (strings.Contains(v, "icon") || strings.Contains(v, "apple-touch-icon")) {
 					hasIcon = true
+					iconRel = v
 				}
-				if cleanStr(attr.Key) == "href" {
+				if k == "href" {
 					href = attr.Val
+				}
+				if k == "sizes" {
+					iconSizes = attr.Val
+				}
+				if k == "type" {
+					iconType = attr.Val
 				}
 				if len(href) > 0 && canonical && link != href {
 					hasCanonical = true
@@ -214,9 +309,15 @@ func (scraper *Scraper) parseDocument(doc *Document) error {
 						return err
 					}
 				}
-				if len(href) > 0 && hasIcon {
-					doc.Preview.Icon = href
-				}
+			}
+			if len(href) > 0 && hasIcon {
+				doc.Preview.Icons = append(doc.Preview.Icons, IconCandidate{
+					URL:   href,
+					Sizes: iconSizes,
+					Type:  iconType,
+					Rel:   iconRel,
+				})
+				doc.Preview.Icon = href
 			}
 
 		case "meta":

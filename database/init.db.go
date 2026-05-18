@@ -251,6 +251,9 @@ func InitDB() {
 	if !columnExists("nav_setting", "pexelsApiKey") {
 		DB.Exec(`ALTER TABLE nav_setting ADD COLUMN pexelsApiKey TEXT;`)
 	}
+		if !columnExists("nav_setting", "proxy") {
+			DB.Exec(`ALTER TABLE nav_setting ADD COLUMN proxy TEXT DEFAULT '';`)
+		}
 
 	// 如果不存在，就初始化默认搜索引擎
 	sql_get_search_engine := `

@@ -144,6 +144,7 @@ const buildData = (): ContentData => ({
     enableBackground: false,
     enableGlassmorphism: false,
     pexelsApiKey: "",
+    proxy: "",
   },
   siteConfig: {
     id: 1,

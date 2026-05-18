@@ -177,6 +177,13 @@ export const Setting: React.FC<SettingProps> = (props) => {
             >
               <Input.Password placeholder="请输入 Pexels API Key" />
             </Form.Item>
+            <Form.Item
+              label="网络代理"
+              name="proxy"
+              tooltip="配置 HTTP 代理地址，仅用于获取网站图标。例如: http://127.0.0.1:7890。留空则直连"
+            >
+              <Input placeholder="http://127.0.0.1:7890" />
+            </Form.Item>
             <Form.Item label="启用背景图片" name="enableBackground" tooltip="开启后页面将显示背景图片">
               <Switch defaultChecked={Boolean(store?.setting?.enableBackground)} />
             </Form.Item>

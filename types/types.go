@@ -16,6 +16,7 @@ type Setting struct {
 	EnableBackground     bool   `json:"enableBackground"`
 	EnableGlassmorphism  bool   `json:"enableGlassmorphism"`
 	PexelsApiKey         string `json:"pexelsApiKey"`
+	Proxy                string `json:"proxy"`
 }
 
 type Token struct {

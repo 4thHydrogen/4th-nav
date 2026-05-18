@@ -50,6 +50,7 @@ describe('TypeScript types', () => {
       enableBackground: true,
       enableGlassmorphism: false,
       pexelsApiKey: "",
+    proxy: "",
     };
     expect(setting.enableBackground).toBe(true);
     expect(setting.backgroundUrl).toBe('bing');

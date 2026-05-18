@@ -1,4 +1,5 @@
 import { useCallback, useRef, useState } from "react";
+import { Plus } from "lucide-react";
 import type { DockItem } from "../../types";
 import { fetchRemoveDockItem, fetchUpdateDockSort } from "../../utils/api";
 import "./index.css";
@@ -72,6 +73,7 @@ export default function DockBar({ items, onChange }: DockBarProps) {
   if (!items || items.length === 0) {
     return (
       <div className="dock-bar dock-empty-hint">
+        <span className="dock-empty-icon"><Plus size={16} /></span>
         <span className="dock-empty-text">右键工具卡片可添加到 Dock</span>
       </div>
     );
