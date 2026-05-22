@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -68,6 +69,10 @@ func IsLogin(c *gin.Context) bool {
 	if rawToken == "" {
 		return false
 	}
-	token, err := ParseJWT(rawToken)
+	tokenStr := rawToken
+	if strings.HasPrefix(rawToken, "Bearer ") {
+		tokenStr = strings.TrimPrefix(rawToken, "Bearer ")
+	}
+	token, err := ParseJWT(tokenStr)
 	return err == nil && token.Valid
 }
