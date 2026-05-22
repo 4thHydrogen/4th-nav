@@ -41,7 +41,7 @@ const FloatingActions = ({ showGithub, theme, onThemeSwitch, showRefresh, onRefr
       {showGithub && (
         <a
           className="floating-action-btn"
-          href="https://github.com/mereithhh/van-nav"
+          href="https://github.com/4thHydrogen/4th-nav"
           target="_blank"
           rel="noreferrer"
           title="GitHub"

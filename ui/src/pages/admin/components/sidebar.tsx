@@ -63,7 +63,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </button>
 
         <a
-          href="https://github.com/mereithhh/van-nav"
+          href="https://github.com/4thHydrogen/4th-nav"
           target="_blank"
           rel="noopener noreferrer"
           className={`
