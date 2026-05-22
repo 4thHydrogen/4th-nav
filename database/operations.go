@@ -1,6 +1,6 @@
 package database
 
-import "github.com/mereith/nav/types"
+import "github.com/4thHydrogen/4th-nav/types"
 
 func HasApiToken(token string) bool {
 	sql := `SELECT value FROM nav_api_token WHERE value = ? and disabled = 0`

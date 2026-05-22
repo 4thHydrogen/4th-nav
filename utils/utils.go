@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mereith/nav/logger"
-	"github.com/mereith/nav/types"
+	"github.com/4thHydrogen/4th-nav/logger"
+	"github.com/4thHydrogen/4th-nav/types"
 	"golang.org/x/crypto/bcrypt"
 )
 

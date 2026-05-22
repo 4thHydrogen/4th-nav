@@ -1,9 +1,9 @@
 package service
 
 import (
-	"github.com/mereith/nav/database"
-	"github.com/mereith/nav/types"
-	"github.com/mereith/nav/utils"
+	"github.com/4thHydrogen/4th-nav/database"
+	"github.com/4thHydrogen/4th-nav/types"
+	"github.com/4thHydrogen/4th-nav/utils"
 	"strings"
 )
 

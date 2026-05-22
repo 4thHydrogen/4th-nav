@@ -1,6 +1,6 @@
-module github.com/mereith/nav
+module github.com/4thHydrogen/4th-nav
 
-go 1.25.0
+go 1.26.0
 
 require (
 	github.com/gin-contrib/gzip v1.2.3

@@ -1,9 +1,9 @@
 package service
 
 import (
-	"github.com/mereith/nav/database"
-	"github.com/mereith/nav/logger"
-	"github.com/mereith/nav/types"
+	"github.com/4thHydrogen/4th-nav/database"
+	"github.com/4thHydrogen/4th-nav/logger"
+	"github.com/4thHydrogen/4th-nav/types"
 )
 
 func GetSiteConfig() types.SiteConfig {

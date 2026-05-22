@@ -9,11 +9,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mereith/nav/database"
-	"github.com/mereith/nav/goscraper"
-	"github.com/mereith/nav/logger"
-	"github.com/mereith/nav/types"
-	"github.com/mereith/nav/utils"
+	"github.com/4thHydrogen/4th-nav/database"
+	"github.com/4thHydrogen/4th-nav/goscraper"
+	"github.com/4thHydrogen/4th-nav/logger"
+	"github.com/4thHydrogen/4th-nav/types"
+	"github.com/4thHydrogen/4th-nav/utils"
 )
 
 const minIconSize = 64

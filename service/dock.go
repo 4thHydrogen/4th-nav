@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/mereith/nav/database"
-	"github.com/mereith/nav/types"
+	"github.com/4thHydrogen/4th-nav/database"
+	"github.com/4thHydrogen/4th-nav/types"
 )
 
 func GetDockItems() ([]types.DockItem, error) {
