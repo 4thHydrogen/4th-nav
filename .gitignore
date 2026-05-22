@@ -124,7 +124,10 @@ public/*
 act.secret
 *.exe
 .dev
-*.py
 requirements.txt
 
 .DS_Store
+
+# AI tool local configs (not versioned)
+.serena/cache/
+.serena/project.local.yml
