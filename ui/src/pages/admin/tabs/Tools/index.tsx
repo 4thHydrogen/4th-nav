@@ -9,20 +9,12 @@ import {
   Input,
   Select,
   Upload,
-  message,
   Tooltip,
 } from "antd";
 import { CircleHelp } from "lucide-react";
 import React, { useCallback, useState, useEffect } from "react";
 import { getFilter, getOptions, mutiSearch } from "../../../../utils/admin";
-import {
-  fetchAddTool,
-  fetchDeleteTool,
-  fetchExportTools,
-  fetchImportTools,
-  fetchUpdateTool,
-  fetchUpdateToolsSort,
-} from "../../../../utils/api";
+import { fetchUpdateToolsSort } from "../../../../utils/api";
 import { useData } from "../../hooks/useData";
 import type { DragEndEvent } from "@dnd-kit/core";
 import { DndContext } from "@dnd-kit/core";
@@ -34,7 +26,11 @@ import {
 } from "@dnd-kit/sortable";
 import { Row, DragHandle, type DataType } from "./DraggableRow";
 import ToolFormModal from "./ToolFormModal";
-import type { UpdateToolDto, AddToolDto, Tool, ToolType } from "../../../../types";
+import type { Tool } from "../../../../types";
+import { useToolMutations } from "../../../../features/admin-tools/useToolMutations";
+import { useToolBulkActions } from "../../../../features/admin-tools/useToolBulkActions";
+import { useImportExport } from "../../../../features/admin-tools/useImportExport";
+import { message } from "antd";
 
 export interface ToolsProps {}
 export const Tools: React.FC<ToolsProps> = () => {
@@ -51,160 +47,42 @@ export const Tools: React.FC<ToolsProps> = () => {
   const [selectedRows, setSelectRows] = useState<DataType[]>([]);
   const [dataSource, setDataSource] = useState<DataType[]>([]);
 
-  const handleDelete = useCallback(
-    async (id: number) => {
-      try {
-        await fetchDeleteTool(id);
-        message.success("删除成功!");
-      } catch {
-        message.warning("删除失败!");
-      } finally {
-        reload();
-      }
-    },
-    [reload]
-  );
+  const { handleDelete, handleUpdate, handleCreate, handleCreateFolder } =
+    useToolMutations(reload);
+  const { handleBulkDelete, handleBulkResetLogo, handleBulkCacheLogo } =
+    useToolBulkActions(reload, selectedRows);
+  const { handleImport, handleExport } = useImportExport(reload);
 
-  const handleUpdate = useCallback(
+  const wrappedHandleCreate = useCallback(
     async (record: DataType) => {
       setRequestLoading(true);
-      try {
-        await fetchUpdateTool(record as unknown as UpdateToolDto);
-        message.success("更新成功! Logo 将在 3 秒后刷新并加载！", 3);
-        setTimeout(() => reload(), 3000);
-      } catch {
-        message.warning("更新失败!");
-      } finally {
-        setRequestLoading(false);
-        setShowEdit(false);
-        reload();
-      }
+      await handleCreate(record);
+      setRequestLoading(false);
+      setShowAddModel(false);
     },
-    [reload]
+    [handleCreate]
   );
 
-  const handleCreate = useCallback(
+  const wrappedHandleCreateFolder = useCallback(
     async (record: DataType) => {
       setRequestLoading(true);
-      try {
-        // 显式传 gridX/gridY = -1（auto layout），避免 Go 零值绕过 schema 默认导致新工具被钉在 (0,0)
-        const payload = { gridX: -1, gridY: -1, ...record } as unknown as AddToolDto;
-        await fetchAddTool(payload);
-        message.success("添加成功! Logo 将在 3 秒后刷新并加载！", 3);
-        setTimeout(() => reload(), 3000);
-      } catch {
-        message.warning("添加失败!");
-      } finally {
-        setRequestLoading(false);
-        setShowAddModel(false);
-        reload();
-      }
+      await handleCreateFolder(record);
+      setRequestLoading(false);
+      setShowAddFolder(false);
+      addFolderForm.resetFields();
     },
-    [reload]
+    [handleCreateFolder, addFolderForm]
   );
 
-  const handleCreateFolder = useCallback(
+  const wrappedHandleUpdate = useCallback(
     async (record: DataType) => {
       setRequestLoading(true);
-      const payload = {
-        gridX: -1,
-        gridY: -1,
-        ...record,
-        type: "folder" as const,
-        url: "",
-        logo: "",
-        parentId: null,
-        size: record.size || "1x1",
-        bgColor: record.bgColor || "",
-      };
-      try {
-        await fetchAddTool(payload as unknown as AddToolDto);
-        message.success("文件夹创建成功！");
-      } catch {
-        message.warning("创建失败!");
-      } finally {
-        setRequestLoading(false);
-        setShowAddFolder(false);
-        addFolderForm.resetFields();
-        reload();
-      }
+      await handleUpdate(record);
+      setRequestLoading(false);
+      setShowEdit(false);
     },
-    [reload, addFolderForm]
+    [handleUpdate]
   );
-
-  const handleImport = useCallback(
-    async (data: unknown) => {
-      try {
-        await fetchImportTools(data as Tool[]);
-        message.success("导入成功!");
-      } catch {
-        message.warning("导入失败!");
-      } finally {
-        reload();
-      }
-    },
-    [reload]
-  );
-
-  const handleBulkDelete = useCallback(async () => {
-    try {
-      for (const each of selectedRows) {
-        try {
-          await fetchDeleteTool(each.id);
-        } catch {}
-      }
-      message.success("删除成功!");
-    } catch {
-      message.success("删除失败!");
-    } finally {
-      reload();
-    }
-  }, [reload, selectedRows]);
-
-  const handleBulkResetLogo = useCallback(async () => {
-    try {
-      for (const each of selectedRows) {
-        try {
-          await fetchUpdateTool({ ...each, logo: "" } as unknown as UpdateToolDto);
-        } catch {}
-      }
-      message.success("重置成功!");
-    } catch {
-      message.success("重置失败!");
-    } finally {
-      reload();
-    }
-  }, [reload, selectedRows]);
-
-  const handleBulkCacheLogo = useCallback(async () => {
-    try {
-      for (const each of selectedRows) {
-        try {
-          await fetchUpdateTool(each as unknown as UpdateToolDto);
-        } catch {}
-      }
-      message.success("重置成功!");
-    } catch {
-      message.success("重置失败!");
-    } finally {
-      reload();
-    }
-  }, [reload, selectedRows]);
-
-  const handleExport = useCallback(async () => {
-    const data = await fetchExportTools();
-    const jsr = JSON.stringify(data);
-    const blob = new Blob([jsr], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "tools.json";
-    document.documentElement.appendChild(a);
-    a.click();
-    document.documentElement.removeChild(a);
-    message.success("导出成功！");
-    reload();
-  }, [reload]);
 
   const onDragEnd = ({ active, over }: DragEndEvent) => {
     if (active.id !== over?.id) {
@@ -495,7 +373,7 @@ export const Tools: React.FC<ToolsProps> = () => {
         form={addForm}
         categories={store?.catelogs || []}
         existingTools={store?.tools || []}
-        onOk={() => handleCreate(addForm.getFieldsValue())}
+        onOk={() => wrappedHandleCreate(addForm.getFieldsValue())}
         onCancel={() => {
           setShowAddModel(false);
           addForm.resetFields();
@@ -509,7 +387,7 @@ export const Tools: React.FC<ToolsProps> = () => {
         form={updateForm}
         categories={store?.catelogs || []}
         existingTools={store?.tools || []}
-        onOk={() => handleUpdate(updateForm.getFieldsValue())}
+        onOk={() => wrappedHandleUpdate(updateForm.getFieldsValue())}
         onCancel={() => setShowEdit(false)}
       />
       <ToolFormModal
@@ -519,7 +397,7 @@ export const Tools: React.FC<ToolsProps> = () => {
         form={addFolderForm}
         categories={store?.catelogs || []}
         existingTools={store?.tools || []}
-        onOk={() => handleCreateFolder(addFolderForm.getFieldsValue())}
+        onOk={() => wrappedHandleCreateFolder(addFolderForm.getFieldsValue())}
         onCancel={() => { setShowAddFolder(false); addFolderForm.resetFields(); }}
         afterClose={() => addFolderForm.resetFields()}
       />
