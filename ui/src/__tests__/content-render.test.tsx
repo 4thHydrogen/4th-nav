@@ -153,6 +153,7 @@ const buildData = (): ContentData => ({
     noImageMode: false,
     compactMode: false,
     columnsPerRow: 6,
+    folderListItemSize: 28,
   },
   dockItems: [],
 });

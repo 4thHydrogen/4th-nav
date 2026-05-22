@@ -64,6 +64,7 @@ describe('TypeScript types', () => {
       noImageMode: false,
       compactMode: false,
       columnsPerRow: 4,
+      folderListItemSize: 28,
     };
     expect(config.columnsPerRow).toBe(4);
   });

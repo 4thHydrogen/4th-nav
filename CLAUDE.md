@@ -1,5 +1,9 @@
 # AGENTS.md
 
+<!-- SPECKIT START -->
+- **Active Plan**: `specs/002-unified-grid-system/plan.md` — 统一网格系统：浮动文件夹窗口、全域拖拽、布局算法重构
+<!-- SPECKIT END -->
+
 ## Workflow
 
 This project uses:

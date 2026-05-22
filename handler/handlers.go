@@ -366,9 +366,16 @@ func AddToolHandler(c *gin.Context) {
 func DeleteToolHandler(c *gin.Context) {
 	// 删除工具
 	id := c.Param("id")
+	numberId, err := strconv.Atoi(id)
+	utils.CheckErr(err)
+
+	// 在删除前获取 parentId，用于空文件夹检测
+	var parentId *int
+	database.DB.QueryRow(`SELECT parent_id FROM nav_table WHERE id = ?`, numberId).Scan(&parentId)
+
 	sql_delete_tool := `
-		DELETE FROM nav_table WHERE id = ?;
-		`
+			DELETE FROM nav_table WHERE id = ?;
+			`
 	stmt, err := database.DB.Prepare(sql_delete_tool)
 	utils.CheckErr(err)
 	res, err := stmt.Exec(id)
@@ -376,21 +383,31 @@ func DeleteToolHandler(c *gin.Context) {
 	_, err = res.RowsAffected()
 	utils.CheckErr(err)
 	// 删除工具的 logo，如果有
-	numberId, err := strconv.Atoi(id)
-	utils.CheckErr(err)
 	// 同时删除 Dock 中的引用
 	database.DB.Exec(`DELETE FROM dock_items WHERE tool_id = ?`, numberId)
 	url1 := service.GetToolLogoUrlById(numberId)
 	urlEncoded := url.QueryEscape(url1)
 	sql_delete_tool_img := `
-		DELETE FROM nav_img WHERE url = ?;
-		`
+			DELETE FROM nav_img WHERE url = ?;
+			`
 	stmt, err = database.DB.Prepare(sql_delete_tool_img)
 	utils.CheckErr(err)
 	res, err = stmt.Exec(urlEncoded)
 	utils.CheckErr(err)
 	_, err = res.RowsAffected()
 	utils.CheckErr(err)
+
+	// 空文件夹自动删除：如果被删条目属于某个文件夹，检查该文件夹是否还有子条目
+	if parentId != nil {
+		var childCount int
+		err := database.DB.QueryRow(`SELECT COUNT(*) FROM nav_table WHERE parent_id = ?`, *parentId).Scan(&childCount)
+		if err == nil && childCount == 0 {
+			database.DB.Exec(`DELETE FROM nav_table WHERE id = ? AND type = 'folder'`, *parentId)
+			database.DB.Exec(`DELETE FROM dock_items WHERE tool_id = ?`, *parentId)
+			logger.LogInfo("空文件夹自动删除: folderId=%d", *parentId)
+		}
+	}
+
 	c.JSON(200, gin.H{
 		"success": true,
 		"message": "删除成功",
@@ -760,10 +777,39 @@ func MoveToolToFolderHandler(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "errorMessage": "无效请求"})
 		return
 	}
+
+	// 禁止文件夹嵌套：不能将文件夹移入另一个文件夹
+	if body.ParentId != nil {
+		var toolType string
+		database.DB.QueryRow(`SELECT type FROM nav_table WHERE id = ?`, id).Scan(&toolType)
+		if toolType == "folder" {
+			c.JSON(http.StatusBadRequest, gin.H{"success": false, "errorMessage": "文件夹不能嵌套"})
+			return
+		}
+	}
+
+	// 移出文件夹时，记录原父文件夹 ID，用于后续空文件夹检测
+	var oldParentId *int
+	if body.ParentId == nil {
+		database.DB.QueryRow(`SELECT parent_id FROM nav_table WHERE id = ?`, id).Scan(&oldParentId)
+	}
+
 	if err := service.MoveToolToFolder(id, body.ParentId); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "errorMessage": err.Error()})
 		return
 	}
+
+	// 空文件夹自动删除
+	if oldParentId != nil {
+		var childCount int
+		err := database.DB.QueryRow(`SELECT COUNT(*) FROM nav_table WHERE parent_id = ?`, *oldParentId).Scan(&childCount)
+		if err == nil && childCount == 0 {
+			database.DB.Exec(`DELETE FROM nav_table WHERE id = ? AND type = 'folder'`, *oldParentId)
+			database.DB.Exec(`DELETE FROM dock_items WHERE tool_id = ?`, *oldParentId)
+			logger.LogInfo("空文件夹自动删除(移出): folderId=%d", *oldParentId)
+		}
+	}
+
 	c.JSON(200, gin.H{"success": true, "message": "移动成功"})
 }
 

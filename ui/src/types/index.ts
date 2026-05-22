@@ -58,6 +58,7 @@ export interface SiteConfig {
   /** @deprecated Use density instead */
   iconSize?: number;
   density?: "compact" | "standard" | "relaxed";
+  folderListItemSize: number;
 }
 
 export interface SearchEngine {

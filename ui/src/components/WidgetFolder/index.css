@@ -49,8 +49,23 @@
   height: 100%;
   grid-template-columns: repeat(var(--grid-w, 1), 1fr);
   grid-template-rows: repeat(var(--grid-h, 1), 1fr);
-  justify-items: center;
+  justify-items: stretch;
+  align-items: stretch;
+}
+
+/* 文件夹内 widget-tool 自动适应格子大小 */
+.widget-folder-preview > .widget-tool {
+  display: flex;
+  flex-direction: column;
   align-items: center;
+  justify-content: center;
+}
+
+.widget-folder-preview > .widget-tool .widget-tool-icon {
+  width: 100%;
+  height: 100%;
+  max-width: var(--icon-size, 48px);
+  max-height: var(--icon-size, 48px);
 }
 
 .widget-folder-empty {
@@ -103,8 +118,8 @@
 }
 
 .widget-folder-slot-empty {
-  width: var(--icon-size, 48px);
-  height: var(--icon-size, 48px);
+  width: 100%;
+  height: 100%;
   pointer-events: none;
 }
 
@@ -112,8 +127,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: var(--icon-size, 48px);
-  height: var(--icon-size, 48px);
+  width: 100%;
+  height: 100%;
   pointer-events: none;
   box-sizing: border-box;
 }
@@ -225,4 +240,41 @@
   color: var(--widget-text-muted);
   padding: 1px 0;
   user-select: none;
+}
+
+/* List mode: scrollable, no truncation */
+.widget-folder-list-scrollable {
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+  padding-bottom: 18px;
+}
+
+.widget-folder-list-scrollable::-webkit-scrollbar {
+  width: 3px;
+}
+
+.widget-folder-list-scrollable::-webkit-scrollbar-thumb {
+  background: var(--widget-text-muted, #999);
+  border-radius: 2px;
+}
+
+/* Right-bottom corner interaction area for opening folder */
+.widget-folder-open-trigger {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0.4;
+  transition: opacity 0.15s ease;
+  z-index: 1;
+}
+
+.widget-folder-open-trigger:hover {
+  opacity: 0.9;
 }

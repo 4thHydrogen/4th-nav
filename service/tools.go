@@ -108,9 +108,21 @@ func ImportTools(data []types.Tool) {
 }
 
 func UpdateTool(data types.UpdateToolDto) {
+	// 保留现有网格位置：auto-layout 条目的 gridX/gridY 为 -1 且未持久化到 DB，
+	// 前端 handleSetSize 用 {...tool, size} 会把 -1 写回，导致 buildLayout 把它当新项排到第一行。
+	if data.GridX < 0 || data.GridY < 0 {
+		var cx, cy int
+		database.DB.QueryRow(`SELECT grid_x, grid_y FROM nav_table WHERE id = ?`, data.Id).Scan(&cx, &cy)
+		if data.GridX < 0 {
+			data.GridX = cx
+		}
+		if data.GridY < 0 {
+			data.GridY = cy
+		}
+	}
 	sql_update_tool := `
 		UPDATE nav_table
-		SET name = ?, url = ?, logo = ?, catelog = ?, ` + "`desc`" + ` = ?, sort = ?, hide = ?, view_mode = ?, type = ?, parent_id = ?, size = ?, bg_color = ?, grid_x = ?, grid_y = ?
+		SET name = ?, url = ?, logo = ?, catelog = ?, ` + "`desc`" + ` = ?, sort = ?, hide = ?, view_mode = ?, type = ?, parent_id = ?, size = ?, bg_color = ?, grid_x = ?, grid_y = ?, folder_view_mode = ?, folder_item_size = ?
 		WHERE id = ?;
 		`
 	stmt, err := database.DB.Prepare(sql_update_tool)
@@ -188,7 +200,9 @@ func GetAllTool() []types.Tool {
 		var bgColor interface{}
 		var gridX interface{}
 		var gridY interface{}
-		err = rows.Scan(&tool.Id, &tool.Name, &tool.Url, &tool.Logo, &tool.Catelog, &tool.Desc, &sort, &hide, &viewMode, &toolType, &parentId, &size, &bgColor, &gridX, &gridY)
+		var folderViewMode interface{}
+		var folderItemSize interface{}
+		err = rows.Scan(&tool.Id, &tool.Name, &tool.Url, &tool.Logo, &tool.Catelog, &tool.Desc, &sort, &hide, &viewMode, &toolType, &parentId, &size, &bgColor, &gridX, &gridY, &folderViewMode, &folderItemSize)
 		if hide == nil {
 			tool.Hide = false
 		} else {
@@ -239,6 +253,16 @@ func GetAllTool() []types.Tool {
 			tool.GridY = -1
 		} else {
 			tool.GridY = int(gridY.(int64))
+		}
+		if folderViewMode == nil || folderViewMode.(string) == "" {
+			tool.FolderViewMode = "grid"
+		} else {
+			tool.FolderViewMode = normalizeFolderViewMode(folderViewMode.(string))
+		}
+		if folderItemSize == nil {
+			tool.FolderItemSize = 28
+		} else {
+			tool.FolderItemSize = normalizeFolderItemSize(int(folderItemSize.(int64)))
 		}
 		utils.CheckErr(err)
 		results = append(results, tool)

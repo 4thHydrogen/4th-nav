@@ -70,7 +70,7 @@ export function buildLayout(tools: Tool[], cols: number): GridLayout[] {
     return autoLayout(tools, cols);
   }
 
-  // 1. 已有位置的项按 (gridY, gridX) 升序优先放置；冲突时向下找空位
+  // 1. 已有位置的项按 (gridY, gridX) 升序优先放置
   const positionedTools = tools
     .filter((t) => t.gridX >= 0)
     .slice()
@@ -89,17 +89,28 @@ export function buildLayout(tools: Tool[], cols: number): GridLayout[] {
 
   for (const tool of positionedTools) {
     const [w, h] = parseSize(tool.size);
-    const baseX = Math.min(Math.max(tool.gridX, 0), cols - w);
+    let x = Math.max(tool.gridX, 0);
     let y = Math.max(tool.gridY, 0);
-    let probe: GridLayout = { i: String(tool.id), x: baseX, y, w, h };
-    while (placed.some((p) => overlaps(p, probe))) {
-      y++;
-      probe = { i: String(tool.id), x: baseX, y, w, h };
+
+    // 如果宽度超出右边界，移到下一行开头
+    if (x + w > cols) {
+      x = 0;
     }
+
+    const probe: GridLayout = { i: String(tool.id), x, y, w, h };
+
+    // 将已放置的重叠项向右推（右到边界则下推）
+    pushOverlapping(placed, probe, cols);
+
+    // 如果 probe 自身与推后的项仍有重叠（极端情况），下移 probe
+    while (placed.some((p) => overlaps(p, probe))) {
+      probe.y++;
+    }
+
     occupy(probe);
   }
 
-  // 2. 新项（gridX < 0）按 sort 顺序找空位放置 — 避免多个新项被堆到 (0,0) 挤压成单列
+  // 2. 新项（gridX < 0）按 sort 顺序找空位放置
   const findEmptyPos = (w: number, h: number): { x: number; y: number } => {
     for (let y = 0; ; y++) {
       for (let x = 0; x <= cols - w; x++) {
@@ -130,6 +141,34 @@ export function buildLayout(tools: Tool[], cols: number): GridLayout[] {
 
 function overlaps(a: GridLayout, b: GridLayout): boolean {
   return !(a.x + a.w <= b.x || b.x + b.w <= a.x || a.y + a.h <= b.y || b.y + b.h <= a.y);
+}
+
+/**
+ * 将 placed 中与 newItem 重叠的项向右推；右侧到边界则向下推。
+ * 递归处理级联碰撞。
+ */
+function pushOverlapping(
+  placed: GridLayout[],
+  newItem: GridLayout,
+  cols: number,
+  visited = new Set<string>()
+) {
+  for (const item of placed) {
+    if (visited.has(item.i)) continue;
+    if (!overlaps(item, newItem)) continue;
+    visited.add(item.i);
+    // 优先右推
+    const rightX = newItem.x + newItem.w;
+    if (rightX + item.w <= cols) {
+      item.x = rightX;
+    } else {
+      // 右推到边界 → 下推
+      item.y = newItem.y + newItem.h;
+      item.x = Math.min(item.x, cols - item.w);
+    }
+    // 级联：被推的项可能又与其他项重叠
+    pushOverlapping(placed, item, cols, visited);
+  }
 }
 
 export function compactLayout(items: GridLayout[], cols: number): GridLayout[] {
@@ -173,33 +212,35 @@ export function moveItem(
   const clampedY = Math.max(0, targetY);
   const moved = { ...active, x: clampedX, y: clampedY };
 
-  // 保留其他项的原位置；仅当发生碰撞时将被碰撞项下移
-  const result: GridLayout[] = [moved];
-  const queue: GridLayout[] = items
+  const others: GridLayout[] = items
     .filter((i) => i.i !== activeId)
     .map((i) => ({ ...i }));
 
-  while (queue.length > 0) {
-    const item = queue.shift()!;
-    let conflict = result.find((r) => overlaps(r, item));
-    if (!conflict) {
-      result.push(item);
-      continue;
-    }
-    // 把碰撞项推到下方第一个不重叠的位置（保持 x 不变）
-    let newY = item.y;
-    while (true) {
-      newY++;
-      const probe = { ...item, y: newY };
-      conflict = result.find((r) => overlaps(r, probe));
-      if (!conflict) {
-        result.push(probe);
-        break;
+  // 将与 moved 重叠的其他项向右推（右到边界则下推）
+  pushOverlapping(others, moved, cols);
+
+  // 处理 others 之间因级联推挤可能产生的重叠：多轮修正
+  for (let round = 0; round < others.length * 2; round++) {
+    let dirty = false;
+    for (let i = 0; i < others.length; i++) {
+      for (let j = i + 1; j < others.length; j++) {
+        if (overlaps(others[i], others[j])) {
+          // 把 j 向右推
+          const rightX = others[i].x + others[i].w;
+          if (rightX + others[j].w <= cols) {
+            others[j].x = rightX;
+          } else {
+            others[j].y = others[i].y + others[i].h;
+            others[j].x = Math.min(others[j].x, cols - others[j].w);
+          }
+          dirty = true;
+        }
       }
     }
+    if (!dirty) break;
   }
 
-  return result;
+  return [moved, ...others];
 }
 
 export function gridToPixels(
@@ -271,7 +312,16 @@ export function useGridLayout(tools: Tool[]) {
     [tools, cols, width]
   );
 
-  const [layout, setLayout] = useState<GridLayout[]>(initialLayout);
+  const [layout, setLayout] = useState<GridLayout[]>([]);
+
+  // 渲染期间同步更新 layout state，消除 useEffect 的一帧延迟。
+  // useEffect 在 commit 后才触发，导致新工具（如合并创建的文件夹）
+  // 在第一帧没有 layout 条目而渲染在 (0,0)，下一帧才跳到正确位置。
+  const prevInitialRef = useRef<GridLayout[]>([]);
+  if (initialLayout !== prevInitialRef.current) {
+    prevInitialRef.current = initialLayout;
+    setLayout(initialLayout);
+  }
 
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastSaved = useRef<string>("");
@@ -295,13 +345,6 @@ export function useGridLayout(tools: Tool[]) {
       });
     }, 500);
   }, []);
-
-  // 仅在 initialLayout 变化时同步 state — 不再做"drift 检测 + autoSave"，
-  // 那会在 width=0 / cols=3 的退化首帧把错误布局写盘，永久毁掉用户位置。
-  // 持久化只发生在用户主动拖拽 (updateLayout) 时。
-  useEffect(() => {
-    setLayout(initialLayout);
-  }, [initialLayout]);
 
   // 窄屏下，原始 gridX 可能被 clamp（视觉上挤到右侧/纵向堆叠）。
   // 此模式下绝对不能 save — 否则窄屏的 clamp 会污染宽屏的 DB 位置。

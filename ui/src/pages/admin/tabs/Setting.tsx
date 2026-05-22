@@ -1,4 +1,4 @@
-import { Button, Card, Form, Input, message, Select, Spin, Switch } from "antd";
+import { Button, Card, Form, Input, message, Select, Slider, Spin, Switch } from "antd";
 import { useCallback, useEffect } from "react";
 import { fetchUpdateSetting, fetchUpdateUser, fetchUpdateSiteConfig } from "../../../utils/api";
 import { useData } from "../hooks/useData";
@@ -231,6 +231,9 @@ export const Setting: React.FC<SettingProps> = (props) => {
                   { label: "宽松", value: "relaxed" },
                 ]}
               />
+            </Form.Item>
+            <Form.Item label="列表行高" name="folderListItemSize" tooltip="文件夹列表模式下每行的高度（20-60px）">
+              <Slider min={20} max={60} step={2} marks={{ 20: '20', 28: '28', 40: '40', 60: '60' }} />
             </Form.Item>
             <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
               <Button type="primary" htmlType="submit">

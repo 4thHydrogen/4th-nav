@@ -6,7 +6,7 @@
   height: 100%;
   text-decoration: none;
   cursor: default;
-  overflow: hidden;
+  overflow: visible;
   position: relative;
 }
 
@@ -94,4 +94,64 @@
   white-space: nowrap;
   max-width: 100%;
   pointer-events: none;
+}
+
+/* Compact mode for folder collapsed state (grid) */
+.widget-tool-compact {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+}
+
+.widget-tool-compact .widget-tool-icon {
+  width: var(--compact-icon-size, 20px);
+  height: var(--compact-icon-size, 20px);
+}
+
+.widget-tool-compact .widget-tool-icon img {
+  border-radius: 6px;
+}
+
+.widget-tool-compact .widget-tool-icon .widget-tool-fallback {
+  border-radius: 6px;
+  font-size: 10px;
+}
+
+/* Compact list mode for folder collapsed state (list) */
+.widget-tool-compact-list {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 4px;
+  width: 100%;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.widget-tool-compact-list .widget-tool-icon {
+  width: var(--compact-icon-size, 16px);
+  height: var(--compact-icon-size, 16px);
+  flex-shrink: 0;
+}
+
+.widget-tool-compact-list .widget-tool-icon img {
+  border-radius: 4px;
+}
+
+.widget-tool-compact-list .widget-tool-icon .widget-tool-fallback {
+  border-radius: 4px;
+  font-size: 8px;
+}
+
+.widget-tool-compact-list .widget-tool-label {
+  font-size: 11px;
+  margin-top: 0;
+  max-width: none;
+  text-align: left;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

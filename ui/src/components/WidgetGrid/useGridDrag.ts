@@ -9,7 +9,6 @@ import {
 } from "@dnd-kit/core";
 import type { Tool } from "../../types";
 import {
-  gridToPixels,
   pixelsToGrid,
   moveItem,
   ROW_HEIGHT,
@@ -30,7 +29,7 @@ interface UseGridDragParams {
   expandedFolderId: number | null;
   setExpandedFolderId: (id: number | null) => void;
   onMoveToFolder: (toolId: number, folderId: number) => void;
-  onMergeToFolder: (toolId1: number, toolId2: number) => void;
+  onMergeToFolder: (toolId1: number, toolId2: number, pos1: { x: number; y: number }, pos2: { x: number; y: number }) => void;
   rowHeight?: number;
   margin?: [number, number];
 }
@@ -136,29 +135,9 @@ export function useGridDrag({
       if (!itemLayout) return;
 
       if (altRef.current) {
-        const { active } = event;
-        const containerRect = gridRef.current.getBoundingClientRect();
-        const translated = active.rect.current.translated;
-        if (!translated) return;
-
-        const cx = translated.left + (itemLayout.w * ((containerRect.width - (cols - 1) * margin[0]) / cols)) / 2;
-        const cy = translated.top + itemLayout.h * rowHeight / 2;
-
-        let found: string | null = null;
-        for (const [lid, l] of layoutMap) {
-          if (lid === id) continue;
-          const px = gridToPixels(l, width, cols, rowHeight, margin);
-          if (
-            cx >= px.left &&
-            cx <= px.left + px.width &&
-            cy >= px.top &&
-            cy <= px.top + px.height
-          ) {
-            found = lid;
-            break;
-          }
-        }
-        setDropTargetId(found);
+        // Use dnd-kit's built-in collision detection (closestCenter)
+        const overId = event.over ? String(event.over.id) : null;
+        setDropTargetId(overId);
       } else {
         const { active } = event;
         const containerRect = gridRef.current.getBoundingClientRect();
@@ -190,7 +169,7 @@ export function useGridDrag({
         if (changed) setLayout(next);
       }
     },
-    [gridRef, layoutMap, width, cols, setLayout]
+    [gridRef, layoutMap, width, cols, rowHeight, margin, setLayout]
   );
 
   const handleDragEnd = useCallback(
@@ -201,10 +180,18 @@ export function useGridDrag({
       if (altRef.current && tool && dropTargetId) {
         const targetTool = toolsMap.get(dropTargetId);
         if (targetTool) {
-          if (targetTool.type === "folder") {
+          // 禁止文件夹嵌套：文件夹不能移入另一个文件夹
+          if (targetTool.type === "folder" && tool.type !== "folder") {
             onMoveToFolder(tool.id, targetTool.id);
-          } else if (!folderIds.has(id)) {
-            onMergeToFolder(tool.id, targetTool.id);
+          } else if (!folderIds.has(id) && targetTool.type !== "folder") {
+            // 传递 layout 可视位置（非 DB 值），确保合并创建文件夹在正确位置
+            const l1 = layoutMap.get(id);
+            const l2 = layoutMap.get(dropTargetId);
+            onMergeToFolder(
+              tool.id, targetTool.id,
+              { x: l1?.x ?? 0, y: l1?.y ?? 0 },
+              { x: l2?.x ?? 0, y: l2?.y ?? 0 }
+            );
           }
         }
       } else {
@@ -216,7 +203,7 @@ export function useGridDrag({
       activeToolRef.current = null;
       originLayoutRef.current = [];
     },
-    [dropTargetId, toolsMap, folderIds, onMoveToFolder, onMergeToFolder, updateLayout]
+    [dropTargetId, toolsMap, folderIds, layoutMap, onMoveToFolder, onMergeToFolder, updateLayout]
   );
 
   const handleDragCancel = useCallback(() => {

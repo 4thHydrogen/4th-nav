@@ -8,11 +8,11 @@ import (
 
 func GetSiteConfig() types.SiteConfig {
 	sql_get_site_config := `
-		SELECT id, noImageMode, compactMode, columnsPerRow, iconSize, density
-		FROM nav_site_config
-		ORDER BY id ASC
-		LIMIT 1;
-		`
+			SELECT id, noImageMode, compactMode, columnsPerRow, iconSize, density, folder_list_item_size
+			FROM nav_site_config
+			ORDER BY id ASC
+			LIMIT 1;
+			`
 	var siteConfig types.SiteConfig
 	row := database.DB.QueryRow(sql_get_site_config)
 	var noImageMode interface{}
@@ -20,15 +20,17 @@ func GetSiteConfig() types.SiteConfig {
 	var columnsPerRow interface{}
 	var iconSize interface{}
 	var density interface{}
-	err := row.Scan(&siteConfig.Id, &noImageMode, &compactMode, &columnsPerRow, &iconSize, &density)
+	var folderListItemSize interface{}
+	err := row.Scan(&siteConfig.Id, &noImageMode, &compactMode, &columnsPerRow, &iconSize, &density, &folderListItemSize)
 	if err != nil {
 		logger.LogError("获取网站配置失败: %s", err)
 		return types.SiteConfig{
-			Id:            1,
-			NoImageMode:   false,
-			CompactMode:   false,
-			ColumnsPerRow: 3,
-			Density:       "standard",
+			Id:                 1,
+			NoImageMode:        false,
+			CompactMode:        false,
+			ColumnsPerRow:      3,
+			Density:            "standard",
+			FolderListItemSize: 28,
 		}
 	}
 
@@ -73,6 +75,18 @@ func GetSiteConfig() types.SiteConfig {
 		siteConfig.Density = density.(string)
 	}
 
+	if folderListItemSize == nil {
+		siteConfig.FolderListItemSize = 28
+	} else {
+		siteConfig.FolderListItemSize = int(folderListItemSize.(int64))
+		if siteConfig.FolderListItemSize < 20 {
+			siteConfig.FolderListItemSize = 20
+		}
+		if siteConfig.FolderListItemSize > 60 {
+			siteConfig.FolderListItemSize = 60
+		}
+	}
+
 	return siteConfig
 }
 
@@ -82,17 +96,25 @@ func UpdateSiteConfig(data types.SiteConfig) error {
 		density = "standard"
 	}
 
+	folderListItemSize := data.FolderListItemSize
+	if folderListItemSize < 20 {
+		folderListItemSize = 20
+	}
+	if folderListItemSize > 60 {
+		folderListItemSize = 60
+	}
+
 	sql_update_site_config := `
-		UPDATE nav_site_config
-		SET noImageMode = ?, compactMode = ?, columnsPerRow = ?, iconSize = ?, density = ?
-		WHERE id = (SELECT id FROM nav_site_config ORDER BY id ASC LIMIT 1);
-		`
+			UPDATE nav_site_config
+			SET noImageMode = ?, compactMode = ?, columnsPerRow = ?, iconSize = ?, density = ?, folder_list_item_size = ?
+			WHERE id = (SELECT id FROM nav_site_config ORDER BY id ASC LIMIT 1);
+			`
 
 	stmt, err := database.DB.Prepare(sql_update_site_config)
 	if err != nil {
 		return err
 	}
-	res, err := stmt.Exec(data.NoImageMode, data.CompactMode, data.ColumnsPerRow, data.IconSize, density)
+	res, err := stmt.Exec(data.NoImageMode, data.CompactMode, data.ColumnsPerRow, data.IconSize, density, folderListItemSize)
 	if err != nil {
 		return err
 	}

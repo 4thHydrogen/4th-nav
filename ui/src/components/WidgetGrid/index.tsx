@@ -17,7 +17,8 @@ import {
 import { useGridDrag } from "./useGridDrag";
 import WidgetTool from "../WidgetTool";
 import WidgetFolder from "../WidgetFolder";
-import InlineFolderPanel from "../InlineFolderPanel";
+import FolderPopupPanel from "../FolderPopupPanel";
+import FolderFloatingWindow from "../FolderFloatingWindow";
 import { useUIStore } from "../../stores/ui";
 import { useUpdateFolderSettings } from "../../queries";
 
@@ -25,10 +26,12 @@ interface WidgetGridProps {
   tools: Tool[];
   allTools: Tool[];
   noImageMode: boolean;
+  listItemSize: number;
   onToolClick: (tool: Tool) => void;
   onToolContextMenu: (e: React.MouseEvent, tool: Tool) => void;
   onMoveToFolder: (toolId: number, folderId: number) => void;
-  onMergeToFolder: (toolId1: number, toolId2: number) => void;
+  onMoveOutOfFolder: (toolId: number) => void;
+  onMergeToFolder: (toolId1: number, toolId2: number, pos1: { x: number; y: number }, pos2: { x: number; y: number }) => void;
 }
 
 interface DraggableItemProps {
@@ -37,9 +40,10 @@ interface DraggableItemProps {
   isDropTarget: boolean;
   isDragging: boolean;
   children: React.ReactNode;
+  dataToolId?: string;
 }
 
-const DraggableItem = ({ tool, style, isDropTarget, isDragging, children }: DraggableItemProps) => {
+const DraggableItem = ({ tool, style, isDropTarget, isDragging, children, dataToolId }: DraggableItemProps) => {
   const { attributes, listeners, setNodeRef: setDragRef } = useDraggable({ id: String(tool.id) });
   const { setNodeRef: setDropRef } = useDroppable({ id: String(tool.id) });
 
@@ -56,6 +60,7 @@ const DraggableItem = ({ tool, style, isDropTarget, isDragging, children }: Drag
       layout
       ref={setRefs}
       data-grid-id={tool.id}
+      data-tool-id={dataToolId}
       className={`widget-grid-item${isDragging ? " widget-grid-item-dragging" : ""}${isDropTarget ? " widget-drop-target" : ""}`}
       style={{
         position: "absolute",
@@ -77,9 +82,11 @@ const WidgetGrid = ({
   tools,
   allTools,
   noImageMode,
+  listItemSize,
   onToolClick,
   onToolContextMenu,
   onMoveToFolder,
+  onMoveOutOfFolder,
   onMergeToFolder,
 }: WidgetGridProps) => {
   const {
@@ -94,10 +101,14 @@ const WidgetGrid = ({
     cellWidth,
     rowHeight,
     margin,
+    isClampMode,
   } = useGridLayout(tools);
 
-  const { expandedFolderId, setExpandedFolderId } = useUIStore();
+  const { expandedFolderId, setExpandedFolderId, popupPanel, openPopupPanel, closePopupPanel } = useUIStore();
   const updateFolderSettings = useUpdateFolderSettings();
+
+  // Track folder card rect for floating window positioning
+  const [folderCardRect, setFolderCardRect] = useState<DOMRect | null>(null);
 
   const toolsMap = useMemo(() => {
     const m = new Map<string, Tool>();
@@ -156,32 +167,32 @@ const WidgetGrid = ({
   });
 
   const handleFolderOpen = useCallback(
-    (tool: Tool) => {
-      setExpandedFolderId(expandedFolderId === tool.id ? null : tool.id);
+    (tool: Tool, mouseX: number, mouseY: number) => {
+      if (popupPanel.visible && popupPanel.folderId === tool.id) {
+        closePopupPanel();
+        setExpandedFolderId(null);
+        setFolderCardRect(null);
+      } else {
+        // Get folder card DOM rect for floating window positioning
+        const folderEl = gridRef.current?.querySelector(`[data-tool-id="${tool.id}"]`);
+        if (folderEl) {
+          setFolderCardRect(folderEl.getBoundingClientRect());
+        }
+        openPopupPanel(tool.id, mouseX, mouseY);
+        setExpandedFolderId(tool.id);
+      }
     },
-    [expandedFolderId, setExpandedFolderId]
+    [popupPanel, openPopupPanel, closePopupPanel, gridRef]
   );
 
-  const panelRef = useRef<HTMLDivElement>(null);
-  const mouseEnteredPanel = useRef(false);
-
+  // Close floating window when grid narrows (resize/window change)
   useEffect(() => {
-    if (expandedFolderId == null) {
-      mouseEnteredPanel.current = false;
-      return;
+    if (popupPanel.visible && isClampMode) {
+      closePopupPanel();
+      setExpandedFolderId(null);
+      setFolderCardRect(null);
     }
-    const handleClickOutside = (e: MouseEvent) => {
-      const target = e.target as Node;
-      const folderEl = document.querySelector(`[data-grid-id="${expandedFolderId}"]`);
-      const isInFolder = folderEl?.contains(target);
-      const isInPanel = panelRef.current?.contains(target);
-      if (!isInFolder && !isInPanel) {
-        setExpandedFolderId(null);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [expandedFolderId, setExpandedFolderId]);
+  }, [isClampMode, popupPanel.visible, closePopupPanel, setExpandedFolderId]);
 
   const itemStyles = useMemo(() => {
     const styles = new Map<string, { left: number; top: number; width: number; height: number }>();
@@ -210,10 +221,12 @@ const WidgetGrid = ({
 
   const expandedFolder = expandedFolderId != null ? toolsMap.get(String(expandedFolderId)) : null;
   const expandedChildren = expandedFolderId != null ? (childrenMap[expandedFolderId] ?? []) : [];
+  const popupFolder = popupPanel.folderId != null ? toolsMap.get(String(popupPanel.folderId)) : null;
+  const popupChildren = popupPanel.folderId != null ? (childrenMap[popupPanel.folderId] ?? []) : [];
 
   const handleUpdateFolderSettings = useCallback(
-    (id: number, folderViewMode: FolderViewMode, folderItemSize: number) => {
-      updateFolderSettings.mutate({ id, folderViewMode, folderItemSize });
+    (id: number, folderViewMode: FolderViewMode, _folderItemSize: number) => {
+      updateFolderSettings.mutate({ id, folderViewMode });
     },
     [updateFolderSettings]
   );
@@ -259,12 +272,14 @@ const WidgetGrid = ({
                   style={itemStyles.get(key)}
                   isDropTarget={dropTargetId === key}
                   isDragging={activeId === key}
+                  dataToolId={key}
                 >
                   {isFolder ? (
                     <WidgetFolder
                       folder={tool}
                       childrenTools={children}
-                      onOpen={() => handleFolderOpen(tool)}
+                      listItemSize={listItemSize}
+                      onOpen={(mx, my) => handleFolderOpen(tool, mx, my)}
                       onOpenChild={onToolClick}
                       onContextMenu={onToolContextMenu}
                     />
@@ -279,42 +294,19 @@ const WidgetGrid = ({
               );
             })}
 
-            <AnimatePresence>
-              {overlayPos && expandedFolder && (
-                <motion.div
-                  ref={panelRef}
-                  key={`panel-${expandedFolderId}`}
-                  className="widget-grid-inline-panel"
-                  initial={{ opacity: 0, scale: 0.96 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.96 }}
-                  transition={{ duration: 0.15, ease: "easeOut" }}
-                  style={{
-                    position: "absolute",
-                    left: overlayPos.left,
-                    top: overlayPos.top,
-                    width: "fit-content",
-                    minWidth: 200,
-                    maxWidth: width - overlayPos.left,
-                    zIndex: 50,
-                  }}
-                  onClick={(e) => e.stopPropagation()}
-                  onMouseEnter={() => { mouseEnteredPanel.current = true; }}
-                  onMouseLeave={() => {
-                    if (mouseEnteredPanel.current) setExpandedFolderId(null);
-                  }}
-                >
-                  <InlineFolderPanel
-                    folder={expandedFolder}
-                    items={expandedChildren}
-                    noImageMode={noImageMode}
-                    onOpenTool={onToolClick}
-                    onClose={() => setExpandedFolderId(null)}
-                    onUpdateFolderSettings={handleUpdateFolderSettings}
-                  />
-                </motion.div>
-              )}
-            </AnimatePresence>
+            {popupPanel.visible && popupFolder && (
+              <FolderFloatingWindow
+                folder={popupFolder}
+                children={popupChildren}
+                listItemSize={listItemSize}
+                folderCardRect={folderCardRect}
+                gridRect={gridRef.current?.getBoundingClientRect() ?? null}
+                onClose={() => { closePopupPanel(); setExpandedFolderId(null); setFolderCardRect(null); }}
+                onOpenTool={onToolClick}
+                onContextMenu={onToolContextMenu}
+                onMoveOut={onMoveOutOfFolder}
+              />
+            )}
           </div>
         )}
       </div>

@@ -66,7 +66,10 @@ const ToolContextMenu = ({
   const nextViewMode: ToolViewMode = tool.viewMode === "card" ? "icon" : "card";
   const canDock = !isFolder;
 
-  const folders = allTools.filter((t) => t.type === "folder" && t.id !== tool.id);
+  // 文件夹不能移入其他文件夹（禁止嵌套）
+  const folders = isFolder
+    ? []
+    : allTools.filter((t) => t.type === "folder" && t.id !== tool.id);
 
   const handleMoveToFolder = async (folderId: number) => {
     try {
@@ -128,6 +131,40 @@ const ToolContextMenu = ({
     onClose();
   };
 
+  const FOLDER_SIZES: ToolSize[] = ["1x1", "2x2", "3x2", "2x3", "3x3"];
+
+  const parseSizeDims = (s: string): [number, number] => {
+    const parts = s.split("x").map(Number);
+    return [parts[0] || 1, parts[1] || 1];
+  };
+
+  const renderSizeGrid = (cols: number, rows: number, isActive: boolean) => (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: `repeat(${cols}, 1fr)`,
+        gap: 2,
+        width: cols * 10 + (cols - 1) * 2,
+        height: rows * 10 + (rows - 1) * 2,
+      }}
+    >
+      {Array.from({ length: cols * rows }).map((_, i) => (
+        <div
+          key={i}
+          style={{
+            width: 10,
+            height: 10,
+            borderRadius: 2,
+            backgroundColor: isActive
+              ? "var(--widget-accent, rgba(99,102,241,0.7))"
+              : "var(--widget-icon-bg, rgba(120,130,150,0.25))",
+            transition: "background-color 0.15s",
+          }}
+        />
+      ))}
+    </div>
+  );
+
   const handleCreateFolder = async () => {
     const name = window.prompt("请输入文件夹名称：");
     if (!name?.trim()) return;
@@ -180,19 +217,25 @@ const ToolContextMenu = ({
             onMouseLeave={() => setShowSizePicker(false)}
           >
             <button className="tool-context-menu-item tool-context-menu-item-flyout-trigger">
-              大小 ({tool.size || "1x1"}) ▸
+              大小 ({tool.size || "1×1"}) ▸
             </button>
             {showSizePicker && (
-              <div className="tool-context-menu-submenu tool-context-menu-submenu-flyout">
-                {(["1x1", "1x2", "2x1", "2x2"] as ToolSize[]).map((s) => (
-                  <button
-                    key={s}
-                    className={`tool-context-menu-item ${tool.size === s ? "active" : ""}`}
-                    onClick={() => handleSetSize(s)}
-                  >
-                    {s.replace("x", "×")}
-                  </button>
-                ))}
+              <div className="tool-context-menu-submenu tool-context-menu-submenu-flyout size-picker-grid">
+                {FOLDER_SIZES.map((s) => {
+                  const [cols, rows] = parseSizeDims(s);
+                  const isActive = tool.size === s;
+                  return (
+                    <button
+                      key={s}
+                      className={`size-picker-option ${isActive ? "active" : ""}`}
+                      onClick={() => handleSetSize(s)}
+                      title={`${cols}×${rows}`}
+                    >
+                      {renderSizeGrid(cols, rows, isActive)}
+                      <span className="size-picker-label">{cols}×{rows}</span>
+                    </button>
+                  );
+                })}
               </div>
             )}
           </div>

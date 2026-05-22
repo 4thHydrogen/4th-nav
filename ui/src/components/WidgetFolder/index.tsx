@@ -3,18 +3,20 @@ import { Folder } from "lucide-react";
 import "./index.css";
 import { getLogoUrl, isInlineSvg } from "../../utils/check";
 import { getJumpTarget } from "../../utils/setting";
+import WidgetTool from "../WidgetTool";
 import type { Tool } from "../../types";
 import { parseSize } from "../WidgetTool";
 
 interface WidgetFolderProps {
   folder: Tool;
   childrenTools: Tool[];
-  onOpen: () => void;
+  listItemSize: number;
+  onOpen: (mouseX: number, mouseY: number) => void;
   onOpenChild: (tool: Tool) => void;
   onContextMenu: (e: React.MouseEvent, tool: Tool) => void;
 }
 
-const WidgetFolder = ({ folder, childrenTools, onOpen, onOpenChild, onContextMenu }: WidgetFolderProps) => {
+const WidgetFolder = ({ folder, childrenTools, listItemSize, onOpen, onOpenChild, onContextMenu }: WidgetFolderProps) => {
 
   const [w, h] = parseSize(folder.size);
   const totalSlots = w * h;
@@ -24,19 +26,6 @@ const WidgetFolder = ({ folder, childrenTools, onOpen, onOpenChild, onContextMen
 
   const bgColor = folder.bgColor || undefined;
   const isListMode = folder.folderViewMode === "list";
-  const itemSize = folder.folderItemSize || 28;
-
-  // 列表模式下计算可显示条目数
-  const listVisibleItems = useMemo(() => {
-    if (!isListMode) return [];
-    // 文件夹内部可用高度 ≈ h * cell高度 (减去 label 和 padding)
-    const folderInnerHeight = h * 72 - 24; // 粗略估算
-    const maxItems = Math.floor(folderInnerHeight / itemSize);
-    const visibleCount = Math.max(0, maxItems - 1); // 留空间给 label
-    return childrenTools.slice(0, visibleCount);
-  }, [isListMode, childrenTools, h, itemSize]);
-
-  const listHasOverflow = isListMode && listVisibleItems.length < childrenTools.length;
 
   const interactiveItems = (() => {
     if (isListMode) return [];
@@ -76,11 +65,9 @@ const WidgetFolder = ({ folder, childrenTools, onOpen, onOpenChild, onContextMen
             mouseDownPos.current = null;
             if (Math.abs(dx) > 3 || Math.abs(dy) > 3) return;
           }
-          onOpen();
+          onOpen(e.clientX, e.clientY);
         }}
-        onAuxClick={(e) => {
-          if (e.button === 1) e.preventDefault();
-        }}
+        onAuxClick={(e) => { if (e.button === 1) e.preventDefault(); }}
         onContextMenu={(e) => onContextMenu(e, folder)}
       >
         {isEmpty ? (
@@ -88,11 +75,27 @@ const WidgetFolder = ({ folder, childrenTools, onOpen, onOpenChild, onContextMen
             <Folder size={20} />
           </div>
         ) : isListMode ? (
-          <div className="widget-folder-list-preview">
-            {listVisibleItems.map((child) => (
-              <FolderListPreviewItem key={child.id} tool={child} itemSize={itemSize} />
+          <div className="widget-folder-list-preview widget-folder-list-scrollable">
+            {childrenTools.map((child) => (
+              <WidgetTool
+                key={child.id}
+                tool={child}
+                hideLabel
+                layout="list"
+                onClick={() => onOpenChild(child)}
+                onContextMenu={onContextMenu}
+              />
             ))}
-            {listHasOverflow && <div className="widget-folder-list-overflow">...</div>}
+            {/* 右下角交互区域：点击打开浮动窗口 */}
+            <div
+              className="widget-folder-open-trigger"
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpen(e.clientX, e.clientY);
+              }}
+            >
+              <Folder size={12} />
+            </div>
           </div>
         ) : (
           <div
@@ -103,10 +106,11 @@ const WidgetFolder = ({ folder, childrenTools, onOpen, onOpenChild, onContextMen
             }}
           >
             {interactiveItems.map((child) => (
-              <ChildIcon
+              <WidgetTool
                 key={child.id}
                 tool={child}
-                onOpenChild={onOpenChild}
+                hideLabel
+                onClick={() => onOpenChild(child)}
                 onContextMenu={onContextMenu}
               />
             ))}
@@ -135,14 +139,41 @@ const WidgetFolder = ({ folder, childrenTools, onOpen, onOpenChild, onContextMen
   );
 };
 
-function FolderListPreviewItem({ tool, itemSize }: { tool: Tool; itemSize: number }) {
+function FolderListPreviewItem({
+  tool,
+  itemSize,
+  onOpenChild,
+  onContextMenu,
+}: {
+  tool: Tool;
+  itemSize: number;
+  onOpenChild: (tool: Tool) => void;
+  onContextMenu: (e: React.MouseEvent, tool: Tool) => void;
+}) {
   const iconSrc = useMemo(() => {
     if (isInlineSvg(tool.logo)) return "";
     return getLogoUrl(tool.logo);
   }, [tool.logo]);
 
   return (
-    <div className="widget-folder-list-item" style={{ height: itemSize }}>
+    <a
+      className="widget-folder-list-item"
+      href={tool.url}
+      target={getJumpTarget() === "blank" ? "_blank" : "_self"}
+      rel="noreferrer"
+      draggable={false}
+      onDragStart={(e) => e.preventDefault()}
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        onOpenChild(tool);
+      }}
+      onContextMenu={(e) => {
+        e.stopPropagation();
+        onContextMenu(e, tool);
+      }}
+      style={{ height: itemSize }}
+    >
       <span className="widget-folder-list-item-icon" style={{ width: itemSize - 6, height: itemSize - 6 }}>
         {!tool.logo || !iconSrc ? (
           <span className="widget-folder-list-item-char">{tool.name.charAt(0).toUpperCase()}</span>
@@ -151,7 +182,7 @@ function FolderListPreviewItem({ tool, itemSize }: { tool: Tool; itemSize: numbe
         )}
       </span>
       <span className="widget-folder-list-item-name">{tool.name}</span>
-    </div>
+    </a>
   );
 }
 
@@ -227,6 +258,7 @@ function ChildIcon({
 }
 
 function MiniIcon({ tool }: { tool: Tool }) {
+  const [error, setError] = useState(false);
   const iconSrc = useMemo(() => {
     if (isInlineSvg(tool.logo)) return "";
     return getLogoUrl(tool.logo);
@@ -234,10 +266,10 @@ function MiniIcon({ tool }: { tool: Tool }) {
 
   return (
     <span className="widget-folder-overflow-cell">
-      {!tool.logo || !iconSrc ? (
+      {!tool.logo || !iconSrc || error ? (
         <span className="widget-folder-overflow-char">{tool.name.charAt(0).toUpperCase()}</span>
       ) : (
-        <img className="widget-folder-overflow-mini" src={iconSrc} alt="" loading="lazy" draggable={false} />
+        <img className="widget-folder-overflow-mini" src={iconSrc} alt="" loading="lazy" draggable={false} onError={() => setError(true)} />
       )}
     </span>
   );

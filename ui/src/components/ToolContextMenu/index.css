@@ -93,6 +93,49 @@
   font-weight: 600;
 }
 
+/* Visual size picker */
+.size-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  padding: 6px;
+  min-width: 140px;
+}
+
+.size-picker-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 4px;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  background: none;
+  cursor: pointer;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+
+.size-picker-option:hover {
+  background: var(--widget-icon-bg, rgba(120, 130, 150, 0.08));
+  border-color: var(--widget-border, rgba(120, 130, 150, 0.2));
+}
+
+.size-picker-option.active {
+  border-color: var(--widget-accent, rgba(99, 102, 241, 0.5));
+  background: var(--widget-icon-bg, rgba(99, 102, 241, 0.08));
+}
+
+.size-picker-label {
+  font-size: 11px;
+  color: var(--widget-text-muted);
+  line-height: 1;
+}
+
+.size-picker-option.active .size-picker-label {
+  color: var(--widget-text);
+  font-weight: 600;
+}
+
 /* Danger action */
 .tool-context-menu-danger {
   color: #e53e3e;

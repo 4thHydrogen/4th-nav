@@ -90,7 +90,7 @@ export function useMoveToFolder() {
 export function useMergeToFolder() {
   const refresh = useRefreshContent();
   return useMutation({
-    mutationFn: async (vars: { toolId1: number; toolId2: number; catelog: string }) => {
+    mutationFn: async (vars: { toolId1: number; toolId2: number; catelog: string; gridX: number; gridY: number }) => {
       const folder = await fetchAddTool({
         name: "新建文件夹",
         url: "",
@@ -104,8 +104,8 @@ export function useMergeToFolder() {
         parentId: null,
         size: "1x1",
         bgColor: "",
-        gridX: -1,
-        gridY: -1,
+        gridX: vars.gridX,
+        gridY: vars.gridY,
         folderViewMode: "grid",
         folderItemSize: 28,
       });
@@ -127,16 +127,16 @@ export function useUpdateLayout() {
 export function useUpdateFolderSettings() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (vars: { id: number; folderViewMode: FolderViewMode; folderItemSize: number }) =>
-      fetchUpdateFolderSettings(vars.id, vars.folderViewMode, vars.folderItemSize),
-    onMutate: async ({ id, folderViewMode, folderItemSize }) => {
+    mutationFn: (vars: { id: number; folderViewMode: FolderViewMode }) =>
+      fetchUpdateFolderSettings(vars.id, vars.folderViewMode, 28),
+    onMutate: async ({ id, folderViewMode }) => {
       await qc.cancelQueries({ queryKey: contentKey });
       const prev = qc.getQueryData<ContentData>(contentKey);
       if (prev) {
         qc.setQueryData<ContentData>(contentKey, {
           ...prev,
           tools: prev.tools.map((t) =>
-            t.id === id ? { ...t, folderViewMode, folderItemSize } : t
+            t.id === id ? { ...t, folderViewMode } : t
           ),
         });
       }

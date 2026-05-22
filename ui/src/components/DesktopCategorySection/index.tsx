@@ -2,8 +2,8 @@ import { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import type { Tool, FolderViewMode } from "../../types";
 import ToolItem from "../ToolItem";
 import FolderItem from "../FolderItem";
-import InlineFolderPanel from "../InlineFolderPanel";
-import { useUpdateFolderSettings } from "../../queries";
+import FolderPopupPanel from "../FolderPopupPanel";
+import { useUpdateFolderSettings, useContentQuery } from "../../queries";
 import "./index.css";
 
 interface DesktopCategorySectionProps {
@@ -26,8 +26,11 @@ const DesktopCategorySection = ({
   onToolClick,
 }: DesktopCategorySectionProps) => {
   const [expandedFolderId, setExpandedFolderId] = useState<number | null>(null);
+  const [popupMousePos, setPopupMousePos] = useState<{ x: number; y: number } | null>(null);
   const sectionRef = useRef<HTMLElement>(null);
   const updateFolderSettings = useUpdateFolderSettings();
+  const { data } = useContentQuery();
+  const listItemSize = data?.siteConfig?.folderListItemSize ?? 28;
 
   const childrenMap = useMemo(() => {
     const map: Record<number, Tool[]> = {};
@@ -40,9 +43,15 @@ const DesktopCategorySection = ({
     return map;
   }, [allTools]);
 
-  const handleFolderClick = useCallback((folderId: number) => {
-    setExpandedFolderId((prev) => (prev === folderId ? null : folderId));
-  }, []);
+  const handleFolderClick = useCallback((folderId: number, mouseX: number, mouseY: number) => {
+    if (expandedFolderId === folderId) {
+      setExpandedFolderId(null);
+      setPopupMousePos(null);
+    } else {
+      setExpandedFolderId(folderId);
+      setPopupMousePos({ x: mouseX, y: mouseY });
+    }
+  }, [expandedFolderId]);
 
   const handleClosePanel = useCallback(() => {
     setExpandedFolderId(null);
@@ -57,8 +66,8 @@ const DesktopCategorySection = ({
   );
 
   const handleUpdateFolderSettings = useCallback(
-    (id: number, folderViewMode: FolderViewMode, folderItemSize: number) => {
-      updateFolderSettings.mutate({ id, folderViewMode, folderItemSize });
+    (id: number, folderViewMode: FolderViewMode, _folderItemSize: number) => {
+      updateFolderSettings.mutate({ id, folderViewMode });
     },
     [updateFolderSettings]
   );
@@ -92,25 +101,35 @@ const DesktopCategorySection = ({
         const isExpanded = expandedFolderId === item.id;
 
         elements.push(
-          <div key={`folder-${item.id}`} style={{ position: "relative" }}>
+          <div
+            key={`folder-${item.id}`}
+            style={{ position: "relative", cursor: "pointer" }}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleFolderClick(item.id, e.clientX, e.clientY);
+            }}
+          >
             <FolderItem
               folder={item}
               childrenTools={children}
               expanded={isExpanded}
-              onClick={() => handleFolderClick(item.id)}
+              onClick={() => {}}
               onContextMenu={onToolContextMenu}
             />
-            {isExpanded && (
-              <div className="desktop-folder-panel-overlay">
-                <InlineFolderPanel
-                  folder={item}
-                  items={children}
-                  noImageMode={noImageMode}
-                  onOpenTool={handleOpenChildTool}
-                  onClose={handleClosePanel}
-                  onUpdateFolderSettings={handleUpdateFolderSettings}
-                />
-              </div>
+            {isExpanded && popupMousePos && (
+              <FolderPopupPanel
+                folder={item}
+                children={children}
+                mouseX={popupMousePos.x}
+                mouseY={popupMousePos.y}
+                listItemSize={listItemSize}
+                siteConfig={data?.siteConfig ?? { id: 0, noImageMode, compactMode: false, columnsPerRow: 3, folderListItemSize: listItemSize }}
+                onClose={handleClosePanel}
+                onOpenTool={handleOpenChildTool}
+                onContextMenu={onToolContextMenu}
+                onMoveOut={() => {}}
+                noImageMode={noImageMode}
+              />
             )}
           </div>
         );

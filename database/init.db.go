@@ -244,6 +244,11 @@ func InitDB() {
 		DB.Exec(`ALTER TABLE nav_site_config ADD COLUMN density TEXT NOT NULL DEFAULT 'standard';`)
 	}
 
+		// 网站配置表结构升级 - 添加全局文件夹列表行高列
+		if !columnExists("nav_site_config", "folder_list_item_size") {
+			DB.Exec(`ALTER TABLE nav_site_config ADD COLUMN folder_list_item_size INTEGER NOT NULL DEFAULT 28;`)
+		}
+
 	// 设置表结构升级 - 添加背景图片和毛玻璃相关字段
 	if !columnExists("nav_setting", "backgroundUrl") {
 		DB.Exec(`ALTER TABLE nav_setting ADD COLUMN backgroundUrl TEXT;`)
@@ -356,6 +361,14 @@ func InitDB() {
 		utils.CheckErr(err)
 	}
 	rows.Close()
+	// 如果 nav_table 为空，初始化测试数据
+	sql_get_tools_count := `SELECT COUNT(*) FROM nav_table;`
+	var toolsCount int
+	err = DB.QueryRow(sql_get_tools_count).Scan(&toolsCount)
+	utils.CheckErr(err)
+	if toolsCount == 0 {
+		initSeedData()
+	}
 	logger.LogInfo("数据库初始化成功💗")
 
 	// 清理空分类记录 - 删除名称为空或只包含空白字符的分类
@@ -379,4 +392,84 @@ func cleanupEmptyCategories() {
 	if err == nil && rowsAffected > 0 {
 		logger.LogInfo("已清理 %d 条空分类记录", rowsAffected)
 	}
+}
+
+// initSeedData 在 nav_table 为空时插入测试数据
+func initSeedData() {
+	// 插入测试文件夹
+	folders := []struct {
+		name     string
+		url      string
+		logo     string
+		catelog  string
+		desc     string
+		sort     int
+		viewMode string
+		type_    string
+		size     string
+		bgColor  string
+	}{
+		{"常用工具", "", "", "", "常用开发工具", 1, "icon", "folder", "1x1", ""},
+		{"学习资源", "", "", "", "技术学习资源", 2, "icon", "folder", "1x1", ""},
+		{"社交媒体", "", "", "", "社交和媒体", 3, "icon", "folder", "1x1", ""},
+	}
+
+	sql_add_folder := `
+		INSERT INTO nav_table (name, url, logo, catelog, ` + "`desc`" + `, sort, hide, view_mode, type, parent_id, size, bg_color, grid_x, grid_y, folder_view_mode, folder_item_size)
+		VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?, NULL, ?, ?, -1, -1, 'grid', 28);
+		`
+	for i, f := range folders {
+		_, err := DB.Exec(sql_add_folder, f.name, f.url, f.logo, f.catelog, f.desc, f.sort+i*0, f.viewMode, f.type_, f.size, f.bgColor)
+		utils.CheckErr(err)
+	}
+
+	// 获取文件夹 ID
+	var folder1ID, folder2ID, folder3ID int
+	DB.QueryRow("SELECT id FROM nav_table WHERE name='常用工具' AND type='folder'").Scan(&folder1ID)
+	DB.QueryRow("SELECT id FROM nav_table WHERE name='学习资源' AND type='folder'").Scan(&folder2ID)
+	DB.QueryRow("SELECT id FROM nav_table WHERE name='社交媒体' AND type='folder'").Scan(&folder3ID)
+
+	// 插入测试网页条目
+	type seedTool struct {
+		name     string
+		url      string
+		logo     string
+		catelog  string
+		desc     string
+		sort     int
+		viewMode string
+		type_    string
+		parentID *int
+		size     string
+		bgColor  string
+	}
+
+	tools := []seedTool{
+		// 常用工具
+		{"GitHub", "https://github.com", "github.ico", "", "代码托管平台", 1, "icon", "icon", &folder1ID, "1x1", ""},
+		{"Google", "https://google.com", "google.ico", "", "搜索引擎", 2, "icon", "icon", &folder1ID, "1x1", ""},
+		{"Stack Overflow", "https://stackoverflow.com", "stackoverflow.ico", "", "技术问答社区", 3, "icon", "icon", &folder1ID, "1x1", ""},
+		// 学习资源
+		{"MDN", "https://developer.mozilla.org", "mdn.ico", "", "Web 开发文档", 4, "icon", "icon", &folder2ID, "1x1", ""},
+		{"TypeScript Docs", "https://www.typescriptlang.org/docs", "typescript.ico", "", "TypeScript 官方文档", 5, "icon", "icon", &folder2ID, "1x1", ""},
+		{"React Docs", "https://react.dev", "react.ico", "", "React 官方文档", 6, "icon", "icon", &folder2ID, "1x1", ""},
+		// 社交媒体
+		{"Twitter/X", "https://x.com", "twitter.ico", "", "社交平台", 7, "icon", "icon", &folder3ID, "1x1", ""},
+		{"Reddit", "https://reddit.com", "reddit.ico", "", "社区论坛", 8, "icon", "icon", &folder3ID, "1x1", ""},
+		{"YouTube", "https://youtube.com", "youtube.ico", "", "视频平台", 9, "icon", "icon", &folder3ID, "1x1", ""},
+		// 独立条目
+		{"Gmail", "https://mail.google.com", "gmail.ico", "", "Google 邮箱", 10, "icon", "icon", nil, "1x1", ""},
+		{"Notion", "https://notion.so", "notion.ico", "", "笔记和协作工具", 11, "icon", "icon", nil, "1x1", ""},
+	}
+
+	sql_add_tool := `
+		INSERT INTO nav_table (name, url, logo, catelog, ` + "`desc`" + `, sort, hide, view_mode, type, parent_id, size, bg_color, grid_x, grid_y, folder_view_mode, folder_item_size)
+		VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, -1, -1, 'grid', 28);
+		`
+	for _, t := range tools {
+		_, err := DB.Exec(sql_add_tool, t.name, t.url, t.logo, t.catelog, t.desc, t.sort, t.viewMode, t.type_, t.parentID, t.size, t.bgColor)
+		utils.CheckErr(err)
+	}
+
+	logger.LogInfo("测试数据初始化成功")
 }

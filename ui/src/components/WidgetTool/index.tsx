@@ -9,6 +9,9 @@ interface WidgetToolProps {
   tool: Tool;
   onContextMenu: (e: React.MouseEvent, tool: Tool) => void;
   onClick: () => void;
+  compact?: boolean;
+  hideLabel?: boolean;
+  layout?: "grid" | "list";
 }
 
 const parseSize = (size: string): [number, number] => {
@@ -19,10 +22,17 @@ const parseSize = (size: string): [number, number] => {
   return [1, 1];
 };
 
-const WidgetTool = ({ tool, onContextMenu, onClick }: WidgetToolProps) => {
+const WidgetTool = ({ tool, onContextMenu, onClick, compact = false, hideLabel = false, layout = "grid" }: WidgetToolProps) => {
   const [w, h] = parseSize(tool.size);
-  const isLarge = w > 1 || h > 1;
+  const isLarge = !compact && (w > 1 || h > 1);
   const mouseDownPos = useRef<{ x: number; y: number } | null>(null);
+
+  // 为 1×1 网页项目生成随机彩色背景（基于 id 哈希，调试用）
+  const debugBg = useMemo(() => {
+    if (compact || tool.type === "folder" || (w > 1 || h > 1)) return undefined;
+    const hue = (tool.id * 137.5) % 360;
+    return `hsl(${hue}, 65%, 85%)`;
+  }, [compact, tool.id, tool.type, w, h]);
 
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
@@ -62,6 +72,31 @@ const WidgetTool = ({ tool, onContextMenu, onClick }: WidgetToolProps) => {
     );
   }, [tool.logo, tool.url, tool.name, imageLoaded, imageError]);
 
+  const modeClass = compact
+    ? layout === "list" ? "widget-tool-compact-list" : "widget-tool-compact"
+    : layout === "list" ? "widget-tool-list"
+    : isLarge ? "widget-tool-large" : "widget-tool-small";
+
+  if (compact && layout === "list") {
+    return (
+      <a
+        href={tool.url}
+        onClick={(e) => {
+          e.preventDefault();
+          onClick();
+        }}
+        onContextMenu={(e) => onContextMenu(e, tool)}
+        onDragStart={(e) => e.preventDefault()}
+        draggable={false}
+        className={`widget-tool ${modeClass}`}
+        title={tool.name}
+      >
+        <div className="widget-tool-icon">{iconEl}</div>
+        <div className="widget-tool-label" title={tool.name}>{tool.name}</div>
+      </a>
+    );
+  }
+
   return (
     <a
       href={tool.url}
@@ -82,14 +117,14 @@ const WidgetTool = ({ tool, onContextMenu, onClick }: WidgetToolProps) => {
       draggable={false}
       target={getJumpTarget() === "blank" ? "_blank" : "_self"}
       rel="noreferrer"
-      className={`widget-tool ${isLarge ? "widget-tool-large" : "widget-tool-small"}`}
+      className={`widget-tool ${modeClass}`}
     >
-      <div className="widget-tool-icon">
-        {iconEl}
-      </div>
-      <div className="widget-tool-label" title={tool.name}>
-        {tool.name}
-      </div>
+      <div className="widget-tool-icon" style={{ backgroundColor: debugBg, borderRadius: debugBg ? '12px' : undefined }}>{iconEl}</div>
+      {!compact && !hideLabel && (
+        <div className="widget-tool-label" title={tool.name}>
+          {tool.name}
+        </div>
+      )}
       {isLarge && tool.desc && (
         <div className="widget-tool-desc" title={tool.desc}>
           {tool.desc}

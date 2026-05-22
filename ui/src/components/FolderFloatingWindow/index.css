@@ -1,0 +1,153 @@
+/* Overlay to block main panel interaction */
+.folder-floating-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 998;
+  background: rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+/* Floating window container */
+.folder-floating-window {
+  position: absolute;
+  z-index: 999;
+  background: var(--bg-card, #fff);
+  border: 1px solid var(--border-color, #e2e2e2);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: folder-floating-enter 200ms ease-out;
+}
+
+@keyframes folder-floating-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Header */
+.folder-floating-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-color, #e2e2e2);
+  flex-shrink: 0;
+}
+
+.folder-floating-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary, #333);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.folder-floating-actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.folder-floating-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--text-secondary, #666);
+  transition: background 0.15s, color 0.15s;
+}
+
+.folder-floating-action-btn:hover {
+  background: var(--bg-hover, rgba(0, 0, 0, 0.06));
+  color: var(--text-primary, #333);
+}
+
+/* Grid layout for items */
+.folder-floating-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 80px);
+  gap: 6px;
+  padding: 10px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.folder-floating-grid::-webkit-scrollbar {
+  width: 4px;
+}
+
+.folder-floating-grid::-webkit-scrollbar-thumb {
+  background: var(--border-color, #ccc);
+  border-radius: 2px;
+}
+
+/* List layout for items */
+.folder-floating-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.folder-floating-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.folder-floating-list::-webkit-scrollbar-thumb {
+  background: var(--border-color, #ccc);
+  border-radius: 2px;
+}
+
+/* Individual item wrapper */
+.folder-floating-item {
+  cursor: grab;
+  touch-action: none;
+  border-radius: 8px;
+  transition: opacity 0.15s, background 0.15s;
+}
+
+.folder-floating-item:hover {
+  background: var(--bg-hover, rgba(0, 0, 0, 0.04));
+}
+
+.folder-floating-item:active {
+  cursor: grabbing;
+}
+
+.folder-floating-item.dragging {
+  opacity: 0.4;
+}
+
+/* Drag hint */
+.folder-floating-drag-hint {
+  margin: 4px 10px 8px;
+  padding: 4px 8px;
+  text-align: center;
+  font-size: 11px;
+  color: var(--text-secondary, #888);
+  background: var(--bg-hover, rgba(0, 0, 0, 0.03));
+  border-radius: 4px;
+}

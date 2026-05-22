@@ -205,15 +205,27 @@ const Content = () => {
     [moveToFolder]
   );
 
+  const handleMoveOutOfFolderCb = useCallback(
+    (toolId: number) => {
+      moveToFolder.mutate({ toolId, folderId: null });
+    },
+    [moveToFolder]
+  );
+
   const handleMergeToFolderCb = useCallback(
-    (toolId1: number, toolId2: number) => {
+    (toolId1: number, toolId2: number, pos1: { x: number; y: number }, pos2: { x: number; y: number }) => {
       const t1 = data?.tools?.find((t) => t.id === toolId1);
       const t2 = data?.tools?.find((t) => t.id === toolId2);
       if (!t1 || !t2) return;
+      // 使用 layout 可视位置（非 DB 值）确保文件夹在正确位置创建
+      const earlier =
+        pos1.y < pos2.y || (pos1.y === pos2.y && pos1.x < pos2.x) ? pos1 : pos2;
       mergeToFolder.mutate({
         toolId1,
         toolId2,
         catelog: t1.catelog || t2.catelog || "",
+        gridX: earlier.x,
+        gridY: earlier.y,
       });
     },
     [data?.tools, mergeToFolder]
@@ -313,9 +325,11 @@ const Content = () => {
                 tools={gridTools}
                 allTools={allTools}
                 noImageMode={noImageMode}
+                listItemSize={data?.siteConfig?.folderListItemSize ?? 28}
                 onToolClick={handleToolClick}
                 onToolContextMenu={handleContextMenu}
                 onMoveToFolder={handleMoveToFolderCb}
+                onMoveOutOfFolder={handleMoveOutOfFolderCb}
                 onMergeToFolder={handleMergeToFolderCb}
               />
             )}

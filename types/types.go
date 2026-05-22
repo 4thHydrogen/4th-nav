@@ -77,10 +77,11 @@ type SearchEngine struct {
 
 // 网站配置模型
 type SiteConfig struct {
-	Id            int    `json:"id"`
-	NoImageMode   bool   `json:"noImageMode"`
-	CompactMode   bool   `json:"compactMode"`
-	ColumnsPerRow int    `json:"columnsPerRow"`
-	IconSize      int    `json:"iconSize"`
-	Density       string `json:"density"`
+	Id                 int    `json:"id"`
+	NoImageMode        bool   `json:"noImageMode"`
+	CompactMode        bool   `json:"compactMode"`
+	ColumnsPerRow      int    `json:"columnsPerRow"`
+	IconSize           int    `json:"iconSize"`
+	Density            string `json:"density"`
+	FolderListItemSize int    `json:"folderListItemSize"`
 }
