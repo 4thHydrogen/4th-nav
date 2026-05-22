@@ -15,7 +15,7 @@ import (
 
 func GetAllHandler(c *gin.Context) {
 	tools := service.GetAllTool()
-	catelogs := service.GetAllCatelog()
+	catelogs := service.GetAllCategories()
 	if !utils.IsLogin(c) {
 		tools = utils.FilterHideTools(tools, catelogs)
 	}

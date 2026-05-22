@@ -13,7 +13,7 @@ import (
 
 func GetAdminAllDataHandler(c *gin.Context) {
 	tools := service.GetAllTool()
-	catelogs := service.GetAllCatelog()
+	catelogs := service.GetAllCategories()
 	setting := service.GetSetting()
 	siteConfig := service.GetSiteConfig()
 	tokens := service.GetApiTokens()

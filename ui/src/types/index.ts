@@ -25,12 +25,15 @@ export interface Tool {
   folderItemSize: number;
 }
 
-export interface Catelog {
+export interface Category {
   id: number;
   name: string;
   sort: number;
   hide: boolean;
 }
+
+/** @deprecated Use Category instead */
+export type Catelog = Category;
 
 export interface Setting {
   id: number;
@@ -97,14 +100,14 @@ export interface ApiResponse<T> {
 
 export interface PublicApiData {
   tools: Tool[];
-  catelogs: Catelog[];
+  catelogs: Category[];
   setting: Setting;
   siteConfig: SiteConfig;
 }
 
 export interface AdminApiData {
   tools: Tool[];
-  catelogs: Catelog[];
+  catelogs: Category[];
   setting: Setting;
   siteConfig: SiteConfig;
   user: Pick<User, "name" | "id">;
@@ -156,15 +159,21 @@ export interface UpdateToolDto extends AddToolDto {
   id: number;
 }
 
-export interface AddCatelogDto {
+export interface AddCategoryDto {
   name: string;
   sort: number;
   hide: boolean;
 }
 
-export interface UpdateCatelogDto extends AddCatelogDto {
+/** @deprecated Use AddCategoryDto instead */
+export type AddCatelogDto = AddCategoryDto;
+
+export interface UpdateCategoryDto extends AddCategoryDto {
   id: number;
 }
+
+/** @deprecated Use UpdateCategoryDto instead */
+export type UpdateCatelogDto = UpdateCategoryDto;
 
 export interface UpdateUserDto {
   id: number;

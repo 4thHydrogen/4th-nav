@@ -18,14 +18,14 @@ type AddTokenDto struct {
 	Name string `json:"name"`
 }
 
-type UpdateCatelogDto struct {
+type UpdateCategoryDto struct {
 	Id   int    `json:"id"`
 	Name string `json:"name"`
 	Sort int    `json:"sort"`
 	Hide bool   `json:"hide"`
 }
 
-type AddCatelogDto struct {
+type AddCategoryDto struct {
 	Name string `json:"name"`
 	Sort int    `json:"sort"`
 	Hide bool   `json:"hide"`

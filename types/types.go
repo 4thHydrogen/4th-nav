@@ -57,7 +57,7 @@ type Tool struct {
 	FolderItemSize int     `json:"folderItemSize"`
 }
 
-type Catelog struct {
+type Category struct {
 	Id   int    `json:"id"`
 	Name string `json:"name"`
 	Sort int    `json:"sort"`

@@ -60,10 +60,15 @@ func RegisterAdminRoutes(admin *gin.RouterGroup) {
 	admin.PUT("/layout", handler.UpdateLayoutHandler)
 	admin.PUT("/tools/sort", handler.UpdateToolsSortHandler)
 
-	// Category routes
-	admin.POST("/catelog", handler.AddCatelogHandler)
-	admin.DELETE("/catelog/:id", handler.DeleteCatelogHandler)
-	admin.PUT("/catelog/:id", handler.UpdateCatelogHandler)
+	// Category routes (legacy /catelog paths for backward compatibility)
+	admin.POST("/catelog", handler.AddCategoryHandler)
+	admin.DELETE("/catelog/:id", handler.DeleteCategoryHandler)
+	admin.PUT("/catelog/:id", handler.UpdateCategoryHandler)
+
+	// Category routes (new canonical paths)
+	admin.POST("/category", handler.AddCategoryHandler)
+	admin.DELETE("/category/:id", handler.DeleteCategoryHandler)
+	admin.PUT("/category/:id", handler.UpdateCategoryHandler)
 
 	// Search engine routes
 	admin.GET("/searchEngine", handler.GetAllSearchEnginesHandler)

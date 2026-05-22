@@ -15,7 +15,7 @@ const Login = React.lazy(() => import('./pages/Login'));
 
 // 懒加载管理后台的子页面
 const Tools = React.lazy(() => import('./pages/admin/tabs/Tools').then(module => ({ default: module.Tools })));
-const Catelog = React.lazy(() => import('./pages/admin/tabs/Catelog').then(module => ({ default: module.Catelog })));
+const Catelog = React.lazy(() => import('./pages/admin/tabs/Category').then(module => ({ default: module.Catelog })));
 const ApiToken = React.lazy(() => import('./pages/admin/tabs/ApiToken').then(module => ({ default: module.ApiToken })));
 const Setting = React.lazy(() => import('./pages/admin/tabs/Setting').then(module => ({ default: module.Setting })));
 const SearchEngine = React.lazy(() => import('./pages/admin/tabs/Search'));

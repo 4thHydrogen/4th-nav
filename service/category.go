@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func UpdateCatelog(data types.UpdateCatelogDto) {
+func UpdateCategory(data types.UpdateCategoryDto) {
 
 	// 查询分类原名称
 	sql_select_old_catelog_name := `select name from nav_catelog where id = ?;`
@@ -51,14 +51,14 @@ func UpdateCatelog(data types.UpdateCatelogDto) {
 	utils.CheckErr(err)
 }
 
-func AddCatelog(data types.AddCatelogDto) {
+func AddCategory(data types.AddCategoryDto) {
 	// 检查分类名称是否为空，如果为空则不创建
 	if data.Name == "" || strings.TrimSpace(data.Name) == "" {
 		return
 	}
 	
 	// 先检查重复不重复
-	existCatelogs := GetAllCatelog()
+	existCatelogs := GetAllCategories()
 	var existCatelogsArr []string
 	for _, catelogDto := range existCatelogs {
 		existCatelogsArr = append(existCatelogsArr, catelogDto.Name)
@@ -78,15 +78,15 @@ func AddCatelog(data types.AddCatelogDto) {
 	utils.CheckErr(err)
 }
 
-func GetAllCatelog() []types.Catelog {
+func GetAllCategories() []types.Category {
 	sql_get_all := `
 		SELECT id,name,sort,hide FROM nav_catelog order by sort;
 	`
-	results := make([]types.Catelog, 0)
+	results := make([]types.Category, 0)
 	rows, err := database.DB.Query(sql_get_all)
 	utils.CheckErr(err)
 	for rows.Next() {
-		var catelog types.Catelog
+		var catelog types.Category
 		err = rows.Scan(&catelog.Id, &catelog.Name, &catelog.Sort, &catelog.Hide)
 		utils.CheckErr(err)
 		results = append(results, catelog)

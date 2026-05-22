@@ -1,17 +1,22 @@
 import { http } from "./http";
-import type { AddCatelogDto, UpdateCatelogDto } from "../../types";
+import type { AddCategoryDto, UpdateCategoryDto } from "../../types";
 
-export const fetchAddCateLog = async (payload: AddCatelogDto) => {
+export const fetchAddCategory = async (payload: AddCategoryDto) => {
     const { data } = await http.post(`/api/admin/catelog`, payload);
     return data?.data || {};
 };
 
-export const fetchUpdateCateLog = async (payload: UpdateCatelogDto) => {
+export const fetchUpdateCategory = async (payload: UpdateCategoryDto) => {
     const { data } = await http.put(`/api/admin/catelog/${payload.id}`, payload);
     return data?.data || {};
 };
 
-export const fetchDeleteCatelog = async (id: number) => {
+export const fetchDeleteCategory = async (id: number) => {
     const { data } = await http.delete(`/api/admin/catelog/${id}`);
     return data?.data || {};
 };
+
+// Legacy aliases for backward compatibility
+export const fetchAddCateLog = fetchAddCategory;
+export const fetchUpdateCateLog = fetchUpdateCategory;
+export const fetchDeleteCatelog = fetchDeleteCategory;

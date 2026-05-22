@@ -87,9 +87,9 @@ func ImportTools(data []types.Tool) {
 		utils.CheckErr(err)
 	}
 	for _, catelog := range catelogs {
-		var addCatelogDto types.AddCatelogDto
+		var addCatelogDto types.AddCategoryDto
 		addCatelogDto.Name = catelog
-		AddCatelog(addCatelogDto)
+		AddCategory(addCatelogDto)
 	}
 	go func(data []types.Tool) {
 		sem := make(chan struct{}, 4)
