@@ -123,10 +123,20 @@
   overflow-x: hidden;
   scrollbar-width: none;
   width: min(1280px, 100%);
-  margin: 0 auto;
+  margin: 0 auto var(--home-bottom-safe-area);
   box-sizing: border-box;
-  mask-image: none;
-  -webkit-mask-image: none;
+  mask-image: linear-gradient(
+    to bottom,
+    black 0%,
+    black calc(100% - 32px),
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    black 0%,
+    black calc(100% - 32px),
+    transparent 100%
+  );
 }
 
 .desktop-workspace::-webkit-scrollbar {
@@ -140,7 +150,7 @@
 
 .desktop-content-shell {
   min-width: 0;
-  padding: 6px 0 var(--home-bottom-safe-area);
+  padding: 6px 0 24px;
   animation: contentFadeIn 0.24s ease-out;
 }
 
@@ -238,7 +248,7 @@ body.glassmorphism .desktop-search-shell input::placeholder {
   }
 
   .desktop-content-shell {
-    padding: 4px 0 var(--home-bottom-safe-area);
+    padding: 4px 0 24px;
   }
 }
 
@@ -276,50 +286,13 @@ body.glassmorphism .desktop-search-shell input::placeholder {
   }
 
   .desktop-content-shell {
-    padding: 2px 0 var(--home-bottom-safe-area);
+    padding: 2px 0 24px;
   }
 
   .desktop-tool-grid-flat {
     grid-template-columns: repeat(auto-fill, minmax(82px, 1fr));
     gap: 12px;
   }
-}
-
-/* ====== Bottom fade ====== */
-
-.desktop-page::after {
-  content: "";
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: calc(var(--home-bottom-safe-area) + 56px);
-  pointer-events: none;
-  background: linear-gradient(
-    to bottom,
-    transparent,
-    rgba(255, 255, 255, 0.85)
-  );
-  z-index: 150;
-}
-
-body.dark-mode .desktop-page::after {
-  background: linear-gradient(
-    to bottom,
-    transparent,
-    rgba(18, 18, 18, 0.85)
-  );
-}
-
-body.has-background .desktop-page::after,
-body.glassmorphism .desktop-page::after {
-  background: linear-gradient(
-    to bottom,
-    transparent,
-    rgba(0, 0, 0, 0.22)
-  );
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
 }
 
 /* ====== Search empty state ====== */
