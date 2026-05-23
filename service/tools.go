@@ -76,8 +76,8 @@ func ImportTools(data []types.Tool) {
 		toolType := normalizeToolType(v.Type)
 		size := normalizeToolSize(v.Size)
 		sql_add_tool := `
-			INSERT INTO nav_table (id, name, catelog, url, logo, ` + "`desc`" + `, sort, hide, view_mode, type, parent_id, size, bg_color, grid_x, grid_y)
-			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+			INSERT INTO nav_table (id, name, catelog, url, logo, ` + "`desc`" + `, sort, hide, view_mode, type, parent_id, size, bg_color, grid_x, grid_y, folder_view_mode, folder_item_size)
+				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 			`
 		stmt, err := database.DB.Prepare(sql_add_tool)
 		utils.CheckErr(err)
@@ -150,8 +150,8 @@ func AddTool(data types.AddToolDto) (int64, error) {
 	}()
 
 	sql_add_tool := `
-		INSERT INTO nav_table (name, url, logo, catelog, ` + "`desc`" + `, sort, hide, view_mode, type, parent_id, size, bg_color, grid_x, grid_y)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+		INSERT INTO nav_table (name, url, logo, catelog, ` + "`desc`" + `, sort, hide, view_mode, type, parent_id, size, bg_color, grid_x, grid_y, folder_view_mode, folder_item_size)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 		`
 	stmt, err := tx.Prepare(sql_add_tool)
 	if err != nil {

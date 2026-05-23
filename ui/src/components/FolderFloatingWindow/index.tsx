@@ -154,7 +154,10 @@ export default function FolderFloatingWindow({
 
   const content =
     viewMode === "list" ? (
-      <div className="folder-floating-list">
+      <div
+        className="folder-floating-list"
+        style={{ "--folder-list-item-size": `${listItemSize}px` } as React.CSSProperties}
+      >
         {children.map((item) => (
           <div
             key={item.id}

@@ -1,7 +1,8 @@
 # AGENTS.md
 
 <!-- SPECKIT START -->
-- **Active Plan**: `specs/002-unified-grid-system/plan.md` — 统一网格系统：浮动文件夹窗口、全域拖拽、布局算法重构
+- **Active Plan**: `specs/003-icon-system/spec.md` — Icon 系统增强：高清获取与批量管理
+- **Active Plan**: `specs/004-glassmorphism-wallpaper/spec.md` — 毛玻璃主题与 Pexels 壁纸
 <!-- SPECKIT END -->
 
 ## Workflow

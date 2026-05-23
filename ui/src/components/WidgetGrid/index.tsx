@@ -57,19 +57,24 @@ const DraggableItem = ({ tool, style, isDropTarget, isDragging, children, dataTo
 
   return (
     <motion.div
-      layout
       ref={setRefs}
       data-grid-id={tool.id}
       data-tool-id={dataToolId}
       className={`widget-grid-item${isDragging ? " widget-grid-item-dragging" : ""}${isDropTarget ? " widget-drop-target" : ""}`}
-      style={{
-        position: "absolute",
+      style={{ position: "absolute" }}
+      animate={{
         left: style?.left ?? 0,
         top: style?.top ?? 0,
         width: style?.width ?? 0,
         height: style?.height ?? 0,
       }}
-      transition={{ type: "spring", stiffness: 350, damping: 30 }}
+      initial={false}
+      transition={{
+        type: "spring",
+        stiffness: 260,
+        damping: 32,
+        mass: 0.8,
+      }}
       {...attributes}
       {...listeners}
     >

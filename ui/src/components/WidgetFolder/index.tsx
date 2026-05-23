@@ -75,21 +75,24 @@ const WidgetFolder = ({ folder, childrenTools, listItemSize, onOpen, onOpenChild
             <Folder size={20} />
           </div>
         ) : isListMode ? (
-          <div className="widget-folder-list-preview widget-folder-list-scrollable">
+          <div
+            className="widget-folder-list-preview widget-folder-list-scrollable"
+            style={{ "--folder-list-item-size": `${listItemSize}px` } as React.CSSProperties}
+            onClick={(e) => e.stopPropagation()}
+          >
             {childrenTools.map((child) => (
-              <WidgetTool
+              <FolderListPreviewItem
                 key={child.id}
                 tool={child}
-                hideLabel
-                layout="list"
-                onClick={() => onOpenChild(child)}
+                itemSize={listItemSize}
+                onOpenChild={onOpenChild}
                 onContextMenu={onContextMenu}
               />
             ))}
-            {/* 右下角交互区域：点击打开浮动窗口 */}
             <div
               className="widget-folder-open-trigger"
               onClick={(e) => {
+                e.preventDefault();
                 e.stopPropagation();
                 onOpen(e.clientX, e.clientY);
               }}
@@ -163,6 +166,8 @@ function FolderListPreviewItem({
       rel="noreferrer"
       draggable={false}
       onDragStart={(e) => e.preventDefault()}
+      onMouseDown={(e) => e.stopPropagation()}
+      onPointerDown={(e) => e.stopPropagation()}
       onClick={(e) => {
         e.preventDefault();
         e.stopPropagation();

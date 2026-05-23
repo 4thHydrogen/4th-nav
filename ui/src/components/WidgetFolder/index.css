@@ -8,7 +8,8 @@
 }
 
 .widget-folder {
-  flex-shrink: 0;
+  width: 100%;
+  flex: 1;
   border-radius: 12px;
   display: flex;
   flex-direction: column;
@@ -23,18 +24,6 @@
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
   border: 1px solid var(--widget-border);
-
-  --folder-gap-x: calc(var(--cell-width, 72px) - var(--icon-size, 48px) + var(--cell-gap-x, 12px));
-  --folder-gap-y: calc(var(--row-height, 80px) - var(--icon-size, 48px) + var(--cell-gap-y, 12px));
-
-  width: calc(
-    var(--grid-w, 1) * var(--icon-size, 48px)
-    + (var(--grid-w, 1) - 1) * var(--folder-gap-x)
-  );
-  height: calc(
-    var(--grid-h, 1) * var(--icon-size, 48px)
-    + (var(--grid-h, 1) - 1) * var(--folder-gap-y)
-  );
 }
 
 .widget-folder:hover {

@@ -1,4 +1,4 @@
-import { useMemo, useCallback, useEffect, useRef, useState } from "react";
+import { useMemo, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { Tool, LayoutItemDto } from "../../types";
 import { fetchUpdateLayout } from "../../utils/api";
 import { parseSize } from "../WidgetTool";
@@ -314,14 +314,16 @@ export function useGridLayout(tools: Tool[]) {
 
   const [layout, setLayout] = useState<GridLayout[]>([]);
 
-  // 渲染期间同步更新 layout state，消除 useEffect 的一帧延迟。
-  // useEffect 在 commit 后才触发，导致新工具（如合并创建的文件夹）
-  // 在第一帧没有 layout 条目而渲染在 (0,0)，下一帧才跳到正确位置。
-  const prevInitialRef = useRef<GridLayout[]>([]);
-  if (initialLayout !== prevInitialRef.current) {
-    prevInitialRef.current = initialLayout;
+  const prevLayoutKeyRef = useRef("");
+
+  useLayoutEffect(() => {
+    const key = initialLayout
+      .map((i) => `${i.i}:${i.x},${i.y},${i.w},${i.h}`)
+      .join("|");
+    if (key === prevLayoutKeyRef.current) return;
+    prevLayoutKeyRef.current = key;
     setLayout(initialLayout);
-  }
+  }, [initialLayout]);
 
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastSaved = useRef<string>("");

@@ -83,9 +83,11 @@ const WidgetTool = ({ tool, onContextMenu, onClick, compact = false, hideLabel =
         href={tool.url}
         onClick={(e) => {
           e.preventDefault();
+          e.stopPropagation();
           onClick();
         }}
-        onContextMenu={(e) => onContextMenu(e, tool)}
+        onMouseDown={(e) => e.stopPropagation()}
+        onContextMenu={(e) => { e.stopPropagation(); onContextMenu(e, tool); }}
         onDragStart={(e) => e.preventDefault()}
         draggable={false}
         className={`widget-tool ${modeClass}`}
@@ -100,8 +102,9 @@ const WidgetTool = ({ tool, onContextMenu, onClick, compact = false, hideLabel =
   return (
     <a
       href={tool.url}
-      onMouseDown={(e) => { mouseDownPos.current = { x: e.clientX, y: e.clientY }; }}
+      onMouseDown={(e) => { e.stopPropagation(); mouseDownPos.current = { x: e.clientX, y: e.clientY }; }}
       onClick={(e) => {
+        e.stopPropagation();
         if (mouseDownPos.current) {
           const dx = e.clientX - mouseDownPos.current.x;
           const dy = e.clientY - mouseDownPos.current.y;
@@ -112,7 +115,7 @@ const WidgetTool = ({ tool, onContextMenu, onClick, compact = false, hideLabel =
         }
         onClick();
       }}
-      onContextMenu={(e) => onContextMenu(e, tool)}
+      onContextMenu={(e) => { e.stopPropagation(); onContextMenu(e, tool); }}
       onDragStart={(e) => e.preventDefault()}
       draggable={false}
       target={getJumpTarget() === "blank" ? "_blank" : "_self"}

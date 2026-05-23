@@ -129,6 +129,10 @@
   transition: opacity 0.15s, background 0.15s;
 }
 
+.folder-floating-list > .folder-floating-item {
+  min-height: var(--folder-list-item-size, 28px);
+}
+
 .folder-floating-item:hover {
   background: var(--bg-hover, rgba(0, 0, 0, 0.04));
 }
