@@ -119,8 +119,8 @@
   width: min(1280px, 100%);
   margin: 0 auto;
   box-sizing: border-box;
-  mask-image: linear-gradient(to bottom, black 0%, black calc(100% - 80px), transparent calc(100% - 8px));
-  -webkit-mask-image: linear-gradient(to bottom, black 0%, black calc(100% - 80px), transparent calc(100% - 8px));
+  mask-image: linear-gradient(to bottom, black 0%, black calc(100% - 130px), transparent calc(100% - 85px));
+  -webkit-mask-image: linear-gradient(to bottom, black 0%, black calc(100% - 130px), transparent calc(100% - 85px));
 }
 
 .desktop-workspace::-webkit-scrollbar {
