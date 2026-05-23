@@ -1,13 +1,3 @@
-.content-wraper::-webkit-scrollbar {
-  display: none; /* Chrome Safari */
-}
-.content-wraper {
-  overflow-y: scroll;
-  -ms-overflow-style: none; /* IE 10+ */
-  scrollbar-width: none; /* firefox */
-  height: 100%;
-}
-
 .record-wraper {
   text-align: center;
   position: fixed;
@@ -21,14 +11,10 @@
   color: #bbb;
 }
 
-/* 分类切换淡入动画 */
+/* ---- Content Fade In ---- */
 @keyframes contentFadeIn {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
-}
-
-.content-wraper > .content {
-  animation: contentFadeIn 0.2s ease-out;
 }
 
 /* ====== Desktop page layout ====== */
@@ -68,15 +54,19 @@
   --grid-item-pad-x: 4px;
 
   width: 100%;
-  min-height: 100vh;
-  padding: 24px 24px 90px 24px;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding: 0 24px;
   box-sizing: border-box;
 }
 
 .desktop-hero {
+  flex-shrink: 0;
   width: 100%;
   display: flex;
   justify-content: center;
+  padding-top: 24px;
   margin-bottom: 16px;
   animation: contentFadeIn 0.22s ease-out;
 }
@@ -121,9 +111,18 @@
 }
 
 .desktop-workspace {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
   width: min(1280px, 100%);
   margin: 0 auto;
   box-sizing: border-box;
+}
+
+.desktop-workspace::-webkit-scrollbar {
+  display: none;
 }
 
 .desktop-workspace-flat {
@@ -133,7 +132,7 @@
 
 .desktop-content-shell {
   min-width: 0;
-  padding: 6px 0 28px;
+  padding: 6px 0 90px;
   animation: contentFadeIn 0.24s ease-out;
 }
 
@@ -223,17 +222,21 @@ body.glassmorphism .desktop-search-shell input::placeholder {
 
 @media (max-width: 1100px) {
   .desktop-page {
-    padding: 36px 18px 28px 18px;
+    padding: 0 18px;
+  }
+
+  .desktop-hero {
+    padding-top: 36px;
   }
 
   .desktop-content-shell {
-    padding: 4px 0 24px;
+    padding: 4px 0 28px;
   }
 }
 
 @media (max-width: 768px) {
   .desktop-page {
-    padding: 30px 12px 22px;
+    padding: 0 12px;
     --icon-size: 36px;
     --icon-gap: 4px;
     --row-height: 64px;
@@ -243,6 +246,7 @@ body.glassmorphism .desktop-search-shell input::placeholder {
   }
 
   .desktop-hero {
+    padding-top: 30px;
     margin-bottom: 20px;
   }
 
@@ -261,10 +265,6 @@ body.glassmorphism .desktop-search-shell input::placeholder {
   .desktop-workspace,
   .desktop-workspace-flat {
     width: 100%;
-  }
-
-  .desktop-page {
-    padding-left: 12px;
   }
 
   .desktop-content-shell {
