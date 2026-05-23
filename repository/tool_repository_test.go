@@ -319,6 +319,76 @@ func TestCreateToolNormalizesPersistedFields(t *testing.T) {
 	}
 }
 
+func TestImportToolPreservesProvidedIDAndNormalizesFields(t *testing.T) {
+	dbPath := filepath.Join(t.TempDir(), "tool-import.db")
+	db, err := sql.Open("sqlite", dbPath)
+	if err != nil {
+		t.Fatalf("open db: %v", err)
+	}
+
+	_, err = db.Exec(`CREATE TABLE nav_table (
+		id INTEGER PRIMARY KEY,
+		name TEXT,
+		url TEXT,
+		logo TEXT,
+		catelog TEXT,
+		"desc" TEXT,
+		sort INTEGER,
+		hide BOOLEAN,
+		view_mode TEXT,
+		type TEXT,
+		parent_id INTEGER,
+		size TEXT,
+		bg_color TEXT,
+		grid_x INTEGER,
+		grid_y INTEGER,
+		folder_view_mode TEXT,
+		folder_item_size INTEGER
+	);`)
+	if err != nil {
+		t.Fatalf("create schema: %v", err)
+	}
+
+	database.DB = db
+	t.Cleanup(func() {
+		_ = db.Close()
+	})
+
+	if err := ImportTool(types.Tool{
+		Id:             88,
+		Name:           "Imported",
+		Url:            "https://imported.example",
+		Logo:           "logo-imported",
+		Catelog:        "ops",
+		Desc:           "imported-desc",
+		Sort:           6,
+		Hide:           true,
+		ViewMode:       "bad",
+		Type:           "weird",
+		Size:           "9x9",
+		GridX:          -3,
+		GridY:          2,
+		FolderViewMode: "bad",
+		FolderItemSize: 5,
+	}); err != nil {
+		t.Fatalf("import tool: %v", err)
+	}
+
+	tool, err := GetToolByID(88)
+	if err != nil {
+		t.Fatalf("get imported tool: %v", err)
+	}
+	if tool.Id != 88 || tool.Name != "Imported" || tool.Sort != 6 || !tool.Hide {
+		t.Fatalf("unexpected imported tool basics: %+v", tool)
+	}
+	if tool.ViewMode != "icon" || tool.Type != "icon" || tool.Size != "1x1" {
+		t.Fatalf("unexpected imported tool normalization: %+v", tool)
+	}
+	if tool.GridX != -1 || tool.GridY != 2 || tool.FolderViewMode != "grid" || tool.FolderItemSize != 20 {
+		t.Fatalf("unexpected imported tool layout: %+v", tool)
+	}
+}
+
 func TestUpdateToolPersistsChanges(t *testing.T) {
 	dbPath := filepath.Join(t.TempDir(), "tool-update.db")
 	db, err := sql.Open("sqlite", dbPath)

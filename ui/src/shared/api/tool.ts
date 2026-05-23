@@ -1,11 +1,6 @@
 import { http } from "./http";
 import type { Tool, AddToolDto, UpdateToolDto, SortUpdateDto, ToolViewMode, LayoutItemDto } from "../../types";
 
-export const fetchAdminData = async (): Promise<import("../../types").AdminApiData> => {
-    const { data } = await http.get("/api/admin/all");
-    return data?.data || {};
-};
-
 export const fetchImportTools = async (payload: Tool[]) => {
     const { data } = await http.post(`/api/admin/importTools`, payload);
     return data?.data || {};

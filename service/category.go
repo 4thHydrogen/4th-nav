@@ -1,96 +1,42 @@
 package service
 
 import (
-	"github.com/4thHydrogen/4th-nav/database"
+	"strings"
+
+	"github.com/4thHydrogen/4th-nav/repository"
 	"github.com/4thHydrogen/4th-nav/types"
 	"github.com/4thHydrogen/4th-nav/utils"
-	"strings"
 )
 
 func UpdateCategory(data types.UpdateCategoryDto) {
-
-	// 查询分类原名称
-	sql_select_old_catelog_name := `select name from nav_catelog where id = ?;`
-	var oldName string
-	err := database.DB.QueryRow(sql_select_old_catelog_name, data.Id).Scan(&oldName)
-	utils.CheckErr(err)
-
-	// 开启事务
-	tx, err := database.DB.Begin()
-	utils.CheckErr(err)
-
-	// 更新分类新名称
-	sql_update_catelog := `
-		UPDATE nav_catelog
-		SET name = ?, sort = ?, hide = ?
-		WHERE id = ?;
-		`
-	stmt, err := tx.Prepare(sql_update_catelog)
-	utils.CheckTxErr(err, tx)
-	res, err := stmt.Exec(data.Name, data.Sort, data.Hide, data.Id)
-	utils.CheckTxErr(err, tx)
-	_, err = res.RowsAffected()
-	utils.CheckTxErr(err, tx)
-
-	if oldName != data.Name {
-		// 更新工具分类新名称
-		sql_update_tools := `
-		UPDATE nav_table
-		SET catelog = ?
-		WHERE catelog = ?;
-		`
-		stmt2, err := tx.Prepare(sql_update_tools)
-		utils.CheckTxErr(err, tx)
-		res2, err := stmt2.Exec(data.Name, oldName)
-		utils.CheckTxErr(err, tx)
-		_, err = res2.RowsAffected()
-		utils.CheckTxErr(err, tx)
-	}
-	// 提交事务
-	err = tx.Commit()
+	err := repository.UpdateCategory(data)
 	utils.CheckErr(err)
 }
 
 func AddCategory(data types.AddCategoryDto) {
-	// 检查分类名称是否为空，如果为空则不创建
 	if data.Name == "" || strings.TrimSpace(data.Name) == "" {
 		return
 	}
-	
-	// 先检查重复不重复
-	existCatelogs := GetAllCategories()
-	var existCatelogsArr []string
-	for _, catelogDto := range existCatelogs {
-		existCatelogsArr = append(existCatelogsArr, catelogDto.Name)
+
+	existingCategories := GetAllCategories()
+	names := make([]string, 0, len(existingCategories))
+	for _, category := range existingCategories {
+		names = append(names, category.Name)
 	}
-	if utils.In(data.Name, existCatelogsArr) {
+	if utils.In(data.Name, names) {
 		return
 	}
-	sql_add_catelog := `
-		INSERT INTO nav_catelog (name,sort,hide)
-		VALUES (?,?,?);
-		`
-	stmt, err := database.DB.Prepare(sql_add_catelog)
-	utils.CheckErr(err)
-	res, err := stmt.Exec(data.Name, data.Sort, data.Hide)
-	utils.CheckErr(err)
-	_, err = res.LastInsertId()
+
+	err := repository.CreateCategory(data)
 	utils.CheckErr(err)
 }
 
+func DeleteCategory(id int) error {
+	return repository.DeleteCategory(id)
+}
+
 func GetAllCategories() []types.Category {
-	sql_get_all := `
-		SELECT id,name,sort,hide FROM nav_catelog order by sort;
-	`
-	results := make([]types.Category, 0)
-	rows, err := database.DB.Query(sql_get_all)
+	results, err := repository.GetAllCategories()
 	utils.CheckErr(err)
-	for rows.Next() {
-		var catelog types.Category
-		err = rows.Scan(&catelog.Id, &catelog.Name, &catelog.Sort, &catelog.Hide)
-		utils.CheckErr(err)
-		results = append(results, catelog)
-	}
-	defer rows.Close()
 	return results
 }

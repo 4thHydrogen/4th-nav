@@ -6,7 +6,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/4thHydrogen/4th-nav/database"
 	"github.com/4thHydrogen/4th-nav/logger"
 	"github.com/4thHydrogen/4th-nav/repository"
 	"github.com/4thHydrogen/4th-nav/types"
@@ -114,14 +113,26 @@ func RefreshAllIcons(force bool, clearCache bool) error {
 func ClearIconCache(mode string) {
 	switch mode {
 	case "cache-only":
-		database.DB.Exec("DELETE FROM nav_img;")
+		if err := repository.ClearImageCache(); err != nil {
+			logger.LogInfo("failed clearing nav_img cache: %s", err)
+			return
+		}
 		logger.LogInfo("Cleared nav_img cache")
 	case "logo-only":
-		database.DB.Exec("UPDATE nav_table SET logo = '';")
+		if err := repository.ClearAllToolLogos(); err != nil {
+			logger.LogInfo("failed clearing nav_table.logo: %s", err)
+			return
+		}
 		logger.LogInfo("Cleared nav_table.logo")
 	case "cache-and-logo":
-		database.DB.Exec("DELETE FROM nav_img;")
-		database.DB.Exec("UPDATE nav_table SET logo = '';")
+		if err := repository.ClearImageCache(); err != nil {
+			logger.LogInfo("failed clearing nav_img cache: %s", err)
+			return
+		}
+		if err := repository.ClearAllToolLogos(); err != nil {
+			logger.LogInfo("failed clearing nav_table.logo: %s", err)
+			return
+		}
 		logger.LogInfo("Cleared nav_img cache and nav_table.logo")
 	}
 }

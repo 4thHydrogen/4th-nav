@@ -1,72 +1,69 @@
-import { useState, useEffect } from 'react';
-import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { LogOut, Star, Home, Settings, Package, LayoutGrid, Search } from 'lucide-react';
-import { MenuItem, Sidebar } from './components/sidebar';
-import "./index.css"
-import { useOnce } from '../../utils/useOnce';
+import { useEffect, useState } from "react";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Home, LayoutGrid, LogOut, Package, Search, Settings, Star } from "lucide-react";
+import { Sidebar, type MenuItem } from "./components/sidebar";
+import "./index.css";
+import { useOnce } from "../../utils/useOnce";
 
 const menuItems: MenuItem[] = [
   {
-    key: 'tools',
+    key: "tools",
     icon: <Package className="w-5 h-5" />,
-    label: '工具管理',
-    path: '/admin/tools'
+    label: "工具管理",
+    path: "/admin/tools",
   },
   {
-    key: 'categories',
+    key: "categories",
     icon: <LayoutGrid className="w-5 h-5" />,
-    label: '分类管理',
-    path: '/admin/categories'
+    label: "分类管理",
+    path: "/admin/categories",
   },
   {
-    key: 'search-engines',
+    key: "search-engines",
     icon: <Search className="w-5 h-5" />,
-    label: '搜索引擎管理',
-    path: '/admin/search-engines'
+    label: "搜索引擎管理",
+    path: "/admin/search-engines",
   },
   {
-    key: 'api-token',
+    key: "api-token",
     icon: <Star className="w-5 h-5" />,
-    label: 'API Token',
-    path: '/admin/api-token'
+    label: "API Token",
+    path: "/admin/api-token",
   },
   {
-    key: 'settings',
+    key: "settings",
     icon: <Settings className="w-5 h-5" />,
-    label: '系统设置',
-    path: '/admin/settings'
-  }
+    label: "系统设置",
+    path: "/admin/settings",
+  },
 ];
 
 export const AdminPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [currentKey, setCurrentKey] = useState('tools');
+  const [currentKey, setCurrentKey] = useState("tools");
 
   useOnce(() => {
-    if (!localStorage.getItem('_token')) {
-      navigate('/login');
+    if (!localStorage.getItem("_token")) {
+      navigate("/login");
     }
   }, []);
 
-  // 根据当前路径设置选中的菜单项
   useEffect(() => {
     const pathname = location.pathname;
-    const currentItem = menuItems.find(item => pathname.includes(item.key));
+    const currentItem = menuItems.find((item) => pathname.includes(item.key));
     if (currentItem) {
       setCurrentKey(currentItem.key);
     }
   }, [location]);
 
-  // 处理退出登录
   const handleLogout = () => {
-    localStorage.removeItem('_token');
-    navigate('/');
+    localStorage.removeItem("_token");
+    navigate("/");
   };
 
   return (
     <div className="admin-page min-h-screen bg-gray-50">
-      {/* Header */}
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
@@ -75,17 +72,11 @@ export const AdminPage = () => {
             </div>
 
             <div className="flex items-center space-x-4">
-              <Link
-                to="/"
-                className="flex items-center px-3 py-2 text-sm text-gray-700 hover:text-gray-900"
-              >
+              <Link to="/" className="flex items-center px-3 py-2 text-sm text-gray-700 hover:text-gray-900">
                 <Home size={16} className="mr-2" />
-                返回主页
+                返回首页
               </Link>
-              <button
-                onClick={handleLogout}
-                className="flex items-center px-3 py-2 text-sm text-gray-700 hover:text-gray-900"
-              >
+              <button onClick={handleLogout} className="flex items-center px-3 py-2 text-sm text-gray-700 hover:text-gray-900">
                 <LogOut size={16} className="mr-2" />
                 退出登录
               </button>
@@ -94,14 +85,10 @@ export const AdminPage = () => {
         </div>
       </header>
 
-      {/* Main Content */}
       <div className="flex flex-1 w-full mx-auto h-[calc(100vh-64px)]">
-        {/* Sidebar */}
         <Sidebar items={menuItems} currentKey={currentKey} onChange={setCurrentKey} />
-
-        {/* Main Content Area */}
-        <main className="flex-1  overflow-auto">
-          <div className=" p-4  h-full">
+        <main className="flex-1 overflow-auto">
+          <div className="p-4 h-full">
             <Outlet />
           </div>
         </main>
@@ -110,4 +97,4 @@ export const AdminPage = () => {
   );
 };
 
-export default AdminPage; 
+export default AdminPage;

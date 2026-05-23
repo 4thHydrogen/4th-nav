@@ -99,3 +99,47 @@ func TestSaveImageSkipsExistingRows(t *testing.T) {
 		t.Fatalf("unexpected stored images: count=%d value=%s", count, value)
 	}
 }
+
+func TestClearImageCache(t *testing.T) {
+	setupIconRepositoryTestDB(t)
+	if _, err := database.DB.Exec(`INSERT INTO nav_img (url, value) VALUES ('a', '1'), ('b', '2')`); err != nil {
+		t.Fatalf("seed images: %v", err)
+	}
+
+	if err := ClearImageCache(); err != nil {
+		t.Fatalf("clear image cache: %v", err)
+	}
+
+	var count int
+	if err := database.DB.QueryRow(`SELECT COUNT(*) FROM nav_img`).Scan(&count); err != nil {
+		t.Fatalf("count images: %v", err)
+	}
+	if count != 0 {
+		t.Fatalf("expected empty cache, got %d rows", count)
+	}
+}
+
+func TestClearAllToolLogos(t *testing.T) {
+	setupIconRepositoryTestDB(t)
+	if _, err := database.DB.Exec(`INSERT INTO nav_table (id, icon_status, icon_error, icon_updated_at) VALUES (1, '', '', 0), (2, '', '', 0)`); err != nil {
+		t.Fatalf("seed tools: %v", err)
+	}
+	if _, err := database.DB.Exec(`ALTER TABLE nav_table ADD COLUMN logo TEXT`); err != nil {
+		t.Fatalf("add logo column: %v", err)
+	}
+	if _, err := database.DB.Exec(`UPDATE nav_table SET logo = 'value'`); err != nil {
+		t.Fatalf("seed logos: %v", err)
+	}
+
+	if err := ClearAllToolLogos(); err != nil {
+		t.Fatalf("clear tool logos: %v", err)
+	}
+
+	var count int
+	if err := database.DB.QueryRow(`SELECT COUNT(*) FROM nav_table WHERE logo <> ''`).Scan(&count); err != nil {
+		t.Fatalf("count non-empty logos: %v", err)
+	}
+	if count != 0 {
+		t.Fatalf("expected all logos cleared, got %d non-empty rows", count)
+	}
+}

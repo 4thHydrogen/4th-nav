@@ -47,3 +47,13 @@ func SaveImage(rawURL string, value string) error {
 	_, err = database.DB.Exec(`INSERT INTO nav_img (url, value) VALUES (?, ?);`, encodedURL, value)
 	return err
 }
+
+func ClearImageCache() error {
+	_, err := database.DB.Exec(`DELETE FROM nav_img;`)
+	return err
+}
+
+func ClearAllToolLogos() error {
+	_, err := database.DB.Exec(`UPDATE nav_table SET logo = '';`)
+	return err
+}

@@ -6,7 +6,6 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/4thHydrogen/4th-nav/database"
 	"github.com/4thHydrogen/4th-nav/logger"
 	"github.com/4thHydrogen/4th-nav/repository"
 	"github.com/4thHydrogen/4th-nav/types"
@@ -70,18 +69,7 @@ func ImportTools(data []types.Tool) {
 		if v.Catelog != "" && strings.TrimSpace(v.Catelog) != "" && !utils.In(v.Catelog, catelogs) {
 			catelogs = append(catelogs, v.Catelog)
 		}
-		viewMode := normalizeViewMode(v.ViewMode)
-		toolType := normalizeToolType(v.Type)
-		size := normalizeToolSize(v.Size)
-		sqlAddTool := `
-			INSERT INTO nav_table (id, name, catelog, url, logo, ` + "`desc`" + `, sort, hide, view_mode, type, parent_id, size, bg_color, grid_x, grid_y, folder_view_mode, folder_item_size)
-				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-			`
-		stmt, err := database.DB.Prepare(sqlAddTool)
-		utils.CheckErr(err)
-		res, err := stmt.Exec(v.Id, v.Name, v.Catelog, v.Url, v.Logo, v.Desc, v.Sort, v.Hide, viewMode, toolType, v.ParentId, size, v.BgColor, v.GridX, v.GridY, normalizeFolderViewMode(v.FolderViewMode), normalizeFolderItemSize(v.FolderItemSize))
-		utils.CheckErr(err)
-		_, err = res.LastInsertId()
+		err := repository.ImportTool(v)
 		utils.CheckErr(err)
 	}
 	for _, catelog := range catelogs {

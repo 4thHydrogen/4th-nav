@@ -131,3 +131,9 @@ requirements.txt
 # AI tool local configs (not versioned)
 .serena/cache/
 .serena/project.local.yml
+.agents/
+.codex/
+.claude/
+.specify/
+.tmp/
+AGENTS.md

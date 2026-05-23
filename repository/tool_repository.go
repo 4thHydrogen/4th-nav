@@ -326,6 +326,32 @@ func CreateTool(data types.AddToolDto) (int64, error) {
 	return id, nil
 }
 
+func ImportTool(data types.Tool) error {
+	_, err := database.DB.Exec(`
+		INSERT INTO nav_table (id, name, catelog, url, logo, `+"`desc`"+`, sort, hide, view_mode, type, parent_id, size, bg_color, grid_x, grid_y, folder_view_mode, folder_item_size)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+	`,
+		data.Id,
+		data.Name,
+		data.Catelog,
+		data.Url,
+		data.Logo,
+		data.Desc,
+		data.Sort,
+		data.Hide,
+		normalizeViewMode(data.ViewMode),
+		normalizeToolType(data.Type),
+		data.ParentId,
+		normalizeToolSize(data.Size),
+		data.BgColor,
+		normalizeGrid(data.GridX),
+		normalizeGrid(data.GridY),
+		normalizeFolderViewMode(data.FolderViewMode),
+		normalizeFolderItemSize(data.FolderItemSize),
+	)
+	return err
+}
+
 func UpdateTool(data types.UpdateToolDto) error {
 	_, err := database.DB.Exec(`
 		UPDATE nav_table

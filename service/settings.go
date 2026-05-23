@@ -1,32 +1,15 @@
 package service
 
 import (
-	"github.com/4thHydrogen/4th-nav/database"
 	"github.com/4thHydrogen/4th-nav/logger"
+	"github.com/4thHydrogen/4th-nav/repository"
 	"github.com/4thHydrogen/4th-nav/types"
 )
 
 func GetSetting() types.Setting {
-	sql_get_user := `
-			SELECT id,favicon,title,govRecord,logo192,logo512,hideAdmin,hideGithub,hideToggleJumpTarget,jumpTargetBlank,backgroundUrl,enableBackground,enableGlassmorphism,pexelsApiKey,proxy
-			FROM nav_setting
-			ORDER BY id ASC
-			LIMIT 1;
-			`
-	var setting types.Setting
-	row := database.DB.QueryRow(sql_get_user, 0)
-	var hideGithub interface{}
-	var hideAdmin interface{}
-	var hideToggleJumpTarget interface{}
-	var jumpTargetBlank interface{}
-	var backgroundUrl interface{}
-	var enableBackground interface{}
-	var enableGlassmorphism interface{}
-	var pexelsApiKey interface{}
-	var proxy interface{}
-	err := row.Scan(&setting.Id, &setting.Favicon, &setting.Title, &setting.GovRecord, &setting.Logo192, &setting.Logo512, &hideAdmin, &hideGithub, &hideToggleJumpTarget, &jumpTargetBlank, &backgroundUrl, &enableBackground, &enableGlassmorphism, &pexelsApiKey, &proxy)
+	setting, err := repository.GetSetting()
 	if err != nil {
-		logger.LogError("获取配置失败: %s", err)
+		logger.LogError("鑾峰彇閰嶇疆澶辫触: %s", err)
 		return types.Setting{
 			Id:                   1,
 			Favicon:              "favicon.ico",
@@ -43,102 +26,9 @@ func GetSetting() types.Setting {
 			EnableGlassmorphism:  false,
 		}
 	}
-	if hideGithub == nil {
-		setting.HideGithub = false
-	} else {
-		if hideGithub.(int64) == 0 {
-			setting.HideGithub = false
-		} else {
-			setting.HideGithub = true
-		}
-	}
-	if hideAdmin == nil {
-		setting.HideAdmin = false
-	} else {
-		if hideAdmin.(int64) == 0 {
-			setting.HideAdmin = false
-		} else {
-			setting.HideAdmin = true
-		}
-	}
-
-	if hideToggleJumpTarget == nil {
-		setting.HideToggleJumpTarget = false
-	} else {
-		if hideToggleJumpTarget.(int64) == 0 {
-			setting.HideToggleJumpTarget = false
-		} else {
-			setting.HideToggleJumpTarget = true
-		}
-	}
-
-	if jumpTargetBlank == nil {
-		setting.JumpTargetBlank = true
-	} else {
-		if jumpTargetBlank.(int64) == 0 {
-			setting.JumpTargetBlank = false
-		} else {
-			setting.JumpTargetBlank = true
-		}
-	}
-
-	if backgroundUrl == nil {
-		setting.BackgroundUrl = ""
-	} else {
-		setting.BackgroundUrl = backgroundUrl.(string)
-	}
-	if pexelsApiKey == nil {
-		setting.PexelsApiKey = ""
-	} else {
-		setting.PexelsApiKey = pexelsApiKey.(string)
-	}
-	if proxy == nil {
-		setting.Proxy = ""
-	} else {
-		setting.Proxy = proxy.(string)
-	}
-
-	if enableBackground == nil {
-		setting.EnableBackground = false
-	} else {
-		if enableBackground.(int64) == 0 {
-			setting.EnableBackground = false
-		} else {
-			setting.EnableBackground = true
-		}
-	}
-
-	if enableGlassmorphism == nil {
-		setting.EnableGlassmorphism = false
-	} else {
-		if enableGlassmorphism.(int64) == 0 {
-			setting.EnableGlassmorphism = false
-		} else {
-			setting.EnableGlassmorphism = true
-		}
-	}
-
 	return setting
 }
 
 func UpdateSetting(data types.Setting) error {
-	sql_update_setting := `
-			UPDATE nav_setting
-			SET favicon = ?, title = ?, govRecord = ?, logo192 = ?, logo512 = ?, hideAdmin = ?, hideGithub = ?, hideToggleJumpTarget = ?, jumpTargetBlank = ?, backgroundUrl = ?, enableBackground = ?, enableGlassmorphism = ?, pexelsApiKey = ?, proxy = ?
-			WHERE id = (SELECT id FROM nav_setting ORDER BY id ASC LIMIT 1);
-			`
-
-	stmt, err := database.DB.Prepare(sql_update_setting)
-	if err != nil {
-		return err
-	}
-	res, err := stmt.Exec(data.Favicon, data.Title, data.GovRecord, data.Logo192, data.Logo512, data.HideAdmin, data.HideGithub, data.HideToggleJumpTarget, data.JumpTargetBlank, data.BackgroundUrl, data.EnableBackground, data.EnableGlassmorphism, data.PexelsApiKey, data.Proxy)
-	if err != nil {
-		return err
-	}
-	_, err = res.RowsAffected()
-	if err != nil {
-		return err
-	}
-	return nil
+	return repository.UpdateSetting(data)
 }

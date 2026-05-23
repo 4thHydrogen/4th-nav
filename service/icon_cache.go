@@ -5,11 +5,10 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"net/url"
 	"strings"
 	"time"
 
-	"github.com/4thHydrogen/4th-nav/database"
+	"github.com/4thHydrogen/4th-nav/repository"
 	"github.com/4thHydrogen/4th-nav/utils"
 )
 
@@ -61,9 +60,10 @@ func FetchAndCacheImage(rawURL string) (*CachedImage, error) {
 	}
 
 	// Write to nav_img cache
-	urlEncoded := url.QueryEscape(rawURL)
 	base64Value := base64.StdEncoding.EncodeToString(data)
-	writeImgCache(urlEncoded, base64Value)
+	if err := repository.SaveImage(rawURL, base64Value); err != nil {
+		return nil, fmt.Errorf("cache image: %w", err)
+	}
 
 	return &CachedImage{
 		Data:        data,
@@ -95,19 +95,5 @@ func guessContentType(ct string, rawURL string) string {
 		return "image/x-icon"
 	default:
 		return "image/png"
-	}
-}
-
-// writeImgCache writes an entry to nav_img.
-func writeImgCache(urlEncoded string, base64Value string) {
-	sql_check := `SELECT id FROM nav_img WHERE url = ?;`
-	rows, err := database.DB.Query(sql_check, urlEncoded)
-	if err != nil {
-		return
-	}
-	rows.Close()
-	if !rows.Next() {
-		sql_add := `INSERT INTO nav_img (url, value) VALUES (?, ?);`
-		database.DB.Exec(sql_add, urlEncoded, base64Value)
 	}
 }

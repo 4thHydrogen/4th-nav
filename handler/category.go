@@ -2,8 +2,8 @@ package handler
 
 import (
 	"net/http"
+	"strconv"
 
-	"github.com/4thHydrogen/4th-nav/database"
 	"github.com/4thHydrogen/4th-nav/service"
 	"github.com/4thHydrogen/4th-nav/types"
 	"github.com/4thHydrogen/4th-nav/utils"
@@ -24,22 +24,29 @@ func AddCategoryHandler(c *gin.Context) {
 	service.AddCategory(data)
 	c.JSON(200, gin.H{
 		"success": true,
-		"message": "增加分类成功",
+		"message": "澧炲姞鍒嗙被鎴愬姛",
 	})
 }
 
 func DeleteCategoryHandler(c *gin.Context) {
-	id := c.Param("id")
-	sql_delete_catelog := `DELETE FROM nav_catelog WHERE id = ?;`
-	stmt, err := database.DB.Prepare(sql_delete_catelog)
-	utils.CheckErr(err)
-	res, err := stmt.Exec(id)
-	utils.CheckErr(err)
-	_, err = res.RowsAffected()
-	utils.CheckErr(err)
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success":      false,
+			"errorMessage": "鏃犳晥 ID",
+		})
+		return
+	}
+	if err := service.DeleteCategory(id); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success":      false,
+			"errorMessage": err.Error(),
+		})
+		return
+	}
 	c.JSON(200, gin.H{
 		"success": true,
-		"message": "删除分类成功",
+		"message": "鍒犻櫎鍒嗙被鎴愬姛",
 	})
 }
 
@@ -56,6 +63,6 @@ func UpdateCategoryHandler(c *gin.Context) {
 	service.UpdateCategory(data)
 	c.JSON(200, gin.H{
 		"success": true,
-		"message": "更新分类成功",
+		"message": "鏇存柊鍒嗙被鎴愬姛",
 	})
 }
