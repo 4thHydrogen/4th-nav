@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { fetchUpdateSetting, fetchUpdateUser, fetchUpdateSiteConfig } from "../../../utils/api";
 import { fetchRefreshMissingIcons, fetchRefreshAllIcons, fetchClearIconCache, fetchIconJobStatus } from "../../../shared/api/tool";
 import type { IconJobStatus } from "../../../shared/api/tool";
+import { parsePexelsUrl, clearPexelsCache, clearAllPexelsCache } from "../../../utils/pexels";
 import { useData } from "../hooks/useData";
 export interface SettingProps { }
 export const Setting: React.FC<SettingProps> = (props) => {
@@ -198,6 +199,32 @@ export const Setting: React.FC<SettingProps> = (props) => {
               tooltip="在 pexels.com/api 免费申请。配置后背景图片 URL 输入 pexels 即可根据主题自动获取亮/暗色调背景图"
             >
               <Input.Password placeholder="请输入 Pexels API Key" />
+            </Form.Item>
+            <Form.Item label="壁纸换一张">
+              <Button
+                onClick={() => {
+                  const bgUrl = settingForm.getFieldValue("backgroundUrl") || "";
+                  const { isPexels, query } = parsePexelsUrl(bgUrl);
+                  if (isPexels) {
+                    clearPexelsCache(query);
+                  } else {
+                    clearAllPexelsCache();
+                  }
+                  reload();
+                  message.success("壁纸已刷新，稍后生效");
+                }}
+              >
+                换一张壁纸
+              </Button>
+              <Button
+                type="link"
+                onClick={() => {
+                  clearAllPexelsCache();
+                  message.success("所有壁纸缓存已清除");
+                }}
+              >
+                清除全部壁纸缓存
+              </Button>
             </Form.Item>
             <Form.Item
               label="网络代理"

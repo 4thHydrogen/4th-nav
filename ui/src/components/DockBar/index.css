@@ -132,8 +132,15 @@ body.dark-mode .dock-bar {
   border-color: var(--widget-border, rgba(255, 255, 255, 0.08));
 }
 
-body.has-background .dock-bar,
-body.glassmorphism .dock-bar {
+body.has-background .dock-bar {
   background: var(--widget-bg, rgba(255, 255, 255, 0.06));
   border-color: var(--widget-border, rgba(255, 255, 255, 0.08));
+}
+
+body.glassmorphism .dock-bar {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.2);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.2);
+  border-color: var(--glass-border);
+  box-shadow: var(--glass-shadow);
 }

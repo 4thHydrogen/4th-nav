@@ -60,13 +60,13 @@
 
 **Independent Test**: 开启毛玻璃主题，对比各组件（widget card、folder、search bar、context menu）的背景和边框——全部半透明+模糊。
 
-- [ ] T010 [P] [US3] WidgetTool 应用 glass 变量：将硬编码的 background/backdrop-filter 替换为 var(--glass-bg) / var(--glass-blur) 等，仅在 enableGlassmorphism 开启时通过条件 class 激活 — `ui/src/components/WidgetTool/index.css`
-- [ ] T011 [P] [US3] WidgetFolder 应用 glass 变量 — `ui/src/components/WidgetFolder/index.css`
-- [ ] T012 [P] [US3] SearchBar 应用 glass 变量 — `ui/src/components/SearchBar/index.css`
-- [ ] T013 [P] [US3] DockBar 应用 glass 变量 — `ui/src/components/DockBar/index.css`
-- [ ] T014 [P] [US3] FolderFloatingWindow 应用 glass 变量 — `ui/src/components/FolderFloatingWindow/index.css`
-- [ ] T015 [P] [US3] ToolContextMenu 应用 glass 变量 — `ui/src/components/ToolContextMenu/index.css`
-- [ ] T016 [US3] 毛玻璃条件控制：确认 enableGlassmorphism 开关通过 body class（如 body.glass-mode）控制 glass 变量是否生效。关闭时组件使用不透明背景 — `ui/src/styles/globals.css`
+- [X] T010 [P] [US3] WidgetTool 应用 glass 变量：将硬编码的 background/backdrop-filter 替换为 var(--glass-bg) / var(--glass-blur) 等，仅在 enableGlassmorphism 开启时通过条件 class 激活 — `ui/src/components/WidgetTool/index.css`
+- [X] T011 [P] [US3] WidgetFolder 应用 glass 变量 — `ui/src/components/WidgetFolder/index.css`
+- [X] T012 [P] [US3] SearchBar 应用 glass 变量 — `ui/src/components/SearchBar/index.css`
+- [X] T013 [P] [US3] DockBar 应用 glass 变量 — `ui/src/components/DockBar/index.css`
+- [X] T014 [P] [US3] FolderFloatingWindow 应用 glass 变量 — `ui/src/components/FolderFloatingWindow/index.css`
+- [X] T015 [P] [US3] ToolContextMenu 应用 glass 变量 — `ui/src/components/ToolContextMenu/index.css`
+- [X] T016 [US3] 毛玻璃条件控制：确认 enableGlassmorphism 开关通过 body class（如 body.glass-mode）控制 glass 变量是否生效。关闭时组件使用不透明背景 — `ui/src/styles/globals.css`
 
 **Checkpoint**: quickstart.md Phase D 可验证。所有组件在 dark/light 下外观一致，关闭毛玻璃时恢复不透明背景。
 

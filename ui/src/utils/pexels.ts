@@ -5,6 +5,10 @@ interface PexelsPhoto {
     original: string;
   };
   photographer: string;
+  photographer_url: string;
+  url: string;
+  avg_color: string;
+  alt: string;
 }
 
 interface PexelsSearchResponse {
@@ -14,13 +18,17 @@ interface PexelsSearchResponse {
   per_page: number;
 }
 
-interface CachedImage {
+export interface CachedPexelsImage {
   url: string;
   photographer: string;
+  photographerUrl: string;
+  photoUrl: string;
+  avgColor: string;
+  alt: string;
   fetchedAt: number;
 }
 
-const CACHE_KEY_PREFIX = "pexels-v2-";
+const CACHE_KEY_PREFIX = "pexels-v3-";
 const CACHE_DURATION = 24 * 60 * 60 * 1000;
 const DEFAULT_QUERY = "nature landscape";
 
@@ -36,28 +44,46 @@ export function parsePexelsUrl(url: string): { isPexels: boolean; query: string 
   return { isPexels: false, query: "" };
 }
 
-function getCacheKey(theme: "light" | "dark", query: string): string {
-  return `${CACHE_KEY_PREFIX}${theme}-${query}`;
+function getThemeColor(theme: "light" | "dark"): string {
+  return theme === "dark" ? "black" : "white";
 }
 
-function getCachedImage(theme: "light" | "dark", query: string): string | null {
-  const raw = localStorage.getItem(getCacheKey(theme, query));
+function getThemeQuery(theme: "light" | "dark"): string {
+  return theme === "dark" ? "abstract glass dark gradient" : "minimal bright glass gradient";
+}
+
+function getCacheKey(theme: "light" | "dark", query: string, color: string): string {
+  return `${CACHE_KEY_PREFIX}${theme}:${query}:${color}:landscape:large`;
+}
+
+export function getCachedPexelsImage(theme: "light" | "dark", query: string): CachedPexelsImage | null {
+  const color = getThemeColor(theme);
+  const raw = localStorage.getItem(getCacheKey(theme, query, color));
   if (!raw) return null;
   try {
-    const cached: CachedImage = JSON.parse(raw);
+    const cached: CachedPexelsImage = JSON.parse(raw);
     if (Date.now() - cached.fetchedAt > CACHE_DURATION) {
-      localStorage.removeItem(getCacheKey(theme, query));
+      localStorage.removeItem(getCacheKey(theme, query, color));
       return null;
     }
-    return cached.url;
+    return cached;
   } catch {
     return null;
   }
 }
 
-function setCachedImage(theme: "light" | "dark", query: string, url: string, photographer: string): void {
-  const entry: CachedImage = { url, photographer, fetchedAt: Date.now() };
-  localStorage.setItem(getCacheKey(theme, query), JSON.stringify(entry));
+function setCachedPexelsImage(theme: "light" | "dark", query: string, photo: PexelsPhoto): void {
+  const color = getThemeColor(theme);
+  const entry: CachedPexelsImage = {
+    url: photo.src.large2x,
+    photographer: photo.photographer,
+    photographerUrl: photo.photographer_url,
+    photoUrl: photo.url,
+    avgColor: photo.avg_color,
+    alt: photo.alt || "",
+    fetchedAt: Date.now(),
+  };
+  localStorage.setItem(getCacheKey(theme, query, color), JSON.stringify(entry));
 }
 
 export async function fetchPexelsImage(
@@ -65,14 +91,17 @@ export async function fetchPexelsImage(
   query: string,
   theme: "light" | "dark"
 ): Promise<string> {
-  const cached = getCachedImage(theme, query);
-  if (cached) return cached;
+  const cached = getCachedPexelsImage(theme, query);
+  if (cached) return cached.url;
 
-  const effectiveQuery = theme === "dark" ? `dark ${query}` : query;
+  const color = getThemeColor(theme);
+  const effectiveQuery = query || getThemeQuery(theme);
   const params = new URLSearchParams({
     query: effectiveQuery,
     orientation: "landscape",
-    per_page: "15",
+    size: "large",
+    color,
+    per_page: "30",
     page: String(Math.floor(Math.random() * 3) + 1),
   });
 
@@ -90,15 +119,25 @@ export async function fetchPexelsImage(
   }
 
   const photo = data.photos[Math.floor(Math.random() * data.photos.length)];
-  const imageUrl = photo.src.original;
-
-  setCachedImage(theme, query, imageUrl, photo.photographer);
-  return imageUrl;
+  setCachedPexelsImage(theme, query, photo);
+  return photo.src.large2x;
 }
 
 export function clearPexelsCache(query: string): void {
   const theme = getCurrentTheme();
-  localStorage.removeItem(getCacheKey(theme, query));
+  const color = getThemeColor(theme);
+  localStorage.removeItem(getCacheKey(theme, query, color));
+}
+
+export function clearAllPexelsCache(): void {
+  const keysToRemove: string[] = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key?.startsWith(CACHE_KEY_PREFIX)) {
+      keysToRemove.push(key);
+    }
+  }
+  keysToRemove.forEach((k) => localStorage.removeItem(k));
 }
 
 export function getCurrentTheme(): "light" | "dark" {

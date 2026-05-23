@@ -34,13 +34,21 @@
   /* 毛玻璃 */
   --blur-sm: blur(16px);
   --blur-md: blur(20px);
+  --glass-bg: rgba(255, 255, 255, 0.58);
+  --glass-bg-strong: rgba(255, 255, 255, 0.72);
   --glass-bg-card: rgba(255, 255, 255, 0.15);
+  --glass-border: rgba(255, 255, 255, 0.45);
   --glass-border-card: rgba(255, 255, 255, 0.18);
+  --glass-shadow: 0 16px 40px rgba(15, 23, 42, 0.14);
+  --glass-blur: 18px;
   --glass-bg-topbar: rgba(255, 255, 255, 0.1);
   --glass-bg-input: rgba(255, 255, 255, 0.15);
   --glass-border-input: rgba(255, 255, 255, 0.25);
   --glass-bg-tag: rgba(255, 255, 255, 0.1);
   --glass-border-tag: rgba(255, 255, 255, 0.2);
+  --glass-text: rgba(15, 23, 42, 0.92);
+  --glass-text-muted: rgba(15, 23, 42, 0.62);
+  --glass-hover: rgba(255, 255, 255, 0.76);
 }
 
 body {
@@ -64,6 +72,17 @@ code {
 body.dark-mode {
   background-color: #121212;
   color: rgba(255, 255, 255, 0.6);
+
+  --glass-bg: rgba(15, 23, 42, 0.46);
+  --glass-bg-strong: rgba(15, 23, 42, 0.62);
+  --glass-bg-card: rgba(15, 23, 42, 0.25);
+  --glass-border: rgba(255, 255, 255, 0.14);
+  --glass-border-card: rgba(255, 255, 255, 0.1);
+  --glass-shadow: 0 18px 48px rgba(0, 0, 0, 0.36);
+  --glass-blur: 20px;
+  --glass-text: rgba(248, 250, 252, 0.94);
+  --glass-text-muted: rgba(248, 250, 252, 0.66);
+  --glass-hover: rgba(30, 41, 59, 0.68);
 }
 body.dark-mode input {
   background-color: #222222;
@@ -126,4 +145,25 @@ body.dark-mode.glassmorphism input {
   background: rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.15);
   color: rgba(255, 255, 255, 0.7);
+}
+
+/* ===== 通用 glass-panel 类 ===== */
+.glass-panel {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.2);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.2);
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .glass-panel {
+    background: var(--glass-bg-strong);
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --glass-blur: 12px;
+  }
 }

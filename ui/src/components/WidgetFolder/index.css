@@ -267,3 +267,12 @@
 .widget-folder-open-trigger:hover {
   opacity: 0.9;
 }
+
+/* ====== Glassmorphism ====== */
+body.glassmorphism .widget-folder {
+  background: var(--glass-bg-card);
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.2);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.2);
+  border-color: var(--glass-border-card);
+  box-shadow: var(--glass-shadow);
+}

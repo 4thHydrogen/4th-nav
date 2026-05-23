@@ -155,3 +155,18 @@
   background: var(--bg-hover, rgba(0, 0, 0, 0.03));
   border-radius: 4px;
 }
+
+/* ====== Glassmorphism ====== */
+body.glassmorphism .folder-floating-window {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.2);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.2);
+  border-color: var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+body.glassmorphism .folder-floating-overlay {
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+}

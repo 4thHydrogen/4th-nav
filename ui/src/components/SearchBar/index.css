@@ -129,3 +129,20 @@
 .engine-dropdown-item.active .engine-dropdown-letter {
   background: var(--widget-interactive-border, rgba(99, 102, 241, 0.2));
 }
+
+/* ====== Glassmorphism ====== */
+body.glassmorphism .search-wraper {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.2);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.2);
+  border-color: var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+body.glassmorphism .engine-dropdown {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.2);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.2);
+  border-color: var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
