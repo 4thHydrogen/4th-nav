@@ -78,7 +78,7 @@
 
 **Independent Test**: 打开设置页，能清晰找到壁纸配置区域，配置 Pexels 并预览。
 
-- [ ] T017 [US4] 设置页壁纸配置区域改进：增加壁纸来源说明文案（"输入 pexels 使用自动主题壁纸；输入 pexels:nature 使用指定关键词"），Pexels API Key 旁边增加测试按钮（可选），色调选择说明 — `ui/src/pages/admin/tabs/Setting.tsx`
+- [X] T017 [US4] 设置页壁纸配置区域改进：增加壁纸来源说明文案（"输入 pexels 使用自动主题壁纸；输入 pexels:nature 使用指定关键词"），Pexels API Key 旁边增加测试按钮（可选），色调选择说明 — `ui/src/pages/admin/tabs/Setting.tsx`
 
 **Checkpoint**: quickstart.md Phase A 可验证。设置页壁纸功能明显可见。
 

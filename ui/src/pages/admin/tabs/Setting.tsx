@@ -1,9 +1,9 @@
-import { Button, Card, Divider, Form, Input, message, Select, Slider, Space, Spin, Switch } from "antd";
+import { Button, Card, Divider, Form, Input, message, Select, Slider, Space, Spin, Switch, Typography } from "antd";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { fetchUpdateSetting, fetchUpdateUser, fetchUpdateSiteConfig } from "../../../utils/api";
 import { fetchRefreshMissingIcons, fetchRefreshAllIcons, fetchClearIconCache, fetchIconJobStatus } from "../../../shared/api/tool";
 import type { IconJobStatus } from "../../../shared/api/tool";
-import { parsePexelsUrl, clearPexelsCache, clearAllPexelsCache } from "../../../utils/pexels";
+import { parsePexelsUrl, clearPexelsCache, clearAllPexelsCache, fetchPexelsImage, getCurrentTheme } from "../../../utils/pexels";
 import { useData } from "../hooks/useData";
 export interface SettingProps { }
 export const Setting: React.FC<SettingProps> = (props) => {
@@ -12,6 +12,7 @@ export const Setting: React.FC<SettingProps> = (props) => {
   const [settingForm] = Form.useForm();
   const [siteConfigForm] = Form.useForm();
   const [iconJob, setIconJob] = useState<IconJobStatus | null>(null);
+  const [testingPexelsKey, setTestingPexelsKey] = useState(false);
   const iconPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const pollIconStatus = useCallback(() => {
@@ -26,6 +27,23 @@ export const Setting: React.FC<SettingProps> = (props) => {
       }
     }, 2000);
   }, [reload]);
+
+  const handleTestPexelsKey = useCallback(async () => {
+    const apiKey = settingForm.getFieldValue("pexelsApiKey");
+    if (!apiKey) {
+      message.warning("请先输入 Pexels API Key");
+      return;
+    }
+    setTestingPexelsKey(true);
+    try {
+      await fetchPexelsImage(apiKey, "test", getCurrentTheme());
+      message.success("API Key 有效，连接成功");
+    } catch {
+      message.error("API Key 无效或网络错误，请检查后重试");
+    } finally {
+      setTestingPexelsKey(false);
+    }
+  }, [settingForm]);
 
   useEffect(() => {
     return () => { if (iconPollRef.current) clearInterval(iconPollRef.current); };
@@ -186,19 +204,35 @@ export const Setting: React.FC<SettingProps> = (props) => {
             <Form.Item label="隐藏跳转方式卡片" name="hideToggleJumpTarget" tooltip="默认展示，开启后将在前台隐藏跳转方式卡片" >
               <Switch defaultChecked={Boolean(store?.setting?.hideToggleJumpTarget)} />
             </Form.Item>
+            <Divider orientation="left" style={{ margin: "16px 0 12px" }}>壁纸配置</Divider>
+            <div style={{ padding: "0 0 12px", color: "rgba(0,0,0,0.45)", fontSize: 13, lineHeight: 1.8 }}>
+              <div><b>壁纸来源格式：</b></div>
+              <div>• <code>pexels</code> — 自动根据当前主题（亮色/暗色）获取匹配色调的背景图</div>
+              <div>• <code>pexels:关键词</code> — 使用指定关键词搜索，如 <code>pexels:ocean</code>、<code>pexels:mountain</code></div>
+              <div>• <code>bing</code> — 自动获取每日 Bing 壁纸</div>
+              <div>• 其他 URL — 直接使用该图片作为背景</div>
+              <div style={{ marginTop: 4 }}>Pexels 模式会自动适配当前主题色调：暗色主题偏好深色壁纸，亮色主题偏好浅色壁纸。</div>
+            </div>
             <Form.Item
               label="背景图片 URL"
               name="backgroundUrl"
-              tooltip="输入图片 URL 作为页面背景。支持 bing 关键字自动获取每日 Bing 壁纸；支持 pexels 关键字获取主题感知背景（需配置 Pexels API Key）；也可输入 pexels:关键词 自定义搜索内容"
             >
-              <Input placeholder="例如: bing、pexels、pexels:ocean 或 https://example.com/bg.jpg" />
+              <Input placeholder="例如: pexels、pexels:ocean、bing 或图片 URL" />
             </Form.Item>
             <Form.Item
               label="Pexels API Key"
               name="pexelsApiKey"
-              tooltip="在 pexels.com/api 免费申请。配置后背景图片 URL 输入 pexels 即可根据主题自动获取亮/暗色调背景图"
+              tooltip="在 pexels.com/api 免费申请，用于获取高质量主题壁纸"
             >
-              <Input.Password placeholder="请输入 Pexels API Key" />
+              <Space.Compact style={{ width: "100%" }}>
+                <Input.Password placeholder="请输入 Pexels API Key" style={{ flex: 1 }} />
+                <Button
+                  loading={testingPexelsKey}
+                  onClick={handleTestPexelsKey}
+                >
+                  测试
+                </Button>
+              </Space.Compact>
             </Form.Item>
             <Form.Item label="壁纸换一张">
               <Button
