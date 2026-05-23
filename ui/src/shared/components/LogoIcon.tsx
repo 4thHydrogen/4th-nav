@@ -5,12 +5,14 @@ import { sanitizeSvg } from "../../utils/sanitize";
 interface LogoIconProps {
   logo: string;
   name: string;
-  /** URL of the tool (used for admin tool special case) */
   toolUrl?: string;
-  size?: number;
+  /** Fixed px size. Ignored when fill=true. */
+  size?: number | string;
   radius?: number | string;
   className?: string;
   fallbackFontSize?: number;
+  /** When true, don't set inline width/height — let parent CSS control sizing */
+  fill?: boolean;
 }
 
 export default function LogoIcon({
@@ -21,6 +23,7 @@ export default function LogoIcon({
   radius = 8,
   className,
   fallbackFontSize,
+  fill = false,
 }: LogoIconProps) {
   const [imageError, setImageError] = useState(false);
 
@@ -28,7 +31,11 @@ export default function LogoIcon({
     setImageError(false);
   }, [logo]);
 
-  const fallbackSize = fallbackFontSize ?? Math.max(10, size * 0.3);
+  const numericSize = typeof size === "number" ? size : 48;
+  const fallbackSize = fallbackFontSize ?? Math.max(10, numericSize * 0.3);
+  const dimStyle = fill
+    ? { width: "100%" as const, height: "100%" as const }
+    : { width: size, height: size };
 
   const src = useMemo(() => {
     if (!logo || isInlineSvg(logo)) return "";
@@ -43,13 +50,13 @@ export default function LogoIcon({
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          width: size,
-          height: size,
+          ...dimStyle,
           borderRadius: radius,
           fontSize: fallbackSize,
           fontWeight: 600,
           color: "var(--widget-text-muted)",
           userSelect: "none",
+          overflow: "hidden",
         }}
       >
         {name.charAt(0).toUpperCase()}
@@ -61,7 +68,7 @@ export default function LogoIcon({
     return (
       <span
         className={className}
-        style={{ display: "flex", width: size, height: size, borderRadius: radius, overflow: "hidden" }}
+        style={{ display: "flex", ...dimStyle, borderRadius: radius, overflow: "hidden" }}
         dangerouslySetInnerHTML={{ __html: sanitizeSvg(logo) }}
       />
     );
@@ -70,7 +77,7 @@ export default function LogoIcon({
   return (
     <span
       className={className}
-      style={{ display: "flex", width: size, height: size, borderRadius: radius, overflow: "hidden" }}
+      style={{ display: "flex", ...dimStyle, borderRadius: radius, overflow: "hidden" }}
     >
       <img
         src={src}
