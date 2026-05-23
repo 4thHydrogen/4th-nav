@@ -5,15 +5,14 @@ import {
   QueryClient,
 } from "@tanstack/react-query";
 import {
-  FetchList,
   fetchUpdateToolViewMode,
-  fetchAddDockItem,
-  fetchMoveToolToFolder,
   fetchAddTool,
-  fetchUpdateLayout,
-  fetchUpdateFolderSettings,
   fetchUpdateTool,
-} from "../utils/api";
+} from "../shared/api/tool";
+import { FetchList } from "../shared/api/content";
+import { fetchAddDockItem } from "../shared/api/dock";
+import { fetchMoveToolToFolder, fetchUpdateFolderSettings } from "../shared/api/folder";
+import { fetchUpdateLayout } from "../shared/api/tool";
 import type { ContentData, ToolViewMode, LayoutItemDto, FolderViewMode, ToolSize } from "../types";
 
 export const queryClient = new QueryClient({

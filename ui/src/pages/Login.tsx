@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { message } from 'antd';
-import { login } from '../utils/api';
+import { login } from '../shared/api/auth';
 import './Login.css';
 
 const Login: React.FC = () => {

@@ -21,7 +21,7 @@ import {
   fetchUpdateSearchEngine,
   fetchDeleteSearchEngine,
   fetchUpdateSearchEnginesSort,
-} from '../../../utils/api';
+} from '../../../shared/api/search-engine';
 
 interface SearchEngine {
   id: number;

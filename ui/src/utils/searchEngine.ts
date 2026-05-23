@@ -1,4 +1,4 @@
-import { fetchGetEnabledSearchEngines } from './api';
+import { fetchGetEnabledSearchEngines } from '../shared/api/search-engine';
 import type { SearchEngine } from '../types';
 
 let searchEnginesCache: SearchEngine[] = [];

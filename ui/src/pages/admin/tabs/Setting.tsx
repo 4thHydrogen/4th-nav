@@ -1,6 +1,6 @@
 import { Button, Card, Divider, Form, Input, message, Select, Slider, Space, Spin, Switch, Typography } from "antd";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { fetchUpdateSetting, fetchUpdateUser, fetchUpdateSiteConfig } from "../../../utils/api";
+import { fetchUpdateSetting, fetchUpdateUser, fetchUpdateSiteConfig } from "../../../shared/api/setting";
 import { fetchRefreshMissingIcons, fetchRefreshAllIcons, fetchClearIconCache, fetchIconJobStatus } from "../../../shared/api/tool";
 import type { IconJobStatus } from "../../../shared/api/tool";
 import { parsePexelsUrl, clearPexelsCache, clearAllPexelsCache, fetchPexelsImage, getCurrentTheme } from "../../../utils/pexels";

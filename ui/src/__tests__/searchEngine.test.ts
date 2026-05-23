@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-vi.mock('../utils/api', () => ({
+vi.mock('../shared/api/search-engine', () => ({
   fetchGetEnabledSearchEngines: vi.fn(),
 }));
 
-import { fetchGetEnabledSearchEngines } from '../utils/api';
+import { fetchGetEnabledSearchEngines } from '../shared/api/search-engine';
 import { getEnabledSearchEngines, generateSearchUrl, clearSearchEngineCache } from '../utils/searchEngine';
 
 const mockEngines = [

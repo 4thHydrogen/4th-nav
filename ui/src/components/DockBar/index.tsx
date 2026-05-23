@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from "react";
 import { Plus } from "lucide-react";
 import type { DockItem } from "../../types";
-import { fetchRemoveDockItem, fetchUpdateDockSort } from "../../utils/api";
+import { fetchRemoveDockItem, fetchUpdateDockSort } from "../../shared/api/dock";
 import LogoIcon from "../../shared/components/LogoIcon";
 import "./index.css";
 

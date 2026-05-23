@@ -1,7 +1,7 @@
 
 import { Button, Card, Form, Input, Modal, message, Popconfirm, Space, Spin, Table, Typography } from 'antd';
 import { useCallback, useState } from 'react';
-import { fetchAddApiToken, fetchDeleteApiToken } from '../../../utils/api';
+import { fetchAddApiToken, fetchDeleteApiToken } from '../../../shared/api/setting';
 import { useData } from '../hooks/useData';
 export interface ApiTokenProps {
 

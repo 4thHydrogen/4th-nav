@@ -2,7 +2,8 @@ import { useEffect, useCallback, useState } from "react";
 import { createPortal } from "react-dom";
 import "./index.css";
 import type { Tool, ToolViewMode, ToolSize } from "../../types";
-import { fetchMoveToolToFolder, fetchDeleteFolder, fetchAddTool, fetchUpdateTool } from "../../utils/api";
+import { fetchAddTool, fetchUpdateTool } from "../../shared/api/tool";
+import { fetchMoveToolToFolder, fetchDeleteFolder } from "../../shared/api/folder";
 import { useUpdateToolSize } from "../../queries";
 
 interface ContextMenuState {

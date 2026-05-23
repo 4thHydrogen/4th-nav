@@ -1,6 +1,6 @@
 import { useMemo, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { Tool, LayoutItemDto } from "../../types";
-import { fetchUpdateLayout } from "../../utils/api";
+import { fetchUpdateLayout } from "../../shared/api/tool";
 import { parseSize } from "../WidgetTool";
 
 export const BREAKPOINTS = { lg: 1100, md: 768, sm: 500, xs: 0 };

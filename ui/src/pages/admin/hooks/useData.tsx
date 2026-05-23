@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { fetchAdminData } from "../../../utils/api";
+import { fetchAdminData } from "../../../shared/api/tool";
 import { useOnce } from "../../../utils/useOnce";
 import type { AdminApiData } from "../../../types";
 

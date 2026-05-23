@@ -19,7 +19,7 @@ import {
   fetchAddCateLog,
   fetchDeleteCatelog,
   fetchUpdateCateLog,
-} from "../../../utils/api";
+} from "../../../shared/api/category";
 import { useData } from "../hooks/useData";
 export interface CatelogProps {}
 export const Catelog: React.FC<CatelogProps> = (props) => {

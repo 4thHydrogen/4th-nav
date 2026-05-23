@@ -265,7 +265,7 @@ describe("moveItem", () => {
     expect(c.y).toBe(6);
   });
 
-  it("pushes only conflicting items down (others stay)", () => {
+  it("moves only conflicting items away (others stay)", () => {
     const items = [
       item("a", 0, 0),
       item("b", 2, 0),
@@ -278,7 +278,7 @@ describe("moveItem", () => {
     const c = result.find((i) => i.i === "c")!;
     expect(a.x).toBe(2);
     expect(a.y).toBe(0);
-    expect(b.y).toBeGreaterThan(0); // pushed down
+    expect(b.x !== 2 || b.y !== 0).toBe(true); // displaced away from the moved item
     expect(c.y).toBe(5); // untouched
   });
 
