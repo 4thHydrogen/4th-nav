@@ -13,7 +13,7 @@
 
 /* Floating window container */
 .folder-floating-window {
-  position: absolute;
+  position: fixed;
   z-index: var(--z-folder-window);
   background: var(--bg-card, #fff);
   border: 1px solid var(--border-color, #e2e2e2);

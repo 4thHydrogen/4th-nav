@@ -59,11 +59,25 @@
   --z-folder-overlay: 700;
   --z-folder-window: 800;
   --z-dropdown: 900;
+  --z-floating-menu: 1000;
   --z-context-menu: 1100;
   --z-popover: 1200;
   --z-modal: 1300;
   --z-toast: 1400;
   --z-tooltip: 1500;
+}
+
+/* Overlay root: all floating panels portal here */
+#app-overlay-root {
+  pointer-events: none;
+}
+
+#app-overlay-root > * {
+  pointer-events: auto;
+}
+
+body.overlay-open .desktop-workspace {
+  pointer-events: none;
 }
 
 body {

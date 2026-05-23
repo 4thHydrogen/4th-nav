@@ -6,6 +6,7 @@ import { decodeTheme, initTheme } from './utils/theme';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from './queries';
+import { OverlayProvider } from './components/OverlayLayer/OverlayProvider';
 import './App.css';
 
 // 使用 React.lazy 懒加载组件
@@ -66,6 +67,7 @@ const LoadingFallback = () => {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
+    <OverlayProvider>
     <AntApp>
       <ErrorBoundary>
         <Router>
@@ -86,6 +88,7 @@ function App() {
       </Router>
       </ErrorBoundary>
     </AntApp>
+    </OverlayProvider>
     </QueryClientProvider>
   );
 }

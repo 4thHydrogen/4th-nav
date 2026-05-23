@@ -52,8 +52,8 @@
   height: 100%;
   grid-template-columns: repeat(var(--grid-w, 1), 1fr);
   grid-template-rows: repeat(var(--grid-h, 1), 1fr);
-  justify-items: stretch;
-  align-items: stretch;
+  justify-items: center;
+  align-items: start;
 }
 
 /* 文件夹内 widget-tool 自动适应格子大小 */
@@ -136,19 +136,7 @@
   box-sizing: border-box;
 }
 
-.widget-folder-overflow-label {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--widget-text-muted);
-  background: var(--widget-icon-bg);
-  border-radius: 6px;
-  user-select: none;
-}
+/* deprecated: replaced by .widget-folder-overflow-count */
 
 .widget-folder-overflow-grid {
   width: 100%;
@@ -170,6 +158,20 @@
   border-radius: 4px;
   overflow: hidden;
   box-sizing: border-box;
+}
+
+.widget-folder-overflow-count {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--widget-text-muted);
+  background: var(--widget-icon-bg);
+  border-radius: 4px;
+  user-select: none;
 }
 
 .widget-folder-label {

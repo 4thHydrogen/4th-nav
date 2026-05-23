@@ -76,9 +76,7 @@
 }
 
 .engine-dropdown {
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
+  position: fixed;
   min-width: 140px;
   margin: 0;
   padding: 4px;
@@ -87,7 +85,7 @@
   border: 1px solid var(--widget-border, rgba(0, 0, 0, 0.08));
   border-radius: 10px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-  z-index: 9999;
+  z-index: var(--z-floating-menu);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
 }

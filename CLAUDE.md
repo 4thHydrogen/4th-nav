@@ -3,6 +3,7 @@
 <!-- SPECKIT START -->
 - **Active Plan**: `specs/003-icon-system/plan.md` — Icon 系统增强：高清获取与批量管理
 - **Active Plan**: `specs/004-glassmorphism-wallpaper/plan.md` — 毛玻璃主题与 Pexels 壁纸
+- **Active Plan**: `specs/005-unified-overlay-system/plan.md` — 统一浮层系统与交互修复
 <!-- SPECKIT END -->
 
 ## Workflow

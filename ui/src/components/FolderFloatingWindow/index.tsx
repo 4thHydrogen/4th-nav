@@ -6,13 +6,14 @@ import WidgetTool from "../WidgetTool";
 import { useUpdateFolderSettings } from "../../queries";
 import type { Tool, FolderViewMode } from "../../types";
 import { getJumpTarget } from "../../utils/setting";
+import { FloatingPortal } from "../OverlayLayer/FloatingPortal";
+import { useOutsidePointerDown } from "../OverlayLayer/useOutsidePointerDown";
 
 interface FolderFloatingWindowProps {
   folder: Tool;
   children: Tool[];
   listItemSize: number;
   folderCardRect: DOMRect | null;
-  gridRect: DOMRect | null;
   onClose: () => void;
   onOpenTool: (tool: Tool) => void;
   onContextMenu: (e: React.MouseEvent, tool: Tool) => void;
@@ -24,7 +25,6 @@ export default function FolderFloatingWindow({
   children,
   listItemSize,
   folderCardRect,
-  gridRect,
   onClose,
   onOpenTool,
   onContextMenu,
@@ -46,31 +46,30 @@ export default function FolderFloatingWindow({
     active: boolean;
   } | null>(null);
 
-  const [w, h] = useMemo(() => {
-    const parts = (folder.size || "2x2").split("x").map(Number);
-    return [parts[0] || 2, parts[1] || 2];
-  }, [folder.size]);
+  // Close on outside pointer down (backup to overlay click)
+  useOutsidePointerDown(panelRef, onClose);
 
-  // Position: centered on folder card, large modal
+  // Position: viewport-fixed, centered on folder card
   const position = useMemo(() => {
-    if (!folderCardRect || !gridRect) return { left: 0, top: 0 };
+    if (!folderCardRect) return { left: 0, top: 0 };
 
-    const panelWidth = Math.min(gridRect.width * 0.85, 800);
-    const panelHeight = Math.min(window.innerHeight * 0.75, 600);
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const panelWidth = Math.min(vw * 0.72, 600);
+    const panelHeight = Math.min(vh * 0.72, 500);
 
-    // Center horizontally on folder card
-    let left = (folderCardRect.left - gridRect.left) + (folderCardRect.width / 2) - (panelWidth / 2);
-    // Clamp to grid bounds
-    if (left < 16) left = 16;
-    if (left + panelWidth > gridRect.width - 16) left = gridRect.width - panelWidth - 16;
+    // Center horizontally on folder card, clamp to viewport
+    let left = folderCardRect.left + (folderCardRect.width / 2) - (panelWidth / 2);
+    if (left < 12) left = 12;
+    if (left + panelWidth > vw - 12) left = vw - panelWidth - 12;
 
     // Vertically: start near folder card, clamp to viewport
-    let top = (folderCardRect.top - gridRect.top) - 20;
-    if (top < 16) top = 16;
-    if (top + panelHeight > window.innerHeight * 0.85) top = window.innerHeight * 0.85 - panelHeight;
+    let top = folderCardRect.top - 20;
+    if (top < 12) top = 12;
+    if (top + panelHeight > vh - 12) top = vh - panelHeight - 12;
 
     return { left, top };
-  }, [folderCardRect, gridRect]);
+  }, [folderCardRect]);
 
   // Close on Escape
   useEffect(() => {
@@ -100,7 +99,6 @@ export default function FolderFloatingWindow({
     [onOpenTool]
   );
 
-  // Drag-out via Pointer Events (Phase 4 will add dnd-kit integration)
   const handleItemPointerDown = useCallback(
     (toolId: number, e: React.PointerEvent) => {
       if (e.button !== 0) return;
@@ -194,7 +192,7 @@ export default function FolderFloatingWindow({
     );
 
   return (
-    <>
+    <FloatingPortal>
       {/* Overlay blocks main panel */}
       <motion.div
         className="folder-floating-overlay"
@@ -221,8 +219,8 @@ export default function FolderFloatingWindow({
         style={{
           left: position.left,
           top: position.top,
-          width: `min(${gridRect ? gridRect.width * 0.85 : 600}px, 800px)`,
-          maxHeight: "75vh",
+          width: `min(${Math.min(window.innerWidth * 0.72, 600)}px, calc(100vw - 24px))`,
+          maxHeight: "72vh",
         }}
       >
         <div className="folder-floating-header" onContextMenu={(e) => onContextMenu(e, folder)}>
@@ -252,6 +250,6 @@ export default function FolderFloatingWindow({
           </div>
         )}
       </motion.div>
-    </>
+    </FloatingPortal>
   );
 }

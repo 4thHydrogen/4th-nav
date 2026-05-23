@@ -1,7 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import "./index.css";
 import { getEnabledSearchEngines, generateSearchUrl } from "../../utils/searchEngine";
 import type { SearchEngine } from "../../types";
+import { FloatingPortal } from "../OverlayLayer/FloatingPortal";
+import { useOutsidePointerDown } from "../OverlayLayer/useOutsidePointerDown";
+import { computePlacement } from "../OverlayLayer/placement";
 
 const STORAGE_KEY = "selectedSearchEngineId";
 
@@ -15,7 +19,8 @@ const SearchBar = (props: SearchBarProps) => {
   const [engines, setEngines] = useState<SearchEngine[]>([]);
   const [selectedEngine, setSelectedEngine] = useState<SearchEngine | null>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLUListElement>(null);
 
   useEffect(() => {
     const onKeyDown = (ev: KeyboardEvent) => {
@@ -50,20 +55,19 @@ const SearchBar = (props: SearchBarProps) => {
     });
   }, []);
 
-  // Close dropdown on outside click
+  // Close on Escape
   useEffect(() => {
     if (!isDropdownOpen) return;
-    const handleClick = (ev: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(ev.target as Node)
-      ) {
-        setIsDropdownOpen(false);
-      }
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsDropdownOpen(false);
     };
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
   }, [isDropdownOpen]);
+
+  // Close on outside pointer down
+  const handleClose = useCallback(() => setIsDropdownOpen(false), []);
+  useOutsidePointerDown(menuRef, handleClose, isDropdownOpen);
 
   const handleSelectEngine = useCallback(
     (engine: SearchEngine) => {
@@ -74,6 +78,24 @@ const SearchBar = (props: SearchBarProps) => {
     },
     [props.onSelectedEngineChange]
   );
+
+  const handleToggle = useCallback(() => {
+    setIsDropdownOpen((prev) => !prev);
+  }, []);
+
+  // Compute dropdown position from button
+  const menuPosition = (() => {
+    if (!buttonRef.current) return { left: 0, top: 0 };
+    const rect = buttonRef.current.getBoundingClientRect();
+    const pos = computePlacement({
+      anchorRect: rect,
+      panelWidth: 160,
+      panelHeight: Math.min(engines.length * 40 + 8, 300),
+      placement: "bottom-end",
+      margin: 8,
+    });
+    return pos;
+  })();
 
   const engineLetter = selectedEngine?.name?.charAt(0)?.toUpperCase() ?? "?";
 
@@ -101,17 +123,35 @@ const SearchBar = (props: SearchBarProps) => {
             props.setSearchText(ev.target.value);
           }}
         />
-        <div className="engine-selector" ref={dropdownRef}>
+        <div className="engine-selector">
           <button
+            ref={buttonRef}
             className="engine-selector-btn"
-            onClick={() => setIsDropdownOpen((prev) => !prev)}
+            onClick={handleToggle}
             title={selectedEngine?.name ?? "选择搜索引擎"}
             type="button"
           >
             {engineLetter}
           </button>
-          {isDropdownOpen && engines.length > 0 && (
-            <ul className="engine-dropdown">
+        </div>
+      </div>
+
+      <AnimatePresence>
+        {isDropdownOpen && engines.length > 0 && (
+          <FloatingPortal>
+            <motion.ul
+              ref={menuRef}
+              className="engine-dropdown"
+              initial={{ opacity: 0, scaleX: 0.2, scaleY: 0.75 }}
+              animate={{ opacity: 1, scaleX: 1, scaleY: 1 }}
+              exit={{ opacity: 0, scaleX: 0.2, scaleY: 0.75 }}
+              transition={{ duration: 0.18 }}
+              style={{
+                left: menuPosition.left,
+                top: menuPosition.top,
+                transformOrigin: "right top",
+              }}
+            >
               {engines.map((engine) => (
                 <li
                   key={engine.id}
@@ -124,10 +164,10 @@ const SearchBar = (props: SearchBarProps) => {
                   <span className="engine-dropdown-name">{engine.name}</span>
                 </li>
               ))}
-            </ul>
-          )}
-        </div>
-      </div>
+            </motion.ul>
+          </FloatingPortal>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

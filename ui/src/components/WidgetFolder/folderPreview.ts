@@ -1,8 +1,9 @@
 import type { Tool } from "../../types";
 
 export interface PreviewSlot {
-  type: "tool" | "overflow" | "empty";
+  type: "tool" | "summary" | "empty";
   tool?: Tool;
+  tools?: Tool[];
   count?: number;
 }
 
@@ -10,9 +11,9 @@ export interface PreviewSlot {
  * Build stable preview slots for a collapsed folder.
  *
  * Rules:
- * - 1×1 folder: internal mini 2×2 grid, max 4 visual units. Overflow → last slot shows "+N".
- * - Larger folders: cols × rows slots. Overflow → last slot shows "+N".
- * - No real icon should squeeze past the slot limit.
+ * - 1×1 folder: internal mini 2×2 grid, max 4 visual units.
+ * - Larger folders: cols × rows slots.
+ * - Overflow: last slot is a summary showing up to 3 mini icons + "+N" count.
  */
 export function buildFolderPreviewSlots(
   children: Tool[],
@@ -34,21 +35,25 @@ export function buildFolderPreviewSlots(
   // No overflow: all children fit
   if (children.length <= maxIcons) {
     const slots: PreviewSlot[] = children.map((tool) => ({ type: "tool" as const, tool }));
-    // Fill remaining with empty
     while (slots.length < maxIcons) {
       slots.push({ type: "empty" });
     }
     return slots;
   }
 
-  // Overflow: show first (maxIcons - 1) tools, last slot is "+N"
+  // Overflow: show first (maxIcons - 1) tools, last slot is summary
+  const regularCount = maxIcons - 1;
   const slots: PreviewSlot[] = children
-    .slice(0, maxIcons - 1)
+    .slice(0, regularCount)
     .map((tool) => ({ type: "tool" as const, tool }));
 
+  const remaining = children.slice(regularCount);
+  const extraCount = children.length - maxIcons;
+
   slots.push({
-    type: "overflow",
-    count: children.length - (maxIcons - 1),
+    type: "summary",
+    tools: remaining,
+    count: extraCount,
   });
 
   return slots;

@@ -11,11 +11,23 @@ interface FolderPreviewSlotProps {
 }
 
 export function FolderPreviewSlot({ slot, onOpenChild, onContextMenu }: FolderPreviewSlotProps) {
-  if (slot.type === "overflow") {
+  if (slot.type === "summary") {
     return (
       <div className="widget-folder-overflow">
         <div className="widget-folder-overflow-grid">
-          <span className="widget-folder-overflow-label">+{slot.count}</span>
+          {slot.tools!.slice(0, 3).map((tool) => (
+            <span key={tool.id} className="widget-folder-overflow-cell">
+              <LogoIcon
+                logo={tool.logo}
+                name={tool.name}
+                fill
+                fallbackFontSize={8}
+              />
+            </span>
+          ))}
+          {slot.count! > 0 && (
+            <span className="widget-folder-overflow-count">+{slot.count}</span>
+          )}
         </div>
       </div>
     );
@@ -70,27 +82,5 @@ export function FolderPreviewSlot({ slot, onOpenChild, onContextMenu }: FolderPr
         />
       </span>
     </a>
-  );
-}
-
-/** Mini icon used in 1×1 folder overflow cells */
-export function FolderMiniIcon({ tool }: { tool: Tool }) {
-  return (
-    <LogoIcon
-      logo={tool.logo}
-      name={tool.name}
-      fill
-      className="widget-folder-overflow-cell"
-      fallbackFontSize={10}
-    />
-  );
-}
-
-/** Overflow slot showing "+N" inside a mini grid */
-export function FolderOverflowSlot({ count }: { count: number }) {
-  return (
-    <div className="widget-folder-overflow">
-      <span className="widget-folder-overflow-label">+{count}</span>
-    </div>
   );
 }
