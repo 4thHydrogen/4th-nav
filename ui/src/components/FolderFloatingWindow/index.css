@@ -6,19 +6,19 @@
   right: 0;
   bottom: 0;
   z-index: var(--z-folder-overlay);
-  background: var(--surface-overlay-bg);
-  backdrop-filter: blur(var(--surface-overlay-blur));
-  -webkit-backdrop-filter: blur(var(--surface-overlay-blur));
+  background: var(--surface-overlay-bg, rgba(0, 0, 0, 0.15));
+  backdrop-filter: blur(var(--surface-overlay-blur, 4px));
+  -webkit-backdrop-filter: blur(var(--surface-overlay-blur, 4px));
 }
 
 /* Floating window container */
 .folder-floating-window {
   position: fixed;
   z-index: var(--z-folder-window);
-  background: var(--surface-panel-bg);
-  backdrop-filter: blur(var(--surface-panel-blur)) saturate(var(--surface-panel-saturate));
-  -webkit-backdrop-filter: blur(var(--surface-panel-blur)) saturate(var(--surface-panel-saturate));
-  border: 1px solid var(--surface-panel-border);
+  background: var(--surface-panel-bg, rgba(255, 255, 255, 0.42));
+  backdrop-filter: blur(var(--surface-panel-blur, 20px)) saturate(var(--surface-panel-saturate, 1.2));
+  -webkit-backdrop-filter: blur(var(--surface-panel-blur, 20px)) saturate(var(--surface-panel-saturate, 1.2));
+  border: 1px solid var(--surface-panel-border, rgba(255, 255, 255, 0.22));
   border-radius: 12px;
   display: flex;
   flex-direction: column;

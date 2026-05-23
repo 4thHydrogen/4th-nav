@@ -10,10 +10,10 @@
   gap: 6px;
   padding: 8px 16px;
   border-radius: 18px;
-  background: var(--surface-widget-bg);
-  backdrop-filter: blur(var(--surface-widget-blur)) saturate(var(--surface-widget-saturate));
-  -webkit-backdrop-filter: blur(var(--surface-widget-blur)) saturate(var(--surface-widget-saturate));
-  border: 1px solid var(--surface-widget-border);
+  background: var(--surface-widget-bg, rgba(255, 255, 255, 0.12));
+  backdrop-filter: blur(var(--surface-widget-blur, 18px)) saturate(var(--surface-widget-saturate, 1.2));
+  -webkit-backdrop-filter: blur(var(--surface-widget-blur, 18px)) saturate(var(--surface-widget-saturate, 1.2));
+  border: 1px solid var(--surface-widget-border, rgba(255, 255, 255, 0.16));
   z-index: var(--z-dock, 500);
   transition: opacity 0.2s, transform 0.2s;
 }

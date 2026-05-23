@@ -65,6 +65,28 @@
   --z-modal: 1300;
   --z-toast: 1400;
   --z-tooltip: 1500;
+
+  /* Surface tokens — unified glassmorphism system */
+  --surface-widget-bg: rgba(255, 255, 255, 0.12);
+  --surface-widget-border: rgba(255, 255, 255, 0.16);
+  --surface-widget-blur: 18px;
+  --surface-widget-saturate: 1.2;
+  --surface-widget-shadow: none;
+
+  --surface-folder-bg: rgba(255, 255, 255, 0.08);
+  --surface-folder-border: rgba(255, 255, 255, 0.06);
+  --surface-folder-blur: 18px;
+  --surface-folder-saturate: 1.2;
+  --surface-folder-shadow: none;
+
+  --surface-panel-bg: rgba(255, 255, 255, 0.42);
+  --surface-panel-border: rgba(255, 255, 255, 0.22);
+  --surface-panel-blur: 20px;
+  --surface-panel-saturate: 1.2;
+  --surface-panel-shadow: 0 20px 60px rgba(15, 23, 42, 0.12);
+
+  --surface-overlay-bg: rgba(0, 0, 0, 0.15);
+  --surface-overlay-blur: 4px;
 }
 
 /* Overlay root: all floating panels portal here */
@@ -102,6 +124,19 @@ body.dark-mode {
   background-color: #121212;
   color: rgba(255, 255, 255, 0.6);
 
+  --surface-widget-bg: rgba(15, 23, 42, 0.24);
+  --surface-widget-border: rgba(255, 255, 255, 0.10);
+
+  --surface-folder-bg: rgba(15, 23, 42, 0.22);
+  --surface-folder-border: rgba(255, 255, 255, 0.06);
+
+  --surface-panel-bg: rgba(30, 32, 38, 0.62);
+  --surface-panel-border: rgba(255, 255, 255, 0.10);
+  --surface-panel-shadow: 0 20px 60px rgba(0, 0, 0, 0.32);
+
+  --surface-overlay-bg: rgba(0, 0, 0, 0.25);
+  --surface-overlay-blur: 6px;
+
   --glass-bg: rgba(15, 23, 42, 0.46);
   --glass-bg-strong: rgba(15, 23, 42, 0.62);
   --glass-bg-card: rgba(15, 23, 42, 0.25);
@@ -126,6 +161,23 @@ body.dark-mode input:focus,
 body.dark-mode input:focus-visible {
   background-color: #3d3d3d;
   border: 1px solid #3d3d3d;
+}
+
+/* ===== Surface tokens: has-background / glassmorphism ===== */
+body.has-background,
+body.glassmorphism {
+  --surface-widget-bg: rgba(255, 255, 255, 0.10);
+  --surface-widget-border: rgba(255, 255, 255, 0.14);
+
+  --surface-folder-bg: rgba(255, 255, 255, 0.08);
+  --surface-folder-border: rgba(255, 255, 255, 0.06);
+
+  --surface-panel-bg: rgba(30, 32, 38, 0.52);
+  --surface-panel-border: rgba(255, 255, 255, 0.16);
+  --surface-panel-shadow: 0 20px 60px rgba(0, 0, 0, 0.28);
+
+  --surface-overlay-bg: rgba(0, 0, 0, 0.22);
+  --surface-overlay-blur: 8px;
 }
 
 /* ===== 背景图片模式 ===== */

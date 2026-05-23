@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback, useState, type ReactNode } from "react";
+import { useEffect, useCallback, useState, type ReactNode } from "react";
 import { createContext, useContext } from "react";
 
 const OverlayContext = createContext<HTMLElement | null>(null);
@@ -12,7 +12,7 @@ interface OverlayProviderProps {
 }
 
 export function OverlayProvider({ children }: OverlayProviderProps) {
-  const rootRef = useRef<HTMLElement | null>(null);
+  const [rootEl, setRootEl] = useState<HTMLElement | null>(null);
   const [activeCount, setActiveCount] = useState(0);
 
   useEffect(() => {
@@ -22,10 +22,9 @@ export function OverlayProvider({ children }: OverlayProviderProps) {
       el.id = "app-overlay-root";
       document.body.appendChild(el);
     }
-    rootRef.current = el;
+    setRootEl(el);
   }, []);
 
-  // Manage body.overlay-open class
   useEffect(() => {
     document.body.classList.toggle("overlay-open", activeCount > 0);
   }, [activeCount]);
@@ -36,7 +35,7 @@ export function OverlayProvider({ children }: OverlayProviderProps) {
   }, []);
 
   return (
-    <OverlayContext.Provider value={rootRef.current}>
+    <OverlayContext.Provider value={rootEl}>
       <OverlayActivityContext.Provider value={register}>
         {children}
       </OverlayActivityContext.Provider>
