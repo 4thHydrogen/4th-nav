@@ -280,13 +280,28 @@ const WidgetGrid = ({
             style={{
               width: itemStyles.get(activeId)?.width,
               height: itemStyles.get(activeId)?.height,
-            }}
+              "--cell-width": `${cellWidth}px`,
+              "--row-height": `${rowHeight}px`,
+              "--cell-gap-x": `${margin[0]}px`,
+              "--cell-gap-y": `${margin[1]}px`,
+            } as React.CSSProperties}
           >
-            <WidgetTool
-              tool={activeTool}
-              onContextMenu={() => {}}
-              onClick={() => {}}
-            />
+            {activeTool.type === "folder" ? (
+              <WidgetFolder
+                folder={activeTool}
+                childrenTools={childrenMap[activeTool.id] ?? []}
+                listItemSize={listItemSize}
+                onOpen={() => {}}
+                onOpenChild={() => {}}
+                onContextMenu={() => {}}
+              />
+            ) : (
+              <WidgetTool
+                tool={activeTool}
+                onContextMenu={() => {}}
+                onClick={() => {}}
+              />
+            )}
           </div>
         ) : null}
       </DragOverlay>

@@ -10,11 +10,10 @@
   gap: 6px;
   padding: 8px 16px;
   border-radius: 18px;
-  background: var(--widget-bg, rgba(255, 255, 255, 0.72));
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  border: 1px solid var(--widget-border, rgba(15, 23, 42, 0.08));
-  box-shadow: var(--widget-overlay-shadow, 0 24px 70px rgba(15, 23, 42, 0.10));
+  background: var(--surface-widget-bg);
+  backdrop-filter: blur(var(--surface-widget-blur)) saturate(var(--surface-widget-saturate));
+  -webkit-backdrop-filter: blur(var(--surface-widget-blur)) saturate(var(--surface-widget-saturate));
+  border: 1px solid var(--surface-widget-border);
   z-index: var(--z-dock, 500);
   transition: opacity 0.2s, transform 0.2s;
 }
@@ -125,22 +124,3 @@
   }
 }
 
-/* ====== Dark mode / Background mode ====== */
-
-body.dark-mode .dock-bar {
-  background: var(--widget-bg, rgba(255, 255, 255, 0.06));
-  border-color: var(--widget-border, rgba(255, 255, 255, 0.08));
-}
-
-body.has-background .dock-bar {
-  background: var(--widget-bg, rgba(255, 255, 255, 0.06));
-  border-color: var(--widget-border, rgba(255, 255, 255, 0.08));
-}
-
-body.glassmorphism .dock-bar {
-  background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur)) saturate(1.2);
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.2);
-  border-color: var(--glass-border);
-  box-shadow: var(--glass-shadow);
-}

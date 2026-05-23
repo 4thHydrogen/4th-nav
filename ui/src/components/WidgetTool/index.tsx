@@ -27,13 +27,6 @@ const WidgetTool = ({ tool, onContextMenu, onClick, compact = false, hideLabel =
   const isLarge = !compact && (w > 1 || h > 1);
   const mouseDownPos = useRef<{ x: number; y: number } | null>(null);
 
-  // 为 1×1 网页项目生成随机彩色背景（基于 id 哈希，调试用）
-  const debugBg = useMemo(() => {
-    if (compact || tool.type === "folder" || (w > 1 || h > 1)) return undefined;
-    const hue = (tool.id * 137.5) % 360;
-    return `hsl(${hue}, 65%, 85%)`;
-  }, [compact, tool.id, tool.type, w, h]);
-
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
 
@@ -122,7 +115,7 @@ const WidgetTool = ({ tool, onContextMenu, onClick, compact = false, hideLabel =
       rel="noreferrer"
       className={`widget-tool ${modeClass}`}
     >
-      <div className="widget-tool-icon" style={{ backgroundColor: debugBg, borderRadius: debugBg ? '12px' : undefined }}>{iconEl}</div>
+      <div className="widget-tool-icon">{iconEl}</div>
       {!compact && !hideLabel && (
         <div className="widget-tool-label" title={tool.name}>
           {tool.name}

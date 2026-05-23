@@ -50,6 +50,23 @@
   --widget-badge-bg: rgba(15, 23, 42, 0.08);
   --widget-badge-text: rgba(30, 30, 30, 0.7);
   --widget-scrollbar: rgba(15, 23, 42, 0.15);
+
+  /* Surface tokens — unified glassmorphism */
+  --surface-widget-bg: rgba(255, 255, 255, 0.16);
+  --surface-widget-border: rgba(255, 255, 255, 0.22);
+  --surface-widget-blur: 18px;
+  --surface-widget-saturate: 1.2;
+  --surface-widget-shadow: none;
+
+  --surface-panel-bg: rgba(255, 255, 255, 0.58);
+  --surface-panel-border: rgba(255, 255, 255, 0.24);
+  --surface-panel-blur: 20px;
+  --surface-panel-saturate: 1.2;
+  --surface-panel-shadow: 0 20px 60px rgba(15, 23, 42, 0.12);
+
+  --surface-overlay-bg: rgba(0, 0, 0, 0.15);
+  --surface-overlay-blur: 4px;
+
   --icon-size: 48px;
   --icon-gap: 6px;
   --row-height: 80px;
@@ -97,11 +114,11 @@
 
 .desktop-search-shell .search-wraper {
   width: 100%;
-  background: rgba(244, 247, 250, 0.55);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  box-shadow: 0 0 14px rgba(0, 0, 0, 0.04);
+  background: var(--surface-widget-bg);
+  backdrop-filter: blur(var(--surface-widget-blur)) saturate(var(--surface-widget-saturate));
+  -webkit-backdrop-filter: blur(var(--surface-widget-blur)) saturate(var(--surface-widget-saturate));
+  border: 1px solid var(--surface-widget-border);
+  box-shadow: var(--surface-widget-shadow);
   color: var(--text-primary);
 }
 
@@ -193,11 +210,20 @@ body.dark-mode .desktop-page {
   --widget-badge-bg: rgba(0, 0, 0, 0.5);
   --widget-badge-text: rgba(255, 255, 255, 0.85);
   --widget-scrollbar: rgba(255, 255, 255, 0.15);
+
+  --surface-widget-bg: rgba(15, 23, 42, 0.28);
+  --surface-widget-border: rgba(255, 255, 255, 0.12);
+  --surface-widget-shadow: none;
+
+  --surface-panel-bg: rgba(30, 32, 38, 0.68);
+  --surface-panel-border: rgba(255, 255, 255, 0.10);
+  --surface-panel-shadow: 0 20px 60px rgba(0, 0, 0, 0.32);
+
+  --surface-overlay-bg: rgba(0, 0, 0, 0.25);
+  --surface-overlay-blur: 6px;
 }
 
 body.dark-mode .desktop-search-shell .search-wraper {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.1);
   color: rgba(255, 255, 255, 0.88);
 }
 
@@ -224,12 +250,21 @@ body.glassmorphism .desktop-page {
   --widget-badge-bg: rgba(0, 0, 0, 0.5);
   --widget-badge-text: rgba(255, 255, 255, 0.85);
   --widget-scrollbar: rgba(255, 255, 255, 0.15);
+
+  --surface-widget-bg: rgba(255, 255, 255, 0.12);
+  --surface-widget-border: rgba(255, 255, 255, 0.18);
+  --surface-widget-shadow: none;
+
+  --surface-panel-bg: rgba(30, 32, 38, 0.52);
+  --surface-panel-border: rgba(255, 255, 255, 0.16);
+  --surface-panel-shadow: 0 20px 60px rgba(0, 0, 0, 0.28);
+
+  --surface-overlay-bg: rgba(0, 0, 0, 0.22);
+  --surface-overlay-blur: 8px;
 }
 
 body.has-background .desktop-search-shell .search-wraper,
 body.glassmorphism .desktop-search-shell .search-wraper {
-  background: rgba(255, 255, 255, 0.14);
-  border-color: rgba(255, 255, 255, 0.18);
   color: rgba(255, 255, 255, 0.94);
 }
 

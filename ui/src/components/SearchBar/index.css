@@ -10,10 +10,10 @@
   padding: 0 14px;
   height: 44px;
   border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: var(--surface-widget-bg);
+  backdrop-filter: blur(var(--surface-widget-blur)) saturate(var(--surface-widget-saturate));
+  -webkit-backdrop-filter: blur(var(--surface-widget-blur)) saturate(var(--surface-widget-saturate));
+  border: 1px solid var(--surface-widget-border);
   transition: all 0.3s;
 }
 
@@ -81,13 +81,13 @@
   margin: 0;
   padding: 4px;
   list-style: none;
-  background: var(--widget-bg, #fff);
-  border: 1px solid var(--widget-border, rgba(0, 0, 0, 0.08));
+  background: var(--surface-panel-bg);
+  border: 1px solid var(--surface-panel-border);
   border-radius: 10px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--surface-panel-shadow);
   z-index: var(--z-floating-menu);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(var(--surface-panel-blur)) saturate(var(--surface-panel-saturate));
+  -webkit-backdrop-filter: blur(var(--surface-panel-blur)) saturate(var(--surface-panel-saturate));
 }
 
 .engine-dropdown-item {
@@ -128,19 +128,3 @@
   background: var(--widget-interactive-border, rgba(99, 102, 241, 0.2));
 }
 
-/* ====== Glassmorphism ====== */
-body.glassmorphism .search-wraper {
-  background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur)) saturate(1.2);
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.2);
-  border-color: var(--glass-border);
-  box-shadow: 0 0 18px rgba(0, 0, 0, 0.06);
-}
-
-body.glassmorphism .engine-dropdown {
-  background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur)) saturate(1.2);
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.2);
-  border-color: var(--glass-border);
-  box-shadow: var(--glass-shadow);
-}
