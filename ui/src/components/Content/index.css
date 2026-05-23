@@ -92,10 +92,11 @@
 
 .desktop-search-shell .search-wraper {
   width: 100%;
-  background: rgba(244, 247, 250, 0.85);
+  background: rgba(244, 247, 250, 0.55);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 0 14px rgba(0, 0, 0, 0.04);
   color: var(--text-primary);
 }
 
