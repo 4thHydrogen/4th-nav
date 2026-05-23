@@ -91,7 +91,7 @@ const SearchBar = (props: SearchBarProps) => {
       anchorRect: rect,
       panelWidth: 160,
       panelHeight: Math.min(engines.length * 40 + 8, 300),
-      placement: "bottom-end",
+      placement: "right-start",
       margin: 8,
     });
     return pos;
@@ -149,7 +149,7 @@ const SearchBar = (props: SearchBarProps) => {
               style={{
                 left: menuPosition.left,
                 top: menuPosition.top,
-                transformOrigin: "right top",
+                transformOrigin: "left center",
               }}
             >
               {engines.map((engine) => (

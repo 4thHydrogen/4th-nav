@@ -1,7 +1,7 @@
 import { Folder } from "lucide-react";
 
 interface FolderOpenButtonProps {
-  onOpen: (mouseX: number, mouseY: number) => void;
+  onOpen: () => void;
 }
 
 export function FolderOpenButton({ onOpen }: FolderOpenButtonProps) {
@@ -14,7 +14,7 @@ export function FolderOpenButton({ onOpen }: FolderOpenButtonProps) {
       onClick={(e) => {
         e.preventDefault();
         e.stopPropagation();
-        onOpen(e.clientX, e.clientY);
+        onOpen();
       }}
       title="打开文件夹"
     >

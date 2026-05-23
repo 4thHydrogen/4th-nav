@@ -48,7 +48,7 @@ export function buildFolderPreviewSlots(
     .map((tool) => ({ type: "tool" as const, tool }));
 
   const remaining = children.slice(regularCount);
-  const extraCount = children.length - maxIcons;
+  const extraCount = Math.max(0, remaining.length - 3);
 
   slots.push({
     type: "summary",

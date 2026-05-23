@@ -8,13 +8,6 @@ interface ContextMenuState {
   tool: Tool | null;
 }
 
-interface PopupPanelState {
-  visible: boolean;
-  folderId: number | null;
-  mouseX: number;
-  mouseY: number;
-}
-
 interface UIState {
   contextMenu: ContextMenuState;
   openContextMenu: (x: number, y: number, tool: Tool) => void;
@@ -22,13 +15,6 @@ interface UIState {
 
   openFolder: Tool | null;
   setOpenFolder: (folder: Tool | null) => void;
-
-  expandedFolderId: number | null;
-  setExpandedFolderId: (id: number | null) => void;
-
-  popupPanel: PopupPanelState;
-  openPopupPanel: (folderId: number, mouseX: number, mouseY: number) => void;
-  closePopupPanel: () => void;
 
   selectedCategories: Set<string>;
   toggleCategory: (cat: string) => void;
@@ -47,15 +33,6 @@ export const useUIStore = create<UIState>((set) => ({
 
   openFolder: null,
   setOpenFolder: (folder) => set({ openFolder: folder }),
-
-  expandedFolderId: null,
-  setExpandedFolderId: (id) => set({ expandedFolderId: id }),
-
-  popupPanel: { visible: false, folderId: null, mouseX: 0, mouseY: 0 },
-  openPopupPanel: (folderId, mouseX, mouseY) =>
-    set({ popupPanel: { visible: true, folderId, mouseX, mouseY } }),
-  closePopupPanel: () =>
-    set({ popupPanel: { visible: false, folderId: null, mouseX: 0, mouseY: 0 } }),
 
   selectedCategories: new Set<string>(),
   toggleCategory: (cat) =>

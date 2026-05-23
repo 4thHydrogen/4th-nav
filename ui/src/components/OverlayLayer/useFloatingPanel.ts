@@ -3,31 +3,34 @@ import { useOverlayActivity } from "./OverlayProvider";
 
 export type OverlayPhase = "closed" | "opening" | "open" | "closing";
 
-export interface FloatingPanelState {
+export interface FloatingPanelState<T = void> {
   phase: OverlayPhase;
   anchorRect: DOMRectReadOnly | null;
+  payload: T | null;
   instanceId: number;
 }
 
-const INITIAL_STATE: FloatingPanelState = {
-  phase: "closed",
-  anchorRect: null,
+const INITIAL_STATE = {
+  phase: "closed" as OverlayPhase,
+  anchorRect: null as DOMRectReadOnly | null,
+  payload: null as unknown,
   instanceId: 0,
 };
 
-export function useFloatingPanel() {
-  const [state, setState] = useState<FloatingPanelState>(INITIAL_STATE);
+export function useFloatingPanel<T = void>() {
+  const [state, setState] = useState<FloatingPanelState<T>>(INITIAL_STATE as FloatingPanelState<T>);
   const registerActivity = useOverlayActivity();
   const unregisterRef = useRef<(() => void) | null>(null);
 
   const open = useCallback(
-    (anchorRect: DOMRectReadOnly) => {
+    (anchorRect: DOMRectReadOnly, payload: T) => {
       if (!unregisterRef.current) {
         unregisterRef.current = registerActivity();
       }
       setState((prev) => ({
         phase: "opening",
         anchorRect,
+        payload,
         instanceId: prev.instanceId + 1,
       }));
     },
@@ -52,14 +55,11 @@ export function useFloatingPanel() {
       unregisterRef.current();
       unregisterRef.current = null;
     }
-    setState((prev) => {
-      if (prev.phase === "closing") return INITIAL_STATE;
-      return prev;
-    });
+    setState(INITIAL_STATE as FloatingPanelState<T>);
   }, []);
 
   const toggle = useCallback(
-    (anchorRect: DOMRectReadOnly) => {
+    (anchorRect: DOMRectReadOnly, payload: T) => {
       setState((prev) => {
         if (prev.phase === "closed" || prev.phase === "closing") {
           if (!unregisterRef.current) {
@@ -68,11 +68,21 @@ export function useFloatingPanel() {
           return {
             phase: "opening",
             anchorRect,
+            payload,
             instanceId: prev.instanceId + 1,
           };
         }
-        // Already open/opening → close
-        return { ...prev, phase: "closing" };
+        // Already open/opening with same payload → close
+        if (prev.payload === payload) {
+          return { ...prev, phase: "closing" };
+        }
+        // Different payload → switch to new one
+        return {
+          phase: "opening",
+          anchorRect,
+          payload,
+          instanceId: prev.instanceId + 1,
+        };
       });
     },
     [registerActivity],

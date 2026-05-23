@@ -11,7 +11,7 @@ interface WidgetFolderProps {
   folder: Tool;
   childrenTools: Tool[];
   listItemSize: number;
-  onOpen: (mouseX: number, mouseY: number) => void;
+  onOpen: () => void;
   onOpenChild: (tool: Tool) => void;
   onContextMenu: (e: React.MouseEvent, tool: Tool) => void;
 }
@@ -47,7 +47,7 @@ const WidgetFolder = ({ folder, childrenTools, listItemSize, onOpen, onOpenChild
             mouseDownPos.current = null;
             if (Math.abs(dx) > 3 || Math.abs(dy) > 3) return;
           }
-          onOpen(e.clientX, e.clientY);
+          onOpen();
         }}
         onAuxClick={(e) => { if (e.button === 1) e.preventDefault(); }}
         onContextMenu={(e) => onContextMenu(e, folder)}

@@ -32,7 +32,6 @@ const mockFolder: Tool = {
 const initialState = {
   contextMenu: { visible: false, x: 0, y: 0, tool: null },
   openFolder: null,
-  expandedFolderId: null,
   selectedCategories: new Set<string>(),
   searchValue: "",
 };
@@ -53,10 +52,6 @@ describe("useUIStore", () => {
 
     it("has openFolder as null", () => {
       expect(useUIStore.getState().openFolder).toBeNull();
-    });
-
-    it("has expandedFolderId as null", () => {
-      expect(useUIStore.getState().expandedFolderId).toBeNull();
     });
 
     it("has an empty selectedCategories Set", () => {
@@ -125,21 +120,6 @@ describe("useUIStore", () => {
 
       expect(useUIStore.getState().openFolder).toEqual(mockFolder);
       expect(useUIStore.getState().openFolder!.id).toBe(2);
-    });
-  });
-
-  describe("expandedFolderId / setExpandedFolderId", () => {
-    it("sets the expanded folder id", () => {
-      useUIStore.getState().setExpandedFolderId(42);
-
-      expect(useUIStore.getState().expandedFolderId).toBe(42);
-    });
-
-    it("setting null clears it", () => {
-      useUIStore.getState().setExpandedFolderId(42);
-      useUIStore.getState().setExpandedFolderId(null);
-
-      expect(useUIStore.getState().expandedFolderId).toBeNull();
     });
   });
 
@@ -242,15 +222,6 @@ describe("useUIStore", () => {
       expect(contextMenu.x).toBe(10);
       expect(contextMenu.y).toBe(20);
       expect(searchValue).toBe("test");
-    });
-
-    it("toggling categories does not affect expandedFolderId", () => {
-      useUIStore.getState().setExpandedFolderId(5);
-      useUIStore.getState().toggleCategory("dev");
-
-      const { expandedFolderId, selectedCategories } = useUIStore.getState();
-      expect(expandedFolderId).toBe(5);
-      expect(selectedCategories.has("dev")).toBe(true);
     });
   });
 });
