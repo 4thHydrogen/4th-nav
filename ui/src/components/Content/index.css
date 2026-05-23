@@ -66,8 +66,8 @@
   width: 100%;
   display: flex;
   justify-content: center;
-  padding-top: 18vh;
-  margin-bottom: 16px;
+  padding-top: 15vh;
+  margin-bottom: 40px;
   animation: contentFadeIn 0.22s ease-out;
 }
 
@@ -228,7 +228,7 @@ body.glassmorphism .desktop-search-shell input::placeholder {
   }
 
   .desktop-hero {
-    padding-top: 15vh;
+    padding-top: 13vh;
   }
 
   .desktop-content-shell {
@@ -248,7 +248,7 @@ body.glassmorphism .desktop-search-shell input::placeholder {
   }
 
   .desktop-hero {
-    padding-top: 12vh;
+    padding-top: 10vh;
     margin-bottom: 20px;
   }
 

@@ -15,10 +15,11 @@
 .folder-floating-window {
   position: fixed;
   z-index: var(--z-folder-window);
-  background: var(--bg-card, #fff);
-  border: 1px solid var(--border-color, #e2e2e2);
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -142,6 +143,12 @@
   color: var(--text-secondary, #888);
   background: var(--bg-hover, rgba(0, 0, 0, 0.03));
   border-radius: 4px;
+}
+
+/* ====== Dark mode ====== */
+body.dark-mode .folder-floating-window {
+  background: rgba(30, 30, 30, 0.82);
+  border-color: rgba(255, 255, 255, 0.08);
 }
 
 /* ====== Glassmorphism ====== */
