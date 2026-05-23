@@ -29,7 +29,7 @@ const WidgetFolder = ({ folder, childrenTools, listItemSize, onOpen, onOpenChild
     <div className="widget-folder-outer" style={{ "--grid-w": w, "--grid-h": h } as React.CSSProperties}>
       <div
         className="widget-folder"
-        style={{ backgroundColor: bgColor }}
+        style={{ "--folder-tint": bgColor || "transparent" } as React.CSSProperties}
         onMouseDown={(e) => {
           if (e.button === 1) {
             e.preventDefault();

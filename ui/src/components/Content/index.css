@@ -25,6 +25,11 @@
   --desktop-border: rgba(15, 23, 42, 0.08);
   --desktop-shadow: 0 24px 70px rgba(15, 23, 42, 0.10);
 
+  /* Dock safe area */
+  --dock-safe-area: 96px;
+  --record-safe-area: 24px;
+  --home-bottom-safe-area: calc(var(--dock-safe-area) + var(--record-safe-area));
+
   /* Widget 系统变量 — 亮色默认值 */
   --widget-bg: rgba(255, 255, 255, 0.72);
   --widget-bg-hover: rgba(255, 255, 255, 0.86);
@@ -118,10 +123,10 @@
   overflow-x: hidden;
   scrollbar-width: none;
   width: min(1280px, 100%);
-  margin: 0 auto;
+  margin: 0 auto var(--home-bottom-safe-area) auto;
   box-sizing: border-box;
-  mask-image: linear-gradient(to bottom, black 0%, black calc(100% - 130px), transparent calc(100% - 85px));
-  -webkit-mask-image: linear-gradient(to bottom, black 0%, black calc(100% - 130px), transparent calc(100% - 85px));
+  mask-image: none;
+  -webkit-mask-image: none;
 }
 
 .desktop-workspace::-webkit-scrollbar {
@@ -135,7 +140,7 @@
 
 .desktop-content-shell {
   min-width: 0;
-  padding: 6px 0 90px;
+  padding: 6px 0 var(--home-bottom-safe-area);
   animation: contentFadeIn 0.24s ease-out;
 }
 
@@ -233,7 +238,7 @@ body.glassmorphism .desktop-search-shell input::placeholder {
   }
 
   .desktop-content-shell {
-    padding: 4px 0 28px;
+    padding: 4px 0 var(--home-bottom-safe-area);
   }
 }
 
@@ -271,13 +276,47 @@ body.glassmorphism .desktop-search-shell input::placeholder {
   }
 
   .desktop-content-shell {
-    padding: 2px 0 18px;
+    padding: 2px 0 var(--home-bottom-safe-area);
   }
 
   .desktop-tool-grid-flat {
     grid-template-columns: repeat(auto-fill, minmax(82px, 1fr));
     gap: 12px;
   }
+}
+
+/* ====== Bottom fade ====== */
+
+.desktop-page::after {
+  content: "";
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: var(--home-bottom-safe-area);
+  height: 24px;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(255, 255, 255, 0.45)
+  );
+  z-index: 150;
+}
+
+body.dark-mode .desktop-page::after {
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(18, 18, 18, 0.45)
+  );
+}
+
+body.glassmorphism .desktop-page::after {
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(0, 0, 0, 0.15)
+  );
 }
 
 /* ====== Search empty state ====== */
