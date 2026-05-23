@@ -9,9 +9,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/4thHydrogen/4th-nav/database"
 	"github.com/4thHydrogen/4th-nav/goscraper"
 	"github.com/4thHydrogen/4th-nav/logger"
+	"github.com/4thHydrogen/4th-nav/repository"
 	"github.com/4thHydrogen/4th-nav/types"
 	"github.com/4thHydrogen/4th-nav/utils"
 )
@@ -70,11 +70,7 @@ func LazyFetchLogo(rawURL string, id int64) {
 }
 
 func updateIconStatus(id int64, status string, errMsg string) {
-	now := time.Now().Unix()
-	_, err := database.DB.Exec(
-		`UPDATE nav_table SET icon_status = ?, icon_error = ?, icon_updated_at = ? WHERE id = ?;`,
-		status, errMsg, now, id,
-	)
+	err := repository.UpdateIconStatus(id, status, errMsg)
 	if err != nil {
 		logger.LogInfo("updateIconStatus: failed for id %d: %s", id, err)
 	}
@@ -248,20 +244,8 @@ func parseJpegDimensions(data []byte) (width, height int, ok bool) {
 }
 
 func GetImgFromDB(url1 string) types.Img {
-	urlEncoded := url.QueryEscape(url1)
-	sql_get_img := `
-			SELECT id,url,value FROM nav_img
-			WHERE url=?;
-			`
-	rows, err := database.DB.Query(sql_get_img, urlEncoded)
+	result, has, err := repository.GetImageByURL(url1)
 	utils.CheckErr(err)
-	var result types.Img
-	var has bool = false
-	for rows.Next() {
-		err = rows.Scan(&result.Id, &result.Url, &result.Value)
-		utils.CheckErr(err)
-		has = true
-	}
 	if !has {
 		var nullImg string
 		l := strings.Split(url1, ".")
@@ -275,32 +259,14 @@ func GetImgFromDB(url1 string) types.Img {
 		return types.Img{Id: 0, Url: url1, Value: nullImg}
 	}
 
-	defer rows.Close()
 	return result
 }
 
 func UpdateImg(url1 string) {
-	urlEncoded := url.QueryEscape(url1)
 	base64ImgValue := utils.GetImgBase64FromUrl(url1)
 	if base64ImgValue == "" {
 		return
 	}
-	sql_get_img := `
-			SELECT * FROM nav_img
-			WHERE url = ?;
-			`
-
-	rows, err := database.DB.Query(sql_get_img, urlEncoded)
+	err := repository.SaveImage(url1, base64ImgValue)
 	utils.CheckErr(err)
-	defer rows.Close()
-	if !rows.Next() {
-		sql_add_img := `
-			INSERT INTO nav_img (url, value)
-			VALUES (?, ?);
-			`
-		stmt, err := database.DB.Prepare(sql_add_img)
-		utils.CheckErr(err)
-		_, err = stmt.Exec(urlEncoded, base64ImgValue)
-		utils.CheckErr(err)
-	}
 }

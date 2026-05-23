@@ -8,6 +8,7 @@ import (
 
 	"github.com/4thHydrogen/4th-nav/database"
 	"github.com/4thHydrogen/4th-nav/logger"
+	"github.com/4thHydrogen/4th-nav/repository"
 	"github.com/4thHydrogen/4th-nav/types"
 )
 
@@ -211,11 +212,5 @@ func getHostFromURL(rawURL string) string {
 
 // getToolByID fetches a single tool by ID.
 func getToolByID(id int64) (types.Tool, error) {
-	tools := GetAllTool()
-	for _, t := range tools {
-		if int64(t.Id) == id {
-			return t, nil
-		}
-	}
-	return types.Tool{}, fmt.Errorf("tool %d not found", id)
+	return repository.GetToolByID(id)
 }

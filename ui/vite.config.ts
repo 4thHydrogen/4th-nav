@@ -6,7 +6,8 @@ import path from 'path'
 export default defineConfig({
   plugins: [react()],
   build: {
-    outDir: 'build',
+    outDir: '../public',
+    emptyOutDir: true,
   },
   server: {
     port: 2333,

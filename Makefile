@@ -1,43 +1,22 @@
-# Simple Makefile for a Go project
-
-# Build the application
-# all: build test
-
 build:
-	@echo "Building..."
+	@echo "Building frontend..."
+	@cd ui && corepack pnpm build
+	@echo "Building backend..."
 	@go build -o van-nav .
 
 run-ui:
-	@cd ./ui/website && pnpm start
+	@cd ui && corepack pnpm dev
 
 run-api:
 	@go run .
 
-# Run the application
 run:
-	@go run .  &
-	@cd ./ui && pnpm run start
+	@echo "Run backend and frontend in separate terminals:"
+	@echo "  make run-api"
+	@echo "  make run-ui"
 
-# Clean the binary
 clean:
 	@echo "Cleaning..."
-	@rm -f main
+	@powershell -Command "Remove-Item -Recurse -Force public -ErrorAction SilentlyContinue; Remove-Item -Force van-nav.exe,van-nav -ErrorAction SilentlyContinue"
 
-# Live Reload
-watch:
-	@if command -v air > /dev/null; then \
-            air; \
-            echo "Watching...";\
-        else \
-            read -p "Go's 'air' is not installed on your machine. Do you want to install it? [Y/n] " choice; \
-            if [ "$$choice" != "n" ] && [ "$$choice" != "N" ]; then \
-                go install github.com/air-verse/air@latest; \
-                air; \
-                echo "Watching...";\
-            else \
-                echo "You chose not to install air. Exiting..."; \
-                exit 1; \
-            fi; \
-        fi
-
-.PHONY: build run clean watch
+.PHONY: build run-ui run-api run clean

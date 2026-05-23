@@ -135,23 +135,23 @@ func InitDB() {
 	if !columnExists("nav_table", "grid_y") {
 		DB.Exec(`ALTER TABLE nav_table ADD COLUMN grid_y INTEGER NOT NULL DEFAULT -1;`)
 	}
-// 文件夹视图模式字段
-		if !columnExists("nav_table", "folder_view_mode") {
-			DB.Exec(`ALTER TABLE nav_table ADD COLUMN folder_view_mode TEXT NOT NULL DEFAULT 'grid';`)
-		}
-		if !columnExists("nav_table", "folder_item_size") {
-			DB.Exec(`ALTER TABLE nav_table ADD COLUMN folder_item_size INTEGER NOT NULL DEFAULT 28;`)
-		}
-		// icon 状态字段
-		if !columnExists("nav_table", "icon_status") {
-			DB.Exec(`ALTER TABLE nav_table ADD COLUMN icon_status TEXT NOT NULL DEFAULT '';`)
-		}
-		if !columnExists("nav_table", "icon_error") {
-			DB.Exec(`ALTER TABLE nav_table ADD COLUMN icon_error TEXT NOT NULL DEFAULT '';`)
-		}
-		if !columnExists("nav_table", "icon_updated_at") {
-			DB.Exec(`ALTER TABLE nav_table ADD COLUMN icon_updated_at INTEGER NOT NULL DEFAULT 0;`)
-		}
+	// 文件夹视图模式字段
+	if !columnExists("nav_table", "folder_view_mode") {
+		DB.Exec(`ALTER TABLE nav_table ADD COLUMN folder_view_mode TEXT NOT NULL DEFAULT 'grid';`)
+	}
+	if !columnExists("nav_table", "folder_item_size") {
+		DB.Exec(`ALTER TABLE nav_table ADD COLUMN folder_item_size INTEGER NOT NULL DEFAULT 28;`)
+	}
+	// icon 状态字段
+	if !columnExists("nav_table", "icon_status") {
+		DB.Exec(`ALTER TABLE nav_table ADD COLUMN icon_status TEXT NOT NULL DEFAULT '';`)
+	}
+	if !columnExists("nav_table", "icon_error") {
+		DB.Exec(`ALTER TABLE nav_table ADD COLUMN icon_error TEXT NOT NULL DEFAULT '';`)
+	}
+	if !columnExists("nav_table", "icon_updated_at") {
+		DB.Exec(`ALTER TABLE nav_table ADD COLUMN icon_updated_at INTEGER NOT NULL DEFAULT 0;`)
+	}
 
 	// 分类表
 	sql_create_table = `
@@ -172,7 +172,7 @@ func InitDB() {
 	if !columnExists("nav_catelog", "hide") {
 		DB.Exec(`ALTER TABLE nav_catelog ADD COLUMN hide BOOLEAN;`)
 	}
-	migration_2024_12_13() // 只涉及 nav_catelog 表，所以可以放在这里
+	runMigrations()
 
 	// api token 表
 	sql_create_table = `
@@ -233,7 +233,7 @@ func InitDB() {
 		`
 	_, err = DB.Exec(sql_create_table)
 	utils.CheckErr(err)
-	
+
 	// 网站配置表结构升级 - 添加compactMode列
 	if !columnExists("nav_site_config", "compactMode") {
 		DB.Exec(`ALTER TABLE nav_site_config ADD COLUMN compactMode BOOLEAN NOT NULL DEFAULT 0;`)
@@ -254,10 +254,10 @@ func InitDB() {
 		DB.Exec(`ALTER TABLE nav_site_config ADD COLUMN density TEXT NOT NULL DEFAULT 'standard';`)
 	}
 
-		// 网站配置表结构升级 - 添加全局文件夹列表行高列
-		if !columnExists("nav_site_config", "folder_list_item_size") {
-			DB.Exec(`ALTER TABLE nav_site_config ADD COLUMN folder_list_item_size INTEGER NOT NULL DEFAULT 28;`)
-		}
+	// 网站配置表结构升级 - 添加全局文件夹列表行高列
+	if !columnExists("nav_site_config", "folder_list_item_size") {
+		DB.Exec(`ALTER TABLE nav_site_config ADD COLUMN folder_list_item_size INTEGER NOT NULL DEFAULT 28;`)
+	}
 
 	// 设置表结构升级 - 添加背景图片和毛玻璃相关字段
 	if !columnExists("nav_setting", "backgroundUrl") {
@@ -273,9 +273,9 @@ func InitDB() {
 	if !columnExists("nav_setting", "pexelsApiKey") {
 		DB.Exec(`ALTER TABLE nav_setting ADD COLUMN pexelsApiKey TEXT;`)
 	}
-		if !columnExists("nav_setting", "proxy") {
-			DB.Exec(`ALTER TABLE nav_setting ADD COLUMN proxy TEXT DEFAULT '';`)
-		}
+	if !columnExists("nav_setting", "proxy") {
+		DB.Exec(`ALTER TABLE nav_setting ADD COLUMN proxy TEXT DEFAULT '';`)
+	}
 
 	// 如果不存在，就初始化默认搜索引擎
 	sql_get_search_engine := `
@@ -297,7 +297,7 @@ func InitDB() {
 			{"Bing", "https://cn.bing.com/search", "q", "bing.ico", 2},
 			{"Google", "https://www.google.com/search", "q", "google.ico", 3},
 		}
-		
+
 		sql_add_search_engine := `
 			INSERT INTO nav_search_engine (name, baseUrl, queryParam, logo, sort, enabled)
 			VALUES (?, ?, ?, ?, ?, ?);
@@ -305,14 +305,14 @@ func InitDB() {
 		stmt, err := DB.Prepare(sql_add_search_engine)
 		utils.CheckErr(err)
 		defer stmt.Close()
-		
+
 		for _, engine := range defaultEngines {
 			_, err = stmt.Exec(engine.name, engine.baseUrl, engine.queryParam, engine.logo, engine.sort, true)
 			utils.CheckErr(err)
 		}
 		logger.LogInfo("默认搜索引擎初始化成功")
 	}
-	
+
 	// 如果不存在，就初始化用户
 	sql_get_user := `
 		SELECT * FROM nav_user;
@@ -397,7 +397,7 @@ func cleanupEmptyCategories() {
 		logger.LogInfo("清理空分类记录时出错: %v", err)
 		return
 	}
-	
+
 	rowsAffected, err := result.RowsAffected()
 	if err == nil && rowsAffected > 0 {
 		logger.LogInfo("已清理 %d 条空分类记录", rowsAffected)
