@@ -4,6 +4,7 @@ import "./index.css";
 import { getLogoUrl, isInlineSvg } from "../../utils/check";
 import { getJumpTarget } from "../../utils/setting";
 import WidgetTool from "../WidgetTool";
+import LogoIcon from "../../shared/components/LogoIcon";
 import type { Tool } from "../../types";
 import { parseSize } from "../WidgetTool";
 
@@ -26,6 +27,18 @@ const WidgetFolder = ({ folder, childrenTools, listItemSize, onOpen, onOpenChild
 
   const bgColor = folder.bgColor || undefined;
   const isListMode = folder.folderViewMode === "list";
+
+  // Collapsed list: only render items that fit in visible height
+  const visibleListCount = useMemo(() => {
+    if (!isListMode || isEmpty) return 0;
+    // folder inner height ≈ h * iconSize + (h-1) * gapY, minus padding (12px)
+    const iconSize = 48;
+    const folderGapY = 80 - iconSize + 12; // cell-height - icon + gap
+    const innerHeight = h * iconSize + (h - 1) * folderGapY - 12;
+    return Math.max(1, Math.floor(innerHeight / listItemSize));
+  }, [isListMode, isEmpty, h, listItemSize]);
+
+  const listOverflow = isListMode ? Math.max(0, childrenTools.length - visibleListCount) : 0;
 
   const interactiveItems = (() => {
     if (isListMode) return [];
@@ -76,11 +89,11 @@ const WidgetFolder = ({ folder, childrenTools, listItemSize, onOpen, onOpenChild
           </div>
         ) : isListMode ? (
           <div
-            className="widget-folder-list-preview widget-folder-list-scrollable"
+            className="widget-folder-list-preview"
             style={{ "--folder-list-item-size": `${listItemSize}px` } as React.CSSProperties}
             onClick={(e) => e.stopPropagation()}
           >
-            {childrenTools.map((child) => (
+            {childrenTools.slice(0, visibleListCount).map((child) => (
               <FolderListPreviewItem
                 key={child.id}
                 tool={child}
@@ -89,16 +102,9 @@ const WidgetFolder = ({ folder, childrenTools, listItemSize, onOpen, onOpenChild
                 onContextMenu={onContextMenu}
               />
             ))}
-            <div
-              className="widget-folder-open-trigger"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                onOpen(e.clientX, e.clientY);
-              }}
-            >
-              <Folder size={12} />
-            </div>
+            {listOverflow > 0 && (
+              <div className="widget-folder-list-overflow">+{listOverflow}</div>
+            )}
           </div>
         ) : (
           <div
@@ -133,6 +139,23 @@ const WidgetFolder = ({ folder, childrenTools, listItemSize, onOpen, onOpenChild
         )}
       </div>
 
+      {isListMode && !isEmpty && (
+        <button
+          type="button"
+          className="widget-folder-open-trigger"
+          onMouseDown={(e) => e.stopPropagation()}
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onOpen(e.clientX, e.clientY);
+          }}
+          title="打开文件夹"
+        >
+          <Folder size={12} />
+        </button>
+      )}
+
       {folder.name && (
         <div className="widget-folder-label" title={folder.name}>
           {folder.name}
@@ -153,11 +176,6 @@ function FolderListPreviewItem({
   onOpenChild: (tool: Tool) => void;
   onContextMenu: (e: React.MouseEvent, tool: Tool) => void;
 }) {
-  const iconSrc = useMemo(() => {
-    if (isInlineSvg(tool.logo)) return "";
-    return getLogoUrl(tool.logo);
-  }, [tool.logo]);
-
   return (
     <a
       className="widget-folder-list-item"
@@ -171,6 +189,9 @@ function FolderListPreviewItem({
       onClick={(e) => {
         e.preventDefault();
         e.stopPropagation();
+        if (tool.url) {
+          window.open(tool.url, getJumpTarget() === "blank" ? "_blank" : "_self", "noopener,noreferrer");
+        }
         onOpenChild(tool);
       }}
       onContextMenu={(e) => {
@@ -179,13 +200,14 @@ function FolderListPreviewItem({
       }}
       style={{ height: itemSize }}
     >
-      <span className="widget-folder-list-item-icon" style={{ width: itemSize - 6, height: itemSize - 6 }}>
-        {!tool.logo || !iconSrc ? (
-          <span className="widget-folder-list-item-char">{tool.name.charAt(0).toUpperCase()}</span>
-        ) : (
-          <img src={iconSrc} alt="" loading="lazy" draggable={false} />
-        )}
-      </span>
+      <LogoIcon
+        logo={tool.logo}
+        name={tool.name}
+        size={itemSize - 6}
+        radius={3}
+        className="widget-folder-list-item-icon"
+        fallbackFontSize={8}
+      />
       <span className="widget-folder-list-item-name">{tool.name}</span>
     </a>
   );
@@ -200,13 +222,7 @@ function ChildIcon({
   onOpenChild: (tool: Tool) => void;
   onContextMenu: (e: React.MouseEvent, tool: Tool) => void;
 }) {
-  const [error, setError] = useState(false);
   const mouseDownPos = useRef<{ x: number; y: number } | null>(null);
-
-  const iconSrc = useMemo(() => {
-    if (isInlineSvg(tool.logo)) return "";
-    return getLogoUrl(tool.logo);
-  }, [tool.logo]);
 
   return (
     <a
@@ -240,43 +256,26 @@ function ChildIcon({
       }}
     >
       <span className="widget-folder-child-icon">
-        {error || !tool.logo ? (
-          <span className="widget-folder-child-fallback">
-            {tool.name.charAt(0).toUpperCase()}
-          </span>
-        ) : iconSrc ? (
-          <img
-            src={iconSrc}
-            alt={tool.name}
-            loading="lazy"
-            draggable={false}
-            onError={() => setError(true)}
-          />
-        ) : (
-          <span className="widget-folder-child-fallback">
-            {tool.name.charAt(0).toUpperCase()}
-          </span>
-        )}
+        <LogoIcon
+          logo={tool.logo}
+          name={tool.name}
+          size={48}
+          radius={6}
+          fallbackFontSize={14}
+        />
       </span>
     </a>
   );
 }
 
 function MiniIcon({ tool }: { tool: Tool }) {
-  const [error, setError] = useState(false);
-  const iconSrc = useMemo(() => {
-    if (isInlineSvg(tool.logo)) return "";
-    return getLogoUrl(tool.logo);
-  }, [tool.logo]);
-
   return (
-    <span className="widget-folder-overflow-cell">
-      {!tool.logo || !iconSrc || error ? (
-        <span className="widget-folder-overflow-char">{tool.name.charAt(0).toUpperCase()}</span>
-      ) : (
-        <img className="widget-folder-overflow-mini" src={iconSrc} alt="" loading="lazy" draggable={false} onError={() => setError(true)} />
-      )}
-    </span>
+    <LogoIcon
+      logo={tool.logo}
+      name={tool.name}
+      className="widget-folder-overflow-cell"
+      fallbackFontSize={10}
+    />
   );
 }
 

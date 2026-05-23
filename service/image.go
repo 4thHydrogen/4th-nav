@@ -162,7 +162,7 @@ func fetchGoogleFavicon(rawURL string) string {
 	if domain == "" {
 		return ""
 	}
-	apiURL := fmt.Sprintf("https://www.google.com/s2/favicons?domain=%s&sz=128", domain)
+	apiURL := fmt.Sprintf("https://www.google.com/s2/favicons?domain=%s&sz=256", domain)
 	client := utils.NewProxiedHttpClient(getProxyURL(), 5*time.Second)
 	resp, err := client.Get(apiURL)
 	if err != nil {
@@ -180,6 +180,9 @@ func fetchGoogleFavicon(rawURL string) string {
 	// Verify it's not a tiny fallback icon (Google returns a 1x1 for unknown domains)
 	data, err := io.ReadAll(resp.Body)
 	if err != nil || len(data) < 100 {
+		return ""
+	}
+	if w, h, ok := parseImageDimensions(data); ok && (w < 16 || h < 16) {
 		return ""
 	}
 	// Save via UpdateImg and return the URL

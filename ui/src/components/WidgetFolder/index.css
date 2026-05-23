@@ -8,14 +8,28 @@
 }
 
 .widget-folder {
-  width: 100%;
-  flex: 1;
+  --folder-gap-x: calc(var(--cell-width, 72px) - var(--icon-size, 48px) + var(--cell-gap-x, 12px));
+  --folder-gap-y: calc(var(--row-height, 80px) - var(--icon-size, 48px) + var(--cell-gap-y, 12px));
+  width: calc(
+    var(--grid-w, 1) * var(--icon-size, 48px)
+    + (var(--grid-w, 1) - 1) * var(--folder-gap-x)
+  );
+  height: calc(
+    var(--grid-h, 1) * var(--icon-size, 48px)
+    + (var(--grid-h, 1) - 1) * var(--folder-gap-y)
+  );
+  flex: 0 0 auto;
   border-radius: 12px;
   display: flex;
   flex-direction: column;
   align-items: stretch;
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transform-origin: top left;
+  transition:
+    width 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    height 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
   overflow: hidden;
   position: relative;
   padding: 6px;
@@ -189,6 +203,26 @@
   padding: 0 4px;
   box-sizing: border-box;
   overflow: hidden;
+  cursor: pointer;
+  border-radius: 6px;
+  text-decoration: none;
+  color: inherit;
+  transition:
+    background-color 0.15s ease,
+    transform 0.15s ease,
+    color 0.15s ease;
+}
+
+.widget-folder-list-item:hover {
+  background: var(--widget-icon-bg, rgba(120, 130, 150, 0.16));
+}
+
+.widget-folder-list-item-icon {
+  transition: transform 0.15s ease;
+}
+
+.widget-folder-list-item:hover .widget-folder-list-item-icon {
+  transform: scale(1.06);
 }
 
 .widget-folder-list-item-icon {
@@ -248,24 +282,35 @@
   border-radius: 2px;
 }
 
-/* Right-bottom corner interaction area for opening folder */
+/* Right-top corner interaction area for opening folder */
 .widget-folder-open-trigger {
   position: absolute;
-  bottom: 2px;
-  right: 2px;
-  width: 18px;
-  height: 18px;
+  top: 4px;
+  right: 4px;
+  width: 20px;
+  height: 20px;
+  border: none;
+  border-radius: 999px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  opacity: 0.4;
-  transition: opacity 0.15s ease;
-  z-index: 1;
+  color: var(--widget-text-muted);
+  background: rgba(255, 255, 255, 0.36);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  opacity: 0.72;
+  transition:
+    opacity 0.15s ease,
+    background-color 0.15s ease,
+    transform 0.15s ease;
+  z-index: 20;
 }
 
 .widget-folder-open-trigger:hover {
-  opacity: 0.9;
+  opacity: 1;
+  transform: scale(1.06);
+  background: var(--widget-icon-bg, rgba(120, 130, 150, 0.22));
 }
 
 /* ====== Glassmorphism ====== */

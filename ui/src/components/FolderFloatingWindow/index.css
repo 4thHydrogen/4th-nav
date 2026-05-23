@@ -5,7 +5,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 998;
+  z-index: var(--z-folder-overlay);
   background: rgba(0, 0, 0, 0.15);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
@@ -14,7 +14,7 @@
 /* Floating window container */
 .folder-floating-window {
   position: absolute;
-  z-index: 999;
+  z-index: var(--z-folder-window);
   background: var(--bg-card, #fff);
   border: 1px solid var(--border-color, #e2e2e2);
   border-radius: 12px;
@@ -22,18 +22,6 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  animation: folder-floating-enter 200ms ease-out;
-}
-
-@keyframes folder-floating-enter {
-  from {
-    opacity: 0;
-    transform: scale(0.95) translateY(-4px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
 }
 
 /* Header */

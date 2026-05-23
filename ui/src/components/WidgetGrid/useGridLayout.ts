@@ -171,6 +171,56 @@ function pushOverlapping(
   }
 }
 
+/**
+ * Anchor resize: the resized item keeps its x/y, only w/h changes.
+ * Other items are pushed to resolve overlaps, but the anchor never moves.
+ */
+export function resizeLayoutItem(
+  items: GridLayout[],
+  itemId: string,
+  nextW: number,
+  nextH: number,
+  cols: number
+): GridLayout[] {
+  const current = items.find((i) => i.i === itemId);
+  if (!current) return items;
+
+  const resized: GridLayout = {
+    ...current,
+    w: nextW,
+    h: nextH,
+    x: Math.min(current.x, cols - nextW),
+    y: current.y,
+  };
+
+  const others: GridLayout[] = items
+    .filter((i) => i.i !== itemId)
+    .map((i) => ({ ...i }));
+
+  pushOverlapping(others, resized, cols);
+
+  for (let round = 0; round < others.length * 2; round++) {
+    let dirty = false;
+    for (let i = 0; i < others.length; i++) {
+      for (let j = i + 1; j < others.length; j++) {
+        if (overlaps(others[i], others[j])) {
+          const rightX = others[i].x + others[i].w;
+          if (rightX + others[j].w <= cols) {
+            others[j].x = rightX;
+          } else {
+            others[j].y = others[i].y + others[i].h;
+            others[j].x = Math.min(others[j].x, cols - others[j].w);
+          }
+          dirty = true;
+        }
+      }
+    }
+    if (!dirty) break;
+  }
+
+  return [resized, ...others];
+}
+
 export function compactLayout(items: GridLayout[], cols: number): GridLayout[] {
   const sorted = [...items].sort((a, b) => a.y - b.y || a.x - b.x);
   const occupied = new Set<string>();
@@ -305,18 +355,51 @@ export function useGridLayout(tools: Tool[]) {
 
   const { rowHeight, margin } = useMemo(readGridVars, [tools, width]);
 
-  const initialLayout = useMemo(
-    // width=0 时（ResizeObserver 还没回调，cols=3 是退化值），跳过 buildLayout
-    // 避免基于错误 cols 计算出"全部挤到 x ∈ {0,1,2}"的退化布局
-    () => (width > 0 ? buildLayout(tools, cols) : []),
-    [tools, cols, width]
-  );
+  const prevToolsRef = useRef<Tool[]>([]);
+  const currentLayoutRef = useRef<GridLayout[]>([]);
+
+  const initialLayout = useMemo(() => {
+    if (width <= 0) return [];
+
+    // Detect single-item size change → use anchor resize
+    const prev = prevToolsRef.current;
+    if (prev.length === tools.length && prev.length > 0 && currentLayoutRef.current.length > 0) {
+      let changedId: string | null = null;
+      let changedW = 0;
+      let changedH = 0;
+      let onlySizeChange = true;
+
+      const prevMap = new Map(prev.map((t) => [t.id, t]));
+      for (const t of tools) {
+        const p = prevMap.get(t.id);
+        if (!p) { onlySizeChange = false; break; }
+        if (p.size !== t.size) {
+          if (changedId !== null) { onlySizeChange = false; break; }
+          changedId = String(t.id);
+          [changedW, changedH] = parseSize(t.size);
+        }
+        if (p.gridX !== t.gridX || p.gridY !== t.gridY || p.sort !== t.sort || p.type !== t.type) {
+          onlySizeChange = false;
+          break;
+        }
+      }
+
+      if (onlySizeChange && changedId) {
+        return resizeLayoutItem(currentLayoutRef.current, changedId, changedW, changedH, cols);
+      }
+    }
+
+    prevToolsRef.current = tools;
+    return buildLayout(tools, cols);
+  }, [tools, cols, width]);
 
   const [layout, setLayout] = useState<GridLayout[]>([]);
+  currentLayoutRef.current = layout;
 
   const prevLayoutKeyRef = useRef("");
 
   useLayoutEffect(() => {
+    prevToolsRef.current = tools;
     const key = initialLayout
       .map((i) => `${i.i}:${i.x},${i.y},${i.w},${i.h}`)
       .join("|");

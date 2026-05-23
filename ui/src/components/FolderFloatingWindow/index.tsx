@@ -1,5 +1,6 @@
 import { useEffect, useRef, useMemo, useState, useCallback } from "react";
 import { X, List, LayoutGrid, Folder } from "lucide-react";
+import { motion } from "framer-motion";
 import "./index.css";
 import WidgetTool from "../WidgetTool";
 import { useUpdateFolderSettings } from "../../queries";
@@ -195,12 +196,28 @@ export default function FolderFloatingWindow({
   return (
     <>
       {/* Overlay blocks main panel */}
-      <div className="folder-floating-overlay" onMouseDown={onClose} />
+      <motion.div
+        className="folder-floating-overlay"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.18 }}
+        onMouseDown={onClose}
+      />
 
       {/* Floating window */}
-      <div
+      <motion.div
         ref={panelRef}
         className="folder-floating-window"
+        initial={{ opacity: 0, scale: 0.92, y: -8 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.94, y: -6 }}
+        transition={{
+          type: "spring",
+          stiffness: 320,
+          damping: 28,
+          mass: 0.8,
+        }}
         style={{
           left: position.left,
           top: position.top,
@@ -234,7 +251,7 @@ export default function FolderFloatingWindow({
             {dragOutZone ? "松开鼠标移出文件夹" : "拖到窗口外以移出文件夹"}
           </div>
         )}
-      </div>
+      </motion.div>
     </>
   );
 }

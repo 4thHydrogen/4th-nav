@@ -1,7 +1,9 @@
 import { useEffect, useCallback, useState } from "react";
+import { createPortal } from "react-dom";
 import "./index.css";
 import type { Tool, ToolViewMode, ToolSize } from "../../types";
 import { fetchMoveToolToFolder, fetchDeleteFolder, fetchAddTool, fetchUpdateTool } from "../../utils/api";
+import { useUpdateToolSize } from "../../queries";
 
 interface ContextMenuState {
   visible: boolean;
@@ -32,6 +34,7 @@ const ToolContextMenu = ({
   const { visible, x, y, tool } = state;
   const [showFolderPicker, setShowFolderPicker] = useState(false);
   const [showSizePicker, setShowSizePicker] = useState(false);
+  const updateToolSize = useUpdateToolSize();
 
   const handleClickOutside = useCallback(() => {
     setShowFolderPicker(false);
@@ -117,17 +120,8 @@ const ToolContextMenu = ({
     onClose();
   };
 
-  const handleSetSize = async (size: ToolSize) => {
-    try {
-      await fetchUpdateTool({
-        ...tool,
-        id: tool.id,
-        size,
-      });
-      onRefresh?.();
-    } catch {
-      // ignore
-    }
+  const handleSetSize = (size: ToolSize) => {
+    updateToolSize.mutate({ id: tool.id, size });
     onClose();
   };
 
@@ -202,7 +196,7 @@ const ToolContextMenu = ({
     top: y,
   };
 
-  return (
+  return createPortal(
     <div className="tool-context-menu" style={menuStyle} onClick={(e) => e.stopPropagation()}>
       <div className="tool-context-menu-title">{tool.name}</div>
 
@@ -329,7 +323,8 @@ const ToolContextMenu = ({
           )}
         </>
       )}
-    </div>
+    </div>,
+    document.body
   );
 };
 

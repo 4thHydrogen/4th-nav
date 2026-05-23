@@ -12,8 +12,9 @@ import {
   fetchAddTool,
   fetchUpdateLayout,
   fetchUpdateFolderSettings,
+  fetchUpdateTool,
 } from "../utils/api";
-import type { ContentData, ToolViewMode, LayoutItemDto, FolderViewMode } from "../types";
+import type { ContentData, ToolViewMode, LayoutItemDto, FolderViewMode, ToolSize } from "../types";
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -137,6 +138,34 @@ export function useUpdateFolderSettings() {
           ...prev,
           tools: prev.tools.map((t) =>
             t.id === id ? { ...t, folderViewMode } : t
+          ),
+        });
+      }
+      return { prev };
+    },
+    onError: (_err, _vars, ctx) => {
+      if (ctx?.prev) qc.setQueryData(contentKey, ctx.prev);
+    },
+  });
+}
+
+export function useUpdateToolSize() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (vars: { id: number; size: ToolSize }) => {
+      const prev = qc.getQueryData<ContentData>(contentKey);
+      const tool = prev?.tools.find((t) => t.id === vars.id);
+      if (!tool) return Promise.resolve();
+      return fetchUpdateTool({ ...tool, size: vars.size });
+    },
+    onMutate: async ({ id, size }) => {
+      await qc.cancelQueries({ queryKey: contentKey });
+      const prev = qc.getQueryData<ContentData>(contentKey);
+      if (prev) {
+        qc.setQueryData<ContentData>(contentKey, {
+          ...prev,
+          tools: prev.tools.map((t) =>
+            t.id === id ? { ...t, size } : t
           ),
         });
       }

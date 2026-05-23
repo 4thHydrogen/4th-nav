@@ -49,6 +49,21 @@
   --glass-text: rgba(15, 23, 42, 0.92);
   --glass-text-muted: rgba(15, 23, 42, 0.62);
   --glass-hover: rgba(255, 255, 255, 0.76);
+
+  /* z-index 层级 */
+  --z-background: -10;
+  --z-base: 0;
+  --z-grid: 10;
+  --z-sticky: 100;
+  --z-dock: 200;
+  --z-folder-overlay: 700;
+  --z-folder-window: 800;
+  --z-dropdown: 900;
+  --z-context-menu: 1100;
+  --z-popover: 1200;
+  --z-modal: 1300;
+  --z-toast: 1400;
+  --z-tooltip: 1500;
 }
 
 body {

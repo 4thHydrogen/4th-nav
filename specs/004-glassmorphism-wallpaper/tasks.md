@@ -18,8 +18,8 @@
 
 **Purpose**: 定义统一的 glass design tokens，为所有组件视觉一致性打基础。
 
-- [ ] T001 定义 glass CSS 变量：在全局 CSS 中新增 `:root` 和 `body.dark-mode` 的 --glass-bg、--glass-bg-strong、--glass-border、--glass-shadow、--glass-blur、--glass-text、--glass-text-muted、--glass-hover 变量（见 data-model.md 中的具体值） — `ui/src/styles/globals.css`
-- [ ] T002 [P] 创建 .glass-panel 通用类 + 降级规则：glass-panel 类（bg + border + shadow + backdrop-filter），`@supports not (backdrop-filter)` 降级为 bg-strong，`@media (max-width: 768px)` blur 降到 12px — `ui/src/styles/globals.css`
+- [x] T001 定义 glass CSS 变量：在全局 CSS 中新增 `:root` 和 `body.dark-mode` 的 --glass-bg、--glass-bg-strong、--glass-border、--glass-shadow、--glass-blur、--glass-text、--glass-text-muted、--glass-hover 变量（见 data-model.md 中的具体值） — `ui/src/styles/globals.css`
+- [x] T002 [P] 创建 .glass-panel 通用类 + 降级规则：glass-panel 类（bg + border + shadow + backdrop-filter），`@supports not (backdrop-filter)` 降级为 bg-strong，`@media (max-width: 768px)` blur 降到 12px — `ui/src/styles/globals.css`
 
 **Checkpoint**: 全局 CSS 文件包含完整的 glass 变量系统和降级规则。`pnpm build` 通过。
 
@@ -31,10 +31,10 @@
 
 **Independent Test**: 配置 Pexels API Key，backgroundUrl=pexels，切换 dark/light 主题，壁纸色调跟随变化。
 
-- [ ] T003 [US1] 增强 Pexels API 调用：修改 fetchPexelsImage，使用 Pexels API `color` 参数替代 query 加 "dark"。dark 主题 color=black + query="abstract glass dark gradient"，light 主题 color=white + query="minimal bright glass gradient"。支持用户自定义 hex 颜色。使用 photo.src.large2x 而非 original — `ui/src/utils/pexels.ts`
-- [ ] T004 [US1] 增强缓存：缓存 key 改为 `pexels-v3:${theme}:${query}:${color}:landscape:large`，缓存内容扩展为 CachedPexelsImage 接口（url、photographer、photographerUrl、photoUrl、avgColor、alt、fetchedAt） — `ui/src/utils/pexels.ts`
-- [ ] T005 [US1] Background 组件增加预加载和淡入：预加载 Image 对象，onload 后设为背景并 320ms opacity 淡入，loading 期间保持渐变 fallback，切换主题时旧壁纸保持到新壁纸就绪 — `ui/src/components/Background/index.tsx`, `ui/src/components/Background/index.css`
-- [ ] T006 [US1] 背景层滤镜：light 主题 brightness(1.02) saturate(1.02)，dark 主题 brightness(0.72) saturate(1.08)，叠加 radial-gradient overlay 增加深度 — `ui/src/components/Background/index.css`
+- [x] T003 [US1] 增强 Pexels API 调用：修改 fetchPexelsImage，使用 Pexels API `color` 参数替代 query 加 "dark"。dark 主题 color=black + query="abstract glass dark gradient"，light 主题 color=white + query="minimal bright glass gradient"。支持用户自定义 hex 颜色。使用 photo.src.large2x 而非 original — `ui/src/utils/pexels.ts`
+- [x] T004 [US1] 增强缓存：缓存 key 改为 `pexels-v3:${theme}:${query}:${color}:landscape:large`，缓存内容扩展为 CachedPexelsImage 接口（url、photographer、photographerUrl、photoUrl、avgColor、alt、fetchedAt） — `ui/src/utils/pexels.ts`
+- [x] T005 [US1] Background 组件增加预加载和淡入：预加载 Image 对象，onload 后设为背景并 320ms opacity 淡入，loading 期间保持渐变 fallback，切换主题时旧壁纸保持到新壁纸就绪 — `ui/src/components/Background/index.tsx`, `ui/src/components/Background/index.css`
+- [x] T006 [US1] 背景层滤镜：light 主题 brightness(1.02) saturate(1.02)，dark 主题 brightness(0.72) saturate(1.08)，叠加 radial-gradient overlay 增加深度 — `ui/src/components/Background/index.css`
 
 **Checkpoint**: quickstart.md Phase A/B 可验证。dark/light 壁纸色调差异明显，切换不闪白。
 
@@ -46,9 +46,9 @@
 
 **Independent Test**: 清除缓存后刷新页面，观察壁纸加载过程。设置页点击"换一张"能切换壁纸。
 
-- [ ] T007 [US2] 新增 PexelsCredit 归因组件：右下角固定定位显示 "Photo by {photographer} on Pexels"，字号 11px，opacity 0.5，可配置隐藏但默认显示。从 pexels 缓存读取 photographer 信息，无缓存时不显示 — `ui/src/components/PexelsCredit/index.tsx`, `ui/src/components/PexelsCredit/index.css`
-- [ ] T008 [US2] 集成归因组件到主页面：在 Content 组件或 App 根组件中渲染 PexelsCredit，传入当前壁纸缓存数据 — `ui/src/components/Content/index.tsx`
-- [ ] T009 [US2] 设置页增加"换一张"按钮：在壁纸配置区域新增按钮，点击清除当前缓存 key + 递增 refreshKey 触发 Background 重新获取。更新 tooltip 文案说明 pexels 格式和 API Key 需求 — `ui/src/pages/admin/tabs/Setting.tsx`
+- [x] T007 [US2] 新增 PexelsCredit 归因组件：右下角固定定位显示 "Photo by {photographer} on Pexels"，字号 11px，opacity 0.5，可配置隐藏但默认显示。从 pexels 缓存读取 photographer 信息，无缓存时不显示 — `ui/src/components/PexelsCredit/index.tsx`, `ui/src/components/PexelsCredit/index.css`
+- [x] T008 [US2] 集成归因组件到主页面：在 Content 组件或 App 根组件中渲染 PexelsCredit，传入当前壁纸缓存数据 — `ui/src/components/Content/index.tsx`
+- [x] T009 [US2] 设置页增加"换一张"按钮：在壁纸配置区域新增按钮，点击清除当前缓存 key + 递增 refreshKey 触发 Background 重新获取。更新 tooltip 文案说明 pexels 格式和 API Key 需求 — `ui/src/pages/admin/tabs/Setting.tsx`
 
 **Checkpoint**: quickstart.md Phase C 可验证。右下角有 Pexels attribution，"换一张"能切换壁纸。
 

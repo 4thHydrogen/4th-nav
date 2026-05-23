@@ -299,19 +299,22 @@ const WidgetGrid = ({
               );
             })}
 
-            {popupPanel.visible && popupFolder && (
-              <FolderFloatingWindow
-                folder={popupFolder}
-                children={popupChildren}
-                listItemSize={listItemSize}
-                folderCardRect={folderCardRect}
-                gridRect={gridRef.current?.getBoundingClientRect() ?? null}
-                onClose={() => { closePopupPanel(); setExpandedFolderId(null); setFolderCardRect(null); }}
-                onOpenTool={onToolClick}
-                onContextMenu={onToolContextMenu}
-                onMoveOut={onMoveOutOfFolder}
-              />
-            )}
+            <AnimatePresence>
+              {popupPanel.visible && popupFolder && (
+                <FolderFloatingWindow
+                  key={popupFolder.id}
+                  folder={popupFolder}
+                  children={popupChildren}
+                  listItemSize={listItemSize}
+                  folderCardRect={folderCardRect}
+                  gridRect={gridRef.current?.getBoundingClientRect() ?? null}
+                  onClose={() => { closePopupPanel(); setExpandedFolderId(null); setFolderCardRect(null); }}
+                  onOpenTool={onToolClick}
+                  onContextMenu={onToolContextMenu}
+                  onMoveOut={onMoveOutOfFolder}
+                />
+              )}
+            </AnimatePresence>
           </div>
         )}
       </div>
