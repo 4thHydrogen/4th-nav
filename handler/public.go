@@ -41,22 +41,34 @@ func GetAllHandler(c *gin.Context) {
 }
 
 func GetLogoImgHandler(c *gin.Context) {
-	url := c.Query("url")
-	if url == "" {
+	imgURL := c.Query("url")
+	if imgURL == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success":      false,
 			"errorMessage": "URL参数不能为空",
 		})
 		return
 	}
-	img := service.GetImgFromDB(url)
+	img := service.GetImgFromDB(imgURL)
+
+	// Cache miss: try to fetch and cache the image
 	if img.Value == "" {
-		c.JSON(http.StatusNotFound, gin.H{
-			"success":      false,
-			"errorMessage": "未找到图片",
-		})
+		cached, err := service.FetchAndCacheImage(imgURL)
+		if err != nil {
+			c.JSON(http.StatusNotFound, gin.H{
+				"success":      false,
+				"errorMessage": "未找到图片",
+			})
+			return
+		}
+		contentType := cached.ContentType
+		if contentType == "" {
+			contentType = guessImgContentType(imgURL)
+		}
+		c.Data(http.StatusOK, contentType, cached.Data)
 		return
 	}
+
 	imgBuffer, err := base64.StdEncoding.DecodeString(img.Value)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -65,15 +77,24 @@ func GetLogoImgHandler(c *gin.Context) {
 		})
 		return
 	}
-	l := strings.Split(url, ".")
-	suffix := l[len(l)-1]
-	t := "image/x-icon"
-	if suffix == "svg" || strings.Contains(url, ".svg") {
-		t = "image/svg+xml"
-	} else if suffix == "png" {
-		t = "image/png"
+	contentType := guessImgContentType(imgURL)
+	c.Data(http.StatusOK, contentType, imgBuffer)
+}
+
+func guessImgContentType(imgURL string) string {
+	lower := strings.ToLower(imgURL)
+	switch {
+	case strings.Contains(lower, ".svg"):
+		return "image/svg+xml"
+	case strings.Contains(lower, ".png"):
+		return "image/png"
+	case strings.Contains(lower, ".jpg") || strings.Contains(lower, ".jpeg"):
+		return "image/jpeg"
+	case strings.Contains(lower, ".webp"):
+		return "image/webp"
+	default:
+		return "image/x-icon"
 	}
-	c.Data(http.StatusOK, t, imgBuffer)
 }
 
 func ManifastHanlder(c *gin.Context) {

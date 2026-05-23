@@ -45,3 +45,38 @@ export const fetchUpdateLayout = async (items: LayoutItemDto[]) => {
     const { data } = await http.put(`/api/admin/layout`, { items });
     return data;
 };
+
+// Icon management
+export const fetchRefreshSingleIcon = async (id: number, force = false) => {
+    const { data } = await http.post(`/api/admin/tool/${id}/icon/refresh`, { force });
+    return data;
+};
+
+export const fetchRefreshMissingIcons = async () => {
+    const { data } = await http.post(`/api/admin/icons/refresh-missing`);
+    return data;
+};
+
+export const fetchRefreshAllIcons = async (clearCache = false, force = false) => {
+    const { data } = await http.post(`/api/admin/icons/refresh-all`, { clearCache, force });
+    return data;
+};
+
+export const fetchClearIconCache = async (mode: string = "cache-only") => {
+    const { data } = await http.delete(`/api/admin/icons/cache`, { data: { mode } });
+    return data;
+};
+
+export interface IconJobStatus {
+    running: boolean;
+    total: number;
+    done: number;
+    success: number;
+    failed: number;
+    lastError: string;
+}
+
+export const fetchIconJobStatus = async (): Promise<IconJobStatus> => {
+    const { data } = await http.get(`/api/admin/icons/status`);
+    return data?.data || { running: false, total: 0, done: 0, success: 0, failed: 0, lastError: "" };
+};

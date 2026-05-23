@@ -283,6 +283,66 @@ func UpdateToolsSortHandler(c *gin.Context) {
 	})
 }
 
+// IconRefreshHandler refreshes icon for a single tool.
+func IconRefreshHandler(c *gin.Context) {
+	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "errorMessage": "无效 ID"})
+		return
+	}
+	var body struct {
+		Force bool `json:"force"`
+	}
+	c.ShouldBindJSON(&body)
+	if err := service.RefreshSingleIcon(id, body.Force); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "errorMessage": err.Error()})
+		return
+	}
+	c.JSON(200, gin.H{"success": true, "message": "icon refresh started"})
+}
+
+// IconsRefreshMissingHandler starts a job to refresh icons for tools with empty logos.
+func IconsRefreshMissingHandler(c *gin.Context) {
+	if err := service.RefreshMissingIcons(); err != nil {
+		c.JSON(http.StatusConflict, gin.H{"success": false, "errorMessage": err.Error()})
+		return
+	}
+	c.JSON(200, gin.H{"success": true, "message": "refresh missing icons started"})
+}
+
+// IconsRefreshAllHandler starts a job to refresh all tool icons.
+func IconsRefreshAllHandler(c *gin.Context) {
+	var body struct {
+		ClearCache bool `json:"clearCache"`
+		Force      bool `json:"force"`
+	}
+	c.ShouldBindJSON(&body)
+	if err := service.RefreshAllIcons(body.Force, body.ClearCache); err != nil {
+		c.JSON(http.StatusConflict, gin.H{"success": false, "errorMessage": err.Error()})
+		return
+	}
+	c.JSON(200, gin.H{"success": true, "message": "refresh all icons started"})
+}
+
+// IconsClearCacheHandler clears icon cache.
+func IconsClearCacheHandler(c *gin.Context) {
+	var body struct {
+		Mode string `json:"mode"`
+	}
+	c.ShouldBindJSON(&body)
+	if body.Mode == "" {
+		body.Mode = "cache-only"
+	}
+	service.ClearIconCache(body.Mode)
+	c.JSON(200, gin.H{"success": true, "message": "icon cache cleared"})
+}
+
+// IconsStatusHandler returns current icon job status.
+func IconsStatusHandler(c *gin.Context) {
+	status := service.GetIconJobStatus()
+	c.JSON(200, gin.H{"success": true, "data": status})
+}
+
 func UpdateUserHandler(c *gin.Context) {
 	var data types.UpdateUserDto
 	if err := c.ShouldBindJSON(&data); err != nil {

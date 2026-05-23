@@ -142,6 +142,16 @@ func InitDB() {
 		if !columnExists("nav_table", "folder_item_size") {
 			DB.Exec(`ALTER TABLE nav_table ADD COLUMN folder_item_size INTEGER NOT NULL DEFAULT 28;`)
 		}
+		// icon 状态字段
+		if !columnExists("nav_table", "icon_status") {
+			DB.Exec(`ALTER TABLE nav_table ADD COLUMN icon_status TEXT NOT NULL DEFAULT '';`)
+		}
+		if !columnExists("nav_table", "icon_error") {
+			DB.Exec(`ALTER TABLE nav_table ADD COLUMN icon_error TEXT NOT NULL DEFAULT '';`)
+		}
+		if !columnExists("nav_table", "icon_updated_at") {
+			DB.Exec(`ALTER TABLE nav_table ADD COLUMN icon_updated_at INTEGER NOT NULL DEFAULT 0;`)
+		}
 
 	// 分类表
 	sql_create_table = `

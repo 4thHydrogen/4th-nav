@@ -58,40 +58,26 @@ func getIcon(rawURL string) string {
 }
 
 func LazyFetchLogo(rawURL string, id int64) {
-	// Pipeline: brand preset → goscraper → path probe → Google API
-
-	// Step 1: Brand preset
-	if preset := MatchBrandPreset(rawURL); preset != "" {
-		logger.LogInfo("LazyFetchLogo: matched brand preset for %s → %s", rawURL, preset)
-		UpdateToolIcon(id, preset)
-		return
-	}
-
-	// Step 2: goscraper multi-candidate selection
-	logo := getIcon(rawURL)
+	updateIconStatus(id, "fetching", "")
+	logo := DiscoverIconPipeline(rawURL)
 	if logo != "" {
-		if isSvgUrl(logo) || checkIconQuality(logo) {
-			UpdateToolIcon(id, logo)
-			return
-		}
-		logger.LogInfo("LazyFetchLogo: goscraper icon quality too low: %s", logo)
-	}
-
-	// Step 3: Probe common high-res paths
-	if probed := probeCommonIconPaths(rawURL); probed != "" {
-		logger.LogInfo("LazyFetchLogo: found icon via path probe: %s", probed)
-		UpdateToolIcon(id, probed)
+		UpdateToolIcon(id, logo)
+		updateIconStatus(id, "success", "")
 		return
 	}
-
-	// Step 4: Google Favicon API fallback
-	if fallback := fetchGoogleFavicon(rawURL); fallback != "" {
-		logger.LogInfo("LazyFetchLogo: using Google Favicon API fallback for %s", rawURL)
-		UpdateToolIcon(id, fallback)
-		return
-	}
-
+	updateIconStatus(id, "failed", "all strategies failed")
 	logger.LogInfo("LazyFetchLogo: all strategies failed for %s", rawURL)
+}
+
+func updateIconStatus(id int64, status string, errMsg string) {
+	now := time.Now().Unix()
+	_, err := database.DB.Exec(
+		`UPDATE nav_table SET icon_status = ?, icon_error = ?, icon_updated_at = ? WHERE id = ?;`,
+		status, errMsg, now, id,
+	)
+	if err != nil {
+		logger.LogInfo("updateIconStatus: failed for id %d: %s", id, err)
+	}
 }
 
 func isSvgUrl(iconUrl string) bool {

@@ -60,6 +60,13 @@ func RegisterAdminRoutes(admin *gin.RouterGroup) {
 	admin.PUT("/layout", handler.UpdateLayoutHandler)
 	admin.PUT("/tools/sort", handler.UpdateToolsSortHandler)
 
+	// Icon management
+	admin.POST("/tool/:id/icon/refresh", handler.IconRefreshHandler)
+	admin.POST("/icons/refresh-missing", handler.IconsRefreshMissingHandler)
+	admin.POST("/icons/refresh-all", handler.IconsRefreshAllHandler)
+	admin.DELETE("/icons/cache", handler.IconsClearCacheHandler)
+	admin.GET("/icons/status", handler.IconsStatusHandler)
+
 	// Category routes (legacy /catelog paths for backward compatibility)
 	admin.POST("/catelog", handler.AddCategoryHandler)
 	admin.DELETE("/catelog/:id", handler.DeleteCategoryHandler)

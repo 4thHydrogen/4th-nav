@@ -1,8 +1,8 @@
 # AGENTS.md
 
 <!-- SPECKIT START -->
-- **Active Plan**: `specs/003-icon-system/spec.md` — Icon 系统增强：高清获取与批量管理
-- **Active Plan**: `specs/004-glassmorphism-wallpaper/spec.md` — 毛玻璃主题与 Pexels 壁纸
+- **Active Plan**: `specs/003-icon-system/plan.md` — Icon 系统增强：高清获取与批量管理
+- **Active Plan**: `specs/004-glassmorphism-wallpaper/plan.md` — 毛玻璃主题与 Pexels 壁纸
 <!-- SPECKIT END -->
 
 ## Workflow

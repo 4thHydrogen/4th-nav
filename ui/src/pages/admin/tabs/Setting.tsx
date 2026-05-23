@@ -1,6 +1,8 @@
-import { Button, Card, Form, Input, message, Select, Slider, Spin, Switch } from "antd";
-import { useCallback, useEffect } from "react";
+import { Button, Card, Divider, Form, Input, message, Select, Slider, Space, Spin, Switch } from "antd";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { fetchUpdateSetting, fetchUpdateUser, fetchUpdateSiteConfig } from "../../../utils/api";
+import { fetchRefreshMissingIcons, fetchRefreshAllIcons, fetchClearIconCache, fetchIconJobStatus } from "../../../shared/api/tool";
+import type { IconJobStatus } from "../../../shared/api/tool";
 import { useData } from "../hooks/useData";
 export interface SettingProps { }
 export const Setting: React.FC<SettingProps> = (props) => {
@@ -8,6 +10,26 @@ export const Setting: React.FC<SettingProps> = (props) => {
   const [userForm] = Form.useForm();
   const [settingForm] = Form.useForm();
   const [siteConfigForm] = Form.useForm();
+  const [iconJob, setIconJob] = useState<IconJobStatus | null>(null);
+  const iconPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const pollIconStatus = useCallback(() => {
+    if (iconPollRef.current) clearInterval(iconPollRef.current);
+    iconPollRef.current = setInterval(async () => {
+      const status = await fetchIconJobStatus();
+      setIconJob(status);
+      if (!status.running) {
+        if (iconPollRef.current) clearInterval(iconPollRef.current);
+        iconPollRef.current = null;
+        reload();
+      }
+    }, 2000);
+  }, [reload]);
+
+  useEffect(() => {
+    return () => { if (iconPollRef.current) clearInterval(iconPollRef.current); };
+  }, []);
+
   useEffect(() => {
     userForm.setFieldsValue(store?.user ?? {})
     settingForm.setFieldsValue(store?.setting ?? {})
@@ -189,6 +211,53 @@ export const Setting: React.FC<SettingProps> = (props) => {
             </Form.Item>
             <Form.Item label="启用毛玻璃效果" name="enableGlassmorphism" tooltip="开启后卡片和导航栏将呈现毛玻璃半透明效果">
               <Switch defaultChecked={Boolean(store?.setting?.enableGlassmorphism)} />
+            </Form.Item>
+            <Divider orientation="left" style={{ margin: "16px 0 12px" }}>图标管理</Divider>
+            <Form.Item label="图标操作">
+              <Space direction="vertical" style={{ width: "100%" }}>
+                <Space wrap>
+                  <Button
+                    loading={iconJob?.running}
+                    onClick={async () => {
+                      const res = await fetchRefreshMissingIcons();
+                      message.success(res?.message || "任务已开始");
+                      pollIconStatus();
+                    }}
+                  >
+                    重新获取缺失图标
+                  </Button>
+                  <Button
+                    loading={iconJob?.running}
+                    onClick={async () => {
+                      if (!confirm("将强制重新获取所有工具图标，确定继续？")) return;
+                      const res = await fetchRefreshAllIcons(true, true);
+                      message.success(res?.message || "任务已开始");
+                      pollIconStatus();
+                    }}
+                  >
+                    强制重新获取全部
+                  </Button>
+                  <Button
+                    danger
+                    onClick={async () => {
+                      if (!confirm("将清空所有图标缓存，确定继续？")) return;
+                      const res = await fetchClearIconCache("cache-only");
+                      message.success(res?.message || "缓存已清空");
+                      reload();
+                    }}
+                  >
+                    清空图标缓存
+                  </Button>
+                </Space>
+                {iconJob && (iconJob.running || iconJob.total > 0) && (
+                  <div style={{ fontSize: 12, color: "#666" }}>
+                    {iconJob.running ? "任务进行中..." : "任务完成"} —
+                    总计 {iconJob.total}，成功 {iconJob.success}，失败 {iconJob.failed}
+                    {iconJob.running && <>，已完成 {iconJob.done}</>}
+                    {iconJob.lastError && <div style={{ color: "#ff4d4f" }}>最近错误：{iconJob.lastError}</div>}
+                  </div>
+                )}
+              </Space>
             </Form.Item>
             <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
               <Button type="primary" htmlType="submit">
