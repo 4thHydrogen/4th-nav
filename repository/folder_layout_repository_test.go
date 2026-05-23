@@ -100,6 +100,21 @@ func TestMoveToolToFolder(t *testing.T) {
 	}
 }
 
+func TestCountChildren(t *testing.T) {
+	db := setupRepositoryTestDB(t)
+	if _, err := db.Exec(`INSERT INTO nav_table (id, parent_id) VALUES (10, NULL), (11, 10), (12, 10), (13, NULL)`); err != nil {
+		t.Fatalf("seed tools: %v", err)
+	}
+
+	count, err := CountChildren(10)
+	if err != nil {
+		t.Fatalf("count children: %v", err)
+	}
+	if count != 2 {
+		t.Fatalf("expected 2 children, got %d", count)
+	}
+}
+
 func TestDeleteFolderMoveChildrenToRoot(t *testing.T) {
 	db := setupRepositoryTestDB(t)
 	if _, err := db.Exec(`INSERT INTO nav_table (id, parent_id) VALUES (10, NULL), (11, 10), (12, 10)`); err != nil {

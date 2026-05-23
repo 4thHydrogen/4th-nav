@@ -3,6 +3,7 @@ package repository
 import (
 	"database/sql"
 	"fmt"
+	"net/url"
 	"strconv"
 	"strings"
 
@@ -188,9 +189,89 @@ func GetToolLogoURLByID(id int) (string, error) {
 	return logo, nil
 }
 
+func GetToolParentID(id int) (*int, error) {
+	var parentID sql.NullInt64
+	err := database.DB.QueryRow(`SELECT parent_id FROM nav_table WHERE id = ?;`, id).Scan(&parentID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, fmt.Errorf("tool %d not found", id)
+		}
+		return nil, err
+	}
+	if !parentID.Valid {
+		return nil, nil
+	}
+	pid := int(parentID.Int64)
+	return &pid, nil
+}
+
+func GetToolTypeByID(id int) (string, error) {
+	var toolType string
+	err := database.DB.QueryRow(`SELECT type FROM nav_table WHERE id = ?;`, id).Scan(&toolType)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return "", fmt.Errorf("tool %d not found", id)
+		}
+		return "", err
+	}
+	return toolType, nil
+}
+
 func UpdateToolLogoByID(id int64, logo string) error {
 	_, err := database.DB.Exec(`UPDATE nav_table SET logo = ? WHERE id = ?;`, logo, id)
 	return err
+}
+
+func DeleteTool(id int) error {
+	tx, err := database.DB.Begin()
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+		}
+	}()
+
+	var parentID sql.NullInt64
+	var logo string
+	err = tx.QueryRow(`SELECT parent_id, logo FROM nav_table WHERE id = ?;`, id).Scan(&parentID, &logo)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return fmt.Errorf("tool %d not found", id)
+		}
+		return err
+	}
+
+	if _, err = tx.Exec(`DELETE FROM nav_table WHERE id = ?;`, id); err != nil {
+		return err
+	}
+	if _, err = tx.Exec(`DELETE FROM dock_items WHERE tool_id = ?;`, id); err != nil {
+		return err
+	}
+	if logo != "" {
+		encodedURL := url.QueryEscape(logo)
+		if _, err = tx.Exec(`DELETE FROM nav_img WHERE url = ?;`, encodedURL); err != nil {
+			return err
+		}
+	}
+
+	if parentID.Valid {
+		var childCount int
+		if err = tx.QueryRow(`SELECT COUNT(*) FROM nav_table WHERE parent_id = ?;`, parentID.Int64).Scan(&childCount); err != nil {
+			return err
+		}
+		if childCount == 0 {
+			if _, err = tx.Exec(`DELETE FROM dock_items WHERE tool_id = ?;`, parentID.Int64); err != nil {
+				return err
+			}
+			if _, err = tx.Exec(`DELETE FROM nav_table WHERE id = ? AND type = 'folder';`, parentID.Int64); err != nil {
+				return err
+			}
+		}
+	}
+
+	return tx.Commit()
 }
 
 func CreateTool(data types.AddToolDto) (int64, error) {

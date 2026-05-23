@@ -2,10 +2,8 @@ package handler
 
 import (
 	"net/http"
-	"net/url"
 	"strconv"
 
-	"github.com/4thHydrogen/4th-nav/database"
 	"github.com/4thHydrogen/4th-nav/logger"
 	"github.com/4thHydrogen/4th-nav/service"
 	"github.com/4thHydrogen/4th-nav/types"
@@ -18,7 +16,7 @@ func ExportToolsHandler(c *gin.Context) {
 	tools := service.GetAllTool()
 	c.JSON(200, gin.H{
 		"success": true,
-		"message": "导出工具成功",
+		"message": "瀵煎嚭宸ュ叿鎴愬姛",
 		"data":    tools,
 	})
 }
@@ -37,7 +35,7 @@ func ImportToolsHandler(c *gin.Context) {
 	service.ImportTools(tools)
 	c.JSON(200, gin.H{
 		"success": true,
-		"message": "导入工具成功",
+		"message": "瀵煎叆宸ュ叿鎴愬姛",
 	})
 }
 
@@ -52,7 +50,7 @@ func AddToolHandler(c *gin.Context) {
 		return
 	}
 
-	logger.LogInfo("%s 获取 logo: %s", data.Name, data.Logo)
+	logger.LogInfo("%s 鑾峰彇 logo: %s", data.Name, data.Logo)
 	id, err := service.AddTool(data)
 	if err != nil {
 		utils.CheckErr(err)
@@ -67,7 +65,7 @@ func AddToolHandler(c *gin.Context) {
 	}
 	c.JSON(200, gin.H{
 		"success": true,
-		"message": "添加成功",
+		"message": "娣诲姞鎴愬姛",
 		"data": gin.H{
 			"id": id,
 		},
@@ -76,44 +74,20 @@ func AddToolHandler(c *gin.Context) {
 
 func DeleteToolHandler(c *gin.Context) {
 	id := c.Param("id")
-	numberId, err := strconv.Atoi(id)
-	utils.CheckErr(err)
+	numberID, err := strconv.Atoi(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "errorMessage": "鏃犳晥 ID"})
+		return
+	}
 
-	var parentId *int
-	database.DB.QueryRow(`SELECT parent_id FROM nav_table WHERE id = ?`, numberId).Scan(&parentId)
-
-	sql_delete_tool := `DELETE FROM nav_table WHERE id = ?;`
-	stmt, err := database.DB.Prepare(sql_delete_tool)
-	utils.CheckErr(err)
-	res, err := stmt.Exec(id)
-	utils.CheckErr(err)
-	_, err = res.RowsAffected()
-	utils.CheckErr(err)
-
-	database.DB.Exec(`DELETE FROM dock_items WHERE tool_id = ?`, numberId)
-	url1 := service.GetToolLogoUrlById(numberId)
-	urlEncoded := url.QueryEscape(url1)
-	sql_delete_tool_img := `DELETE FROM nav_img WHERE url = ?;`
-	stmt, err = database.DB.Prepare(sql_delete_tool_img)
-	utils.CheckErr(err)
-	res, err = stmt.Exec(urlEncoded)
-	utils.CheckErr(err)
-	_, err = res.RowsAffected()
-	utils.CheckErr(err)
-
-	if parentId != nil {
-		var childCount int
-		err := database.DB.QueryRow(`SELECT COUNT(*) FROM nav_table WHERE parent_id = ?`, *parentId).Scan(&childCount)
-		if err == nil && childCount == 0 {
-			database.DB.Exec(`DELETE FROM nav_table WHERE id = ? AND type = 'folder'`, *parentId)
-			database.DB.Exec(`DELETE FROM dock_items WHERE tool_id = ?`, *parentId)
-			logger.LogInfo("空文件夹自动删除: folderId=%d", *parentId)
-		}
+	if err := service.DeleteTool(numberID); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "errorMessage": err.Error()})
+		return
 	}
 
 	c.JSON(200, gin.H{
 		"success": true,
-		"message": "删除成功",
+		"message": "鍒犻櫎鎴愬姛",
 	})
 }
 
@@ -129,85 +103,65 @@ func UpdateToolHandler(c *gin.Context) {
 	}
 	service.UpdateTool(data)
 	if data.Logo == "" {
-		logger.LogInfo("%s 获取 logo: %s", data.Name, data.Logo)
+		logger.LogInfo("%s 鑾峰彇 logo: %s", data.Name, data.Logo)
 		go service.LazyFetchLogo(data.Url, int64(data.Id))
 	}
 	c.JSON(200, gin.H{
 		"success": true,
-		"message": "更新成功",
+		"message": "鏇存柊鎴愬姛",
 	})
 }
 
 func UpdateToolViewModeHandler(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "errorMessage": "无效 ID"})
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "errorMessage": "鏃犳晥 ID"})
 		return
 	}
 	var body struct {
 		ViewMode string `json:"viewMode"`
 	}
 	if err := c.ShouldBindJSON(&body); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "errorMessage": "无效请求"})
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "errorMessage": "鏃犳晥璇锋眰"})
 		return
 	}
 	if err := service.UpdateToolViewMode(id, body.ViewMode); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "errorMessage": err.Error()})
 		return
 	}
-	c.JSON(200, gin.H{"success": true, "message": "布局更新成功"})
+	c.JSON(200, gin.H{"success": true, "message": "甯冨眬鏇存柊鎴愬姛"})
 }
 
 func MoveToolToFolderHandler(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "errorMessage": "无效 ID"})
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "errorMessage": "鏃犳晥 ID"})
 		return
 	}
 	var body struct {
 		ParentId *int `json:"parentId"`
 	}
 	if err := c.ShouldBindJSON(&body); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "errorMessage": "无效请求"})
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "errorMessage": "鏃犳晥璇锋眰"})
 		return
-	}
-
-	if body.ParentId != nil {
-		var toolType string
-		database.DB.QueryRow(`SELECT type FROM nav_table WHERE id = ?`, id).Scan(&toolType)
-		if toolType == "folder" {
-			c.JSON(http.StatusBadRequest, gin.H{"success": false, "errorMessage": "文件夹不能嵌套"})
-			return
-		}
-	}
-
-	var oldParentId *int
-	if body.ParentId == nil {
-		database.DB.QueryRow(`SELECT parent_id FROM nav_table WHERE id = ?`, id).Scan(&oldParentId)
 	}
 
 	if err := service.MoveToolToFolder(id, body.ParentId); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "errorMessage": err.Error()})
+		status := http.StatusInternalServerError
+		if err.Error() == "folders cannot be moved into another folder" {
+			status = http.StatusBadRequest
+		}
+		c.JSON(status, gin.H{"success": false, "errorMessage": err.Error()})
 		return
 	}
 
-	if oldParentId != nil {
-		var childCount int
-		err := database.DB.QueryRow(`SELECT COUNT(*) FROM nav_table WHERE parent_id = ?`, *oldParentId).Scan(&childCount)
-		if err == nil && childCount == 0 {
-			database.DB.Exec(`DELETE FROM nav_table WHERE id = ? AND type = 'folder'`, *oldParentId)
-			database.DB.Exec(`DELETE FROM dock_items WHERE tool_id = ?`, *oldParentId)
-			logger.LogInfo("空文件夹自动删除(移出): folderId=%d", *oldParentId)
-		}
-	}
-
-	c.JSON(200, gin.H{"success": true, "message": "移动成功"})
+	c.JSON(200, gin.H{"success": true, "message": "绉诲姩鎴愬姛"})
 }
 
 func UpdateFolderSettingsHandler(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "errorMessage": "无效 ID"})
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "errorMessage": "鏃犳晥 ID"})
 		return
 	}
 	var body struct {
@@ -215,32 +169,32 @@ func UpdateFolderSettingsHandler(c *gin.Context) {
 		FolderItemSize int    `json:"folderItemSize"`
 	}
 	if err := c.ShouldBindJSON(&body); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "errorMessage": "无效请求"})
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "errorMessage": "鏃犳晥璇锋眰"})
 		return
 	}
 	if err := service.UpdateFolderSettings(id, body.FolderViewMode, body.FolderItemSize); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "errorMessage": err.Error()})
 		return
 	}
-	c.JSON(200, gin.H{"success": true, "message": "文件夹设置更新成功"})
+	c.JSON(200, gin.H{"success": true, "message": "鏂囦欢澶硅缃洿鏂版垚鍔?"})
 }
 
 func DeleteFolderHandler(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "errorMessage": "无效 ID"})
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "errorMessage": "鏃犳晥 ID"})
 		return
 	}
 	mode := c.DefaultQuery("mode", "move-children-to-root")
 	if mode != "move-children-to-root" && mode != "delete-with-children" {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "errorMessage": "无效的删除模式"})
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "errorMessage": "鏃犳晥鐨勫垹闄ゆā寮?"})
 		return
 	}
 	if err := service.DeleteFolder(id, mode); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "errorMessage": err.Error()})
 		return
 	}
-	c.JSON(200, gin.H{"success": true, "message": "删除文件夹成功"})
+	c.JSON(200, gin.H{"success": true, "message": "鍒犻櫎鏂囦欢澶规垚鍔?"})
 }
 
 func UpdateLayoutHandler(c *gin.Context) {
@@ -253,7 +207,7 @@ func UpdateLayoutHandler(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "errorMessage": err.Error()})
 		return
 	}
-	c.JSON(200, gin.H{"success": true, "message": "布局更新成功"})
+	c.JSON(200, gin.H{"success": true, "message": "甯冨眬鏇存柊鎴愬姛"})
 }
 
 func UpdateToolsSortHandler(c *gin.Context) {
@@ -279,7 +233,7 @@ func UpdateToolsSortHandler(c *gin.Context) {
 
 	c.JSON(200, gin.H{
 		"success": true,
-		"message": "更新排序成功",
+		"message": "鏇存柊鎺掑簭鎴愬姛",
 	})
 }
 
@@ -287,7 +241,7 @@ func UpdateToolsSortHandler(c *gin.Context) {
 func IconRefreshHandler(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "errorMessage": "无效 ID"})
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "errorMessage": "鏃犳晥 ID"})
 		return
 	}
 	var body struct {
@@ -356,6 +310,6 @@ func UpdateUserHandler(c *gin.Context) {
 	service.UpdateUser(data)
 	c.JSON(200, gin.H{
 		"success": true,
-		"message": "更新用户成功",
+		"message": "鏇存柊鐢ㄦ埛鎴愬姛",
 	})
 }

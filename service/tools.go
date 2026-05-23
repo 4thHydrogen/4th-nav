@@ -57,9 +57,6 @@ func normalizeToolSize(v string) string {
 	return fmt.Sprintf("%dx%d", w, h)
 }
 
-// normalizeGrid 把不合法的 gridX/gridY 值（如 Go 零值 0 但未明确指定）规范化为 -1（auto layout）。
-// 用户拖拽产生的位置 (>= 0) 保留；前端 AddTool 未指定位置时一律视为 -1，
-// 防止"新建工具被钉在 (0,0)"的 bug 污染整体布局。
 func normalizeGrid(v int) int {
 	if v < 0 {
 		return -1
@@ -76,11 +73,11 @@ func ImportTools(data []types.Tool) {
 		viewMode := normalizeViewMode(v.ViewMode)
 		toolType := normalizeToolType(v.Type)
 		size := normalizeToolSize(v.Size)
-		sql_add_tool := `
+		sqlAddTool := `
 			INSERT INTO nav_table (id, name, catelog, url, logo, ` + "`desc`" + `, sort, hide, view_mode, type, parent_id, size, bg_color, grid_x, grid_y, folder_view_mode, folder_item_size)
 				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 			`
-		stmt, err := database.DB.Prepare(sql_add_tool)
+		stmt, err := database.DB.Prepare(sqlAddTool)
 		utils.CheckErr(err)
 		res, err := stmt.Exec(v.Id, v.Name, v.Catelog, v.Url, v.Logo, v.Desc, v.Sort, v.Hide, viewMode, toolType, v.ParentId, size, v.BgColor, v.GridX, v.GridY, normalizeFolderViewMode(v.FolderViewMode), normalizeFolderItemSize(v.FolderItemSize))
 		utils.CheckErr(err)
@@ -109,8 +106,6 @@ func ImportTools(data []types.Tool) {
 }
 
 func UpdateTool(data types.UpdateToolDto) {
-	// 保留现有网格位置：auto-layout 条目的 gridX/gridY 为 -1 且未持久化到 DB，
-	// 前端 handleSetSize 用 {...tool, size} 会把 -1 写回，导致 buildLayout 把它当新项排到第一行。
 	if data.GridX < 0 || data.GridY < 0 {
 		tool, err := repository.GetToolByID(int64(data.Id))
 		utils.CheckErr(err)
@@ -131,7 +126,7 @@ func AddTool(data types.AddToolDto) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
-	logger.LogInfo("新增工具: %s", data.Name)
+	logger.LogInfo("鏂板宸ュ叿: %s", data.Name)
 
 	if data.Logo != "" {
 		UpdateImg(data.Logo)
@@ -158,6 +153,10 @@ func UpdateToolIcon(id int64, logo string) {
 	UpdateImg(logo)
 }
 
+func DeleteTool(id int) error {
+	return repository.DeleteTool(id)
+}
+
 func UpdateToolsSort(updates []types.UpdateToolsSortDto) error {
 	return repository.UpdateToolsSort(updates)
 }
@@ -172,7 +171,37 @@ func UpdateFolderSettings(id int, folderViewMode string, folderItemSize int) err
 }
 
 func MoveToolToFolder(toolId int, parentId *int) error {
-	return repository.MoveToolToFolder(toolId, parentId)
+	toolType, err := repository.GetToolTypeByID(toolId)
+	if err != nil {
+		return err
+	}
+	if toolType == "folder" && parentId != nil {
+		return fmt.Errorf("folders cannot be moved into another folder")
+	}
+
+	oldParentID, err := repository.GetToolParentID(toolId)
+	if err != nil {
+		return err
+	}
+
+	if err := repository.MoveToolToFolder(toolId, parentId); err != nil {
+		return err
+	}
+
+	if oldParentID != nil && (parentId == nil || *parentId != *oldParentID) {
+		childCount, err := repository.CountChildren(*oldParentID)
+		if err != nil {
+			return err
+		}
+		if childCount == 0 {
+			if err := repository.DeleteFolder(*oldParentID, "move-children-to-root"); err != nil {
+				return err
+			}
+			logger.LogInfo("empty folder removed after move: folderId=%d", *oldParentID)
+		}
+	}
+
+	return nil
 }
 
 func DeleteFolder(folderId int, mode string) error {

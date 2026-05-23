@@ -23,6 +23,12 @@ func MoveToolToFolder(toolId int, parentId *int) error {
 	return err
 }
 
+func CountChildren(parentID int) (int, error) {
+	var childCount int
+	err := database.DB.QueryRow(`SELECT COUNT(*) FROM nav_table WHERE parent_id = ?;`, parentID).Scan(&childCount)
+	return childCount, err
+}
+
 func DeleteFolder(folderId int, mode string) error {
 	tx, err := database.DB.Begin()
 	if err != nil {

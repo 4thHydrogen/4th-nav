@@ -402,3 +402,154 @@ func TestUpdateToolPersistsChanges(t *testing.T) {
 		t.Fatalf("unexpected layout fields: %+v", tool)
 	}
 }
+
+func TestGetToolParentID(t *testing.T) {
+	dbPath := filepath.Join(t.TempDir(), "tool-parent.db")
+	db, err := sql.Open("sqlite", dbPath)
+	if err != nil {
+		t.Fatalf("open db: %v", err)
+	}
+
+	_, err = db.Exec(`CREATE TABLE nav_table (
+		id INTEGER PRIMARY KEY,
+		parent_id INTEGER NULL
+	);`)
+	if err != nil {
+		t.Fatalf("create schema: %v", err)
+	}
+
+	database.DB = db
+	t.Cleanup(func() {
+		_ = db.Close()
+	})
+
+	if _, err := db.Exec(`INSERT INTO nav_table (id, parent_id) VALUES (1, NULL), (2, 99)`); err != nil {
+		t.Fatalf("seed tools: %v", err)
+	}
+
+	parentID, err := GetToolParentID(1)
+	if err != nil {
+		t.Fatalf("get null parent: %v", err)
+	}
+	if parentID != nil {
+		t.Fatalf("expected nil parent, got %+v", parentID)
+	}
+
+	parentID, err = GetToolParentID(2)
+	if err != nil {
+		t.Fatalf("get parent: %v", err)
+	}
+	if parentID == nil || *parentID != 99 {
+		t.Fatalf("unexpected parent id: %+v", parentID)
+	}
+}
+
+func TestGetToolTypeByID(t *testing.T) {
+	dbPath := filepath.Join(t.TempDir(), "tool-type.db")
+	db, err := sql.Open("sqlite", dbPath)
+	if err != nil {
+		t.Fatalf("open db: %v", err)
+	}
+
+	_, err = db.Exec(`CREATE TABLE nav_table (
+		id INTEGER PRIMARY KEY,
+		type TEXT
+	);`)
+	if err != nil {
+		t.Fatalf("create schema: %v", err)
+	}
+
+	database.DB = db
+	t.Cleanup(func() {
+		_ = db.Close()
+	})
+
+	if _, err := db.Exec(`INSERT INTO nav_table (id, type) VALUES (3, 'folder')`); err != nil {
+		t.Fatalf("seed tool: %v", err)
+	}
+
+	toolType, err := GetToolTypeByID(3)
+	if err != nil {
+		t.Fatalf("get tool type: %v", err)
+	}
+	if toolType != "folder" {
+		t.Fatalf("unexpected tool type: %s", toolType)
+	}
+}
+
+func TestDeleteToolCleansImageDockAndEmptyParent(t *testing.T) {
+	dbPath := filepath.Join(t.TempDir(), "tool-delete.db")
+	db, err := sql.Open("sqlite", dbPath)
+	if err != nil {
+		t.Fatalf("open db: %v", err)
+	}
+
+	stmts := []string{
+		`CREATE TABLE nav_table (
+			id INTEGER PRIMARY KEY,
+			type TEXT,
+			parent_id INTEGER NULL,
+			logo TEXT
+		);`,
+		`CREATE TABLE dock_items (
+			id INTEGER PRIMARY KEY,
+			tool_id INTEGER NOT NULL,
+			sort INTEGER NOT NULL DEFAULT 0
+		);`,
+		`CREATE TABLE nav_img (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			url TEXT,
+			value TEXT
+		);`,
+	}
+	for _, stmt := range stmts {
+		if _, err := db.Exec(stmt); err != nil {
+			t.Fatalf("create schema: %v", err)
+		}
+	}
+
+	database.DB = db
+	t.Cleanup(func() {
+		_ = db.Close()
+	})
+
+	if _, err := db.Exec(`
+		INSERT INTO nav_table (id, type, parent_id, logo) VALUES
+			(10, 'folder', NULL, ''),
+			(11, 'icon', 10, 'https://example.com/logo.png');
+	`); err != nil {
+		t.Fatalf("seed tools: %v", err)
+	}
+	if _, err := db.Exec(`INSERT INTO dock_items (id, tool_id, sort) VALUES (1, 10, 0), (2, 11, 1)`); err != nil {
+		t.Fatalf("seed dock items: %v", err)
+	}
+	if _, err := db.Exec(`INSERT INTO nav_img (url, value) VALUES ('https%3A%2F%2Fexample.com%2Flogo.png', 'base64')`); err != nil {
+		t.Fatalf("seed image: %v", err)
+	}
+
+	if err := DeleteTool(11); err != nil {
+		t.Fatalf("delete tool: %v", err)
+	}
+
+	var count int
+	if err := db.QueryRow(`SELECT COUNT(*) FROM nav_table WHERE id IN (10, 11)`).Scan(&count); err != nil {
+		t.Fatalf("count remaining tools: %v", err)
+	}
+	if count != 0 {
+		t.Fatalf("expected tool and empty parent folder deleted, got count=%d", count)
+	}
+
+	if err := db.QueryRow(`SELECT COUNT(*) FROM dock_items`).Scan(&count); err != nil {
+		t.Fatalf("count dock items: %v", err)
+	}
+	if count != 0 {
+		t.Fatalf("expected dock items cleaned up, got count=%d", count)
+	}
+
+	if err := db.QueryRow(`SELECT COUNT(*) FROM nav_img`).Scan(&count); err != nil {
+		t.Fatalf("count images: %v", err)
+	}
+	if count != 0 {
+		t.Fatalf("expected image cache removed, got count=%d", count)
+	}
+}
