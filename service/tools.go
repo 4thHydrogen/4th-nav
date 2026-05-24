@@ -19,15 +19,8 @@ func ImportTools(data []types.Tool) error {
 		}
 	}
 
-	if err := repository.ImportToolsTx(data); err != nil {
+	if err := repository.ImportToolsAndCategoriesTx(data, categories); err != nil {
 		return fmt.Errorf("import tools transaction: %w", err)
-	}
-
-	for _, category := range categories {
-		dto := types.AddCategoryDto{Name: category}
-		if err := AddCategory(dto); err != nil {
-			logger.LogError("failed to add category during import: %v", err)
-		}
 	}
 
 	go func(data []types.Tool) {

@@ -16,7 +16,6 @@ import "./panel-grid.css";
 interface PanelGridProps {
   tools: Tool[];
   allTools: Tool[];
-  noImageMode: boolean;
   listItemSize: number;
   layoutConfig?: GridLayoutConfig;
   onItemClick: (item: PanelItem) => void;
@@ -34,7 +33,6 @@ interface PanelGridProps {
 export default function PanelGrid({
   tools,
   allTools,
-  noImageMode,
   listItemSize,
   layoutConfig,
   onItemClick,
@@ -66,7 +64,14 @@ export default function PanelGrid({
     return maxOriginalGridX >= 0 && maxOriginalGridX >= cols;
   }, [panelItems, cols]);
 
-  usePersistGridLayout(layout, !isClampMode);
+  const { persist } = usePersistGridLayout();
+
+  const handleLayoutChange = useCallback(
+    (layout: GridLayout[]) => {
+      if (!isClampMode) persist(layout);
+    },
+    [isClampMode, persist]
+  );
 
   const layoutMap = useMemo(() => {
     const map = new Map<string, GridLayout>();
@@ -101,6 +106,7 @@ export default function PanelGrid({
     },
     onMoveToFolder,
     onMergeToFolder,
+    onLayoutChange: handleLayoutChange,
     rowHeight,
     margin: margin as [number, number],
   });

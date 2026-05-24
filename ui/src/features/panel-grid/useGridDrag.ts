@@ -33,6 +33,7 @@ interface UseGridDragParams {
     pos1: { x: number; y: number },
     pos2: { x: number; y: number }
   ) => void;
+  onLayoutChange?: (layout: GridLayout[]) => void;
   rowHeight?: number;
   margin?: [number, number];
 }
@@ -134,6 +135,7 @@ export function useGridDrag({
   setExpandedFolderId,
   onMoveToFolder,
   onMergeToFolder,
+  onLayoutChange,
   rowHeight = ROW_HEIGHT,
   margin = [...MARGIN] as [number, number],
 }: UseGridDragParams): GridDragResult {
@@ -257,6 +259,7 @@ export function useGridDrag({
 
       if (!handledAsFolderAction) {
         setLayout(layoutRef.current);
+        onLayoutChange?.(layoutRef.current);
       }
 
       resetDragState(

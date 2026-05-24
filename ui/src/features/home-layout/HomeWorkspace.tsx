@@ -95,7 +95,6 @@ export function HomeWorkspace({
             <PanelGrid
               tools={gridTools}
               allTools={allTools}
-              noImageMode={noImageMode}
               listItemSize={listItemSize}
               layoutConfig={layoutConfig}
               onItemClick={() => onResetSearch()}

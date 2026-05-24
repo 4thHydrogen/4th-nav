@@ -344,6 +344,68 @@ func ImportToolsTx(tools []types.Tool) error {
 	return tx.Commit()
 }
 
+func ImportToolsAndCategoriesTx(tools []types.Tool, categories []string) error {
+	tx, err := database.DB.Begin()
+	if err != nil {
+		return err
+	}
+
+	toolStmt, err := tx.Prepare(`
+		INSERT INTO nav_table (id, name, category, url, logo, description, sort, hide, view_mode, type, parent_id, size, folder_tint, grid_x, grid_y, folder_view_mode, folder_item_size)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+	`)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	defer toolStmt.Close()
+
+	for _, data := range tools {
+		_, err = toolStmt.Exec(
+			data.Id,
+			data.Name,
+			data.Category,
+			data.Url,
+			data.Logo,
+			data.Description,
+			data.Sort,
+			data.Hide,
+			types.NormalizeViewMode(data.ViewMode),
+			types.NormalizeToolType(data.Type),
+			data.ParentId,
+			types.NormalizeToolSize(data.Size),
+			data.FolderTint,
+			types.NormalizeGrid(data.GridX),
+			types.NormalizeGrid(data.GridY),
+			types.NormalizeFolderViewMode(data.FolderViewMode),
+			types.NormalizeFolderItemSize(data.FolderItemSize),
+		)
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("insert tool id %d: %w", data.Id, err)
+		}
+	}
+
+	for _, name := range categories {
+		var existing int
+		err = tx.QueryRow(`SELECT COUNT(*) FROM categories WHERE name = ?`, name).Scan(&existing)
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("check category %q: %w", name, err)
+		}
+		if existing > 0 {
+			continue
+		}
+		_, err = tx.Exec(`INSERT INTO categories (name, sort, hide) VALUES (?, 0, 0)`, name)
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("insert category %q: %w", name, err)
+		}
+	}
+
+	return tx.Commit()
+}
+
 func UpdateTool(data types.UpdateToolDto) error {
 	_, err := database.DB.Exec(`
 		UPDATE nav_table
