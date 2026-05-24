@@ -153,7 +153,8 @@ func ScoreCandidates(candidates []IconCandidate, pageURL string) IconCandidate {
 }
 
 func getOrigin(rawURL string) string {
-	u, err := url.Parse(rawURL)
+	normalized := normalizeURL(rawURL)
+	u, err := url.Parse(normalized)
 	if err != nil {
 		return ""
 	}

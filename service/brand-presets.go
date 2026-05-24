@@ -511,7 +511,8 @@ func init() {
 // 例如对于 "www.jd.com"，依次尝试 "www.jd.com"、"jd.com"。
 // 返回匹配的图标路径，未匹配则返回空字符串。
 func MatchBrandPreset(rawURL string) string {
-	parsed, err := url.Parse(rawURL)
+	normalized := normalizeURL(rawURL)
+	parsed, err := url.Parse(normalized)
 	if err != nil {
 		return ""
 	}

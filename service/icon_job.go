@@ -72,7 +72,10 @@ func RefreshMissingIcons() error {
 		if t.Type == "folder" || t.Url == "" || t.Url == "admin" {
 			continue
 		}
-		if t.Logo == "" {
+		if !isIconHealthy(t.Logo) {
+			if t.Logo != "" {
+				UpdateToolIcon(int64(t.Id), "")
+			}
 			targets = append(targets, t)
 		}
 	}
@@ -106,7 +109,10 @@ func RefreshAllIcons(force bool, clearCache bool) error {
 		if force {
 			UpdateToolIcon(int64(t.Id), "")
 		}
-		if t.Logo == "" || force {
+		if !isIconHealthy(t.Logo) || force {
+			if !force && t.Logo != "" {
+				UpdateToolIcon(int64(t.Id), "")
+			}
 			targets = append(targets, t)
 		}
 	}

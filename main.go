@@ -4,11 +4,13 @@ import (
 	"embed"
 	"flag"
 	"fmt"
+	iofs "io/fs"
 	"net/http"
 
 	"github.com/4thHydrogen/4th-nav/database"
 	"github.com/4thHydrogen/4th-nav/logger"
 	"github.com/4thHydrogen/4th-nav/server"
+	"github.com/4thHydrogen/4th-nav/service"
 )
 
 //go:embed public
@@ -20,6 +22,9 @@ var addr = flag.String("addr", "0.0.0.0", "指定监听地址")
 func main() {
 	flag.Parse()
 	database.InitDB()
+
+	publicFS, _ := iofs.Sub(fs, "public")
+	service.InitStaticFS(publicFS)
 
 	router := server.NewRouter(fs)
 

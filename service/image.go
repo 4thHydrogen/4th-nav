@@ -152,7 +152,8 @@ func probeCommonIconPaths(rawURL string) string {
 }
 
 func fetchGoogleFavicon(rawURL string) string {
-	u, err := url.Parse(rawURL)
+	normalized := normalizeURL(rawURL)
+	u, err := url.Parse(normalized)
 	if err != nil {
 		return ""
 	}

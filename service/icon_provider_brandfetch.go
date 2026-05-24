@@ -36,7 +36,8 @@ func (p *BrandfetchProvider) Collect(rawURL string, setting *types.Setting) ([]I
 }
 
 func extractHost(rawURL string) (string, error) {
-	u, err := url.Parse(rawURL)
+	normalized := normalizeURL(rawURL)
+	u, err := url.Parse(normalized)
 	if err != nil {
 		return "", fmt.Errorf("parse URL: %w", err)
 	}
