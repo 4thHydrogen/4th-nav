@@ -1,23 +1,21 @@
 import { AnimatePresence } from "framer-motion";
 import FolderFloatingWindow from "../../entities/folder/ui/FolderFloatingWindow";
-import type { Tool } from "../../types";
+import type { FolderItem, LinkItem } from "../../entities/panel/types";
 
 interface FolderPopupHostProps {
   isOpen: boolean;
-  folder: Tool | null;
-  childrenTools: Tool[];
+  folder: FolderItem | null;
   listItemSize: number;
   anchorRect: DOMRect | null;
   onClose: () => void;
-  onOpenTool: (tool: Tool) => void;
-  onContextMenu: (e: React.MouseEvent, tool: Tool) => void;
+  onOpenTool: (item: LinkItem) => void;
+  onContextMenu: (e: React.MouseEvent, item: LinkItem) => void;
   onMoveOut: (toolId: number) => void;
 }
 
 export function FolderPopupHost({
   isOpen,
   folder,
-  childrenTools,
   listItemSize,
   anchorRect,
   onClose,
@@ -31,7 +29,6 @@ export function FolderPopupHost({
         <FolderFloatingWindow
           key={folder.id}
           folder={folder}
-          children={childrenTools}
           listItemSize={listItemSize}
           folderCardRect={anchorRect}
           onClose={onClose}

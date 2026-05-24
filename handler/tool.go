@@ -12,7 +12,11 @@ import (
 )
 
 func ExportToolsHandler(c *gin.Context) {
-	tools := service.GetAllTool()
+	tools, err := service.GetAllTool()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "errorMessage": err.Error()})
+		return
+	}
 	c.JSON(200, gin.H{
 		"success": true,
 		"message": "导出工具成功",

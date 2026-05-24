@@ -12,11 +12,23 @@ import (
 )
 
 func GetAdminAllDataHandler(c *gin.Context) {
-	tools := service.GetAllTool()
-	categories := service.GetAllCategories()
+	tools, err := service.GetAllTool()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "errorMessage": err.Error()})
+		return
+	}
+	categories, err := service.GetAllCategories()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "errorMessage": err.Error()})
+		return
+	}
+	tokens, err := service.GetApiTokens()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "errorMessage": err.Error()})
+		return
+	}
 	setting := service.GetSetting()
 	siteConfig := service.GetSiteConfig()
-	tokens := service.GetApiTokens()
 	userID, ok := c.Get("uid")
 	if !ok {
 		c.JSON(http.StatusBadRequest, gin.H{

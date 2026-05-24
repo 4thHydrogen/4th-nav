@@ -1,9 +1,9 @@
-import type { Tool } from "../../../types";
+import type { LinkItem } from "../../panel/types";
 
 export interface PreviewSlot {
   type: "tool" | "summary" | "empty";
-  tool?: Tool;
-  tools?: Tool[];
+  item?: LinkItem;
+  items?: LinkItem[];
   count?: number;
 }
 
@@ -16,7 +16,7 @@ export interface PreviewSlot {
  * - Overflow: last slot is a summary showing up to 3 mini icons + "+N" count.
  */
 export function buildFolderPreviewSlots(
-  children: Tool[],
+  children: LinkItem[],
   cols: number,
   rows: number,
 ): PreviewSlot[] {
@@ -34,7 +34,7 @@ export function buildFolderPreviewSlots(
 
   // No overflow: all children fit
   if (children.length <= maxIcons) {
-    const slots: PreviewSlot[] = children.map((tool) => ({ type: "tool" as const, tool }));
+    const slots: PreviewSlot[] = children.map((item) => ({ type: "tool" as const, item }));
     while (slots.length < maxIcons) {
       slots.push({ type: "empty" });
     }
@@ -45,14 +45,14 @@ export function buildFolderPreviewSlots(
   const regularCount = maxIcons - 1;
   const slots: PreviewSlot[] = children
     .slice(0, regularCount)
-    .map((tool) => ({ type: "tool" as const, tool }));
+    .map((item) => ({ type: "tool" as const, item }));
 
   const remaining = children.slice(regularCount);
   const extraCount = Math.max(0, remaining.length - 3);
 
   slots.push({
     type: "summary",
-    tools: remaining,
+    items: remaining,
     count: extraCount,
   });
 

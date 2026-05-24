@@ -2,8 +2,11 @@ import { useCallback, useMemo } from "react";
 import { DndContext, closestCenter } from "@dnd-kit/core";
 import type { Tool } from "../../types";
 import type { GridLayoutConfig } from "../../pages/home/useHomeLayoutVars";
+import type { PanelItem, FolderItem, LinkItem } from "../../entities/panel/types";
+import { isFolderItem } from "../../entities/panel/types";
 import { useFloatingPanel } from "../../shared/ui/overlay/useFloatingPanel";
 import { gridToPixels, type GridLayout, useGridLayout } from "./useGridLayout";
+import { usePersistGridLayout } from "./usePersistGridLayout";
 import { useGridDrag } from "./useGridDrag";
 import { usePanelGridModel } from "./usePanelGridModel";
 import { PanelGridCanvas, type PanelGridItemStyle } from "./PanelGridCanvas";
@@ -16,8 +19,8 @@ interface PanelGridProps {
   noImageMode: boolean;
   listItemSize: number;
   layoutConfig?: GridLayoutConfig;
-  onToolClick: (tool: Tool) => void;
-  onToolContextMenu: (e: React.MouseEvent, tool: Tool) => void;
+  onItemClick: (item: PanelItem) => void;
+  onItemContextMenu: (e: React.MouseEvent, item: PanelItem) => void;
   onMoveToFolder: (toolId: number, folderId: number) => void;
   onMoveOutOfFolder: (toolId: number) => void;
   onMergeToFolder: (
@@ -34,16 +37,17 @@ export default function PanelGrid({
   noImageMode,
   listItemSize,
   layoutConfig,
-  onToolClick,
-  onToolContextMenu,
+  onItemClick,
+  onItemContextMenu,
   onMoveToFolder,
   onMoveOutOfFolder,
   onMergeToFolder,
 }: PanelGridProps) {
+  const { panelItems, itemsMap } = usePanelGridModel(tools, allTools);
+
   const {
     layout,
     setLayout,
-    updateLayout,
     wrapperRef,
     gridRef,
     width,
@@ -52,27 +56,32 @@ export default function PanelGrid({
     cellWidth,
     rowHeight,
     margin,
-  } = useGridLayout(tools, layoutConfig);
+  } = useGridLayout(panelItems, layoutConfig);
+
+  const isClampMode = useMemo(() => {
+    const maxOriginalGridX = panelItems.reduce(
+      (maxValue, item) => Math.max(maxValue, item.gridX >= 0 ? item.gridX : -1),
+      -1
+    );
+    return maxOriginalGridX >= 0 && maxOriginalGridX >= cols;
+  }, [panelItems, cols]);
+
+  usePersistGridLayout(layout, !isClampMode);
+
+  const layoutMap = useMemo(() => {
+    const map = new Map<string, GridLayout>();
+    layout.forEach((item) => map.set(item.i, item));
+    return map;
+  }, [layout]);
 
   const folderPanel = useFloatingPanel<number>();
-
-  const { toolsMap, folderIds, childrenMap, layoutMap } = usePanelGridModel(tools, allTools, layout);
-
-  /** PanelGridCanvas and ToolDragOverlay still expect Record<number, Tool[]> */
-  const childrenRecord = useMemo(() => {
-    const record: Record<number, Tool[]> = {};
-    childrenMap.forEach((children, id) => {
-      record[id] = children;
-    });
-    return record;
-  }, [childrenMap]);
 
   const {
     sensors,
     activeId,
     altHeld,
     dropTargetId,
-    activeTool,
+    activeItem,
     handleDragStart,
     handleDragMove,
     handleDragEnd,
@@ -81,10 +90,8 @@ export default function PanelGrid({
     gridRef,
     layout,
     setLayout,
-    updateLayout,
     layoutMap,
-    toolsMap,
-    folderIds,
+    itemsMap,
     cols,
     expandedFolderId: folderPanel.state.payload ?? null,
     setExpandedFolderId: (id: number | null) => {
@@ -99,12 +106,12 @@ export default function PanelGrid({
   });
 
   const handleFolderOpen = useCallback(
-    (tool: Tool) => {
-      const folderEl = gridRef.current?.querySelector(`[data-tool-id="${tool.id}"]`);
+    (item: FolderItem) => {
+      const folderEl = gridRef.current?.querySelector(`[data-tool-id="${item.id}"]`);
       if (!folderEl) {
         return;
       }
-      folderPanel.toggle(folderEl.getBoundingClientRect(), tool.id);
+      folderPanel.toggle(folderEl.getBoundingClientRect(), item.id);
     },
     [gridRef, folderPanel.toggle]
   );
@@ -119,11 +126,28 @@ export default function PanelGrid({
 
   const expandedFolderId = folderPanel.state.payload ?? null;
   const expandedFolder =
-    expandedFolderId != null ? toolsMap.get(String(expandedFolderId)) ?? null : null;
-  const expandedChildren =
-    expandedFolderId != null ? childrenMap.get(expandedFolderId) ?? [] : [];
+    expandedFolderId != null
+      ? (() => {
+          const item = itemsMap.get(String(expandedFolderId));
+          return item && isFolderItem(item) ? item : null;
+        })()
+      : null;
   const folderAnchorRect =
     folderPanel.state.phase !== "closed" ? (folderPanel.state.anchorRect as DOMRect) : null;
+
+  const handlePopupChildContextMenu = useCallback(
+    (e: React.MouseEvent, item: LinkItem) => {
+      onItemContextMenu(e, item);
+    },
+    [onItemContextMenu]
+  );
+
+  const handlePopupChildOpen = useCallback(
+    (item: LinkItem) => {
+      onItemClick(item);
+    },
+    [onItemClick]
+  );
 
   return (
     <DndContext
@@ -148,34 +172,33 @@ export default function PanelGrid({
           cellWidth={cellWidth}
           rowHeight={rowHeight}
           margin={margin}
-          tools={tools}
+          items={panelItems}
           activeId={activeId}
           dropTargetId={dropTargetId}
           itemStyles={itemStyles}
-          childrenMap={childrenRecord}
           listItemSize={listItemSize}
-          onToolClick={onToolClick}
-          onToolContextMenu={onToolContextMenu}
+          onItemClick={onItemClick}
+          onItemContextMenu={onItemContextMenu}
           onFolderOpen={handleFolderOpen}
           folderPopup={{
             isOpen: folderPanel.isOpen,
             folder: expandedFolder,
-            childrenTools: expandedChildren,
             anchorRect: folderAnchorRect,
             onClose: () => folderPanel.markClosed(),
             onMoveOut: onMoveOutOfFolder,
+            onContextMenu: handlePopupChildContextMenu,
+            onOpenTool: handlePopupChildOpen,
           }}
         />
       </div>
 
       <ToolDragOverlay
         activeId={activeId}
-        activeTool={activeTool ?? null}
+        activeItem={activeItem ?? null}
         itemStyle={activeId ? itemStyles.get(activeId) : undefined}
         cellWidth={cellWidth}
         rowHeight={rowHeight}
         margin={margin}
-        childrenMap={childrenRecord}
         listItemSize={listItemSize}
       />
     </DndContext>

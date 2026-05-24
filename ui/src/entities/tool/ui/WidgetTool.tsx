@@ -1,12 +1,12 @@
 import { useMemo, useRef } from "react";
 import ToolIcon from "../../../shared/ui/ToolIcon";
-import type { Tool } from "../../../types";
+import type { LinkItem } from "../../panel/types";
 import { getJumpTarget } from "../../../utils/setting";
 import "./widget-tool.css";
 
 interface WidgetToolProps {
-  tool: Tool;
-  onContextMenu: (e: React.MouseEvent, tool: Tool) => void;
+  item: LinkItem;
+  onContextMenu: (e: React.MouseEvent, item: LinkItem) => void;
   onClick: () => void;
   compact?: boolean;
   hideLabel?: boolean;
@@ -21,23 +21,23 @@ export const parseSize = (size: string): [number, number] => {
   return [1, 1];
 };
 
-const WidgetTool = ({ tool, onContextMenu, onClick, compact = false, hideLabel = false, layout = "grid" }: WidgetToolProps) => {
-  const [w, h] = parseSize(tool.size);
+const WidgetTool = ({ item, onContextMenu, onClick, compact = false, hideLabel = false, layout = "grid" }: WidgetToolProps) => {
+  const [w, h] = parseSize(item.size);
   const isLarge = !compact && (w > 1 || h > 1);
   const mouseDownPos = useRef<{ x: number; y: number } | null>(null);
 
   const iconEl = useMemo(
     () => (
       <ToolIcon
-        logo={tool.logo}
-        name={tool.name}
-        toolUrl={tool.url}
+        logo={item.logo}
+        name={item.name}
+        toolUrl={item.url}
         className="widget-tool-svg"
         fill
         dimWhileLoading
       />
     ),
-    [tool.logo, tool.name, tool.url]
+    [item.logo, item.name, item.url]
   );
 
   const modeClass = compact
@@ -48,28 +48,28 @@ const WidgetTool = ({ tool, onContextMenu, onClick, compact = false, hideLabel =
   if (compact && layout === "list") {
     return (
       <a
-        href={tool.url}
+        href={item.url}
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
           onClick();
         }}
         onMouseDown={(e) => e.stopPropagation()}
-        onContextMenu={(e) => { e.stopPropagation(); onContextMenu(e, tool); }}
+        onContextMenu={(e) => { e.stopPropagation(); onContextMenu(e, item); }}
         onDragStart={(e) => e.preventDefault()}
         draggable={false}
         className={`widget-tool ${modeClass}`}
-        title={tool.name}
+        title={item.name}
       >
         <div className="widget-tool-icon">{iconEl}</div>
-        <div className="widget-tool-label" title={tool.name}>{tool.name}</div>
+        <div className="widget-tool-label" title={item.name}>{item.name}</div>
       </a>
     );
   }
 
   return (
     <a
-      href={tool.url}
+      href={item.url}
       onMouseDown={(e) => { e.stopPropagation(); mouseDownPos.current = { x: e.clientX, y: e.clientY }; }}
       onClick={(e) => {
         e.stopPropagation();
@@ -83,7 +83,7 @@ const WidgetTool = ({ tool, onContextMenu, onClick, compact = false, hideLabel =
         }
         onClick();
       }}
-      onContextMenu={(e) => { e.stopPropagation(); onContextMenu(e, tool); }}
+      onContextMenu={(e) => { e.stopPropagation(); onContextMenu(e, item); }}
       onDragStart={(e) => e.preventDefault()}
       draggable={false}
       target={getJumpTarget() === "blank" ? "_blank" : "_self"}
@@ -92,13 +92,13 @@ const WidgetTool = ({ tool, onContextMenu, onClick, compact = false, hideLabel =
     >
       <div className="widget-tool-icon">{iconEl}</div>
       {!compact && !hideLabel && (
-        <div className="widget-tool-label" title={tool.name}>
-          {tool.name}
+        <div className="widget-tool-label" title={item.name}>
+          {item.name}
         </div>
       )}
-      {isLarge && tool.description && (
-        <div className="widget-tool-desc" title={tool.description}>
-          {tool.description}
+      {isLarge && item.description && (
+        <div className="widget-tool-desc" title={item.description}>
+          {item.description}
         </div>
       )}
     </a>

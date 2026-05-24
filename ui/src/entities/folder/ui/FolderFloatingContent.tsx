@@ -1,14 +1,14 @@
 import WidgetTool from "../../tool/ui/WidgetTool";
-import type { Tool } from "../../../types";
+import type { LinkItem } from "../../panel/types";
 
 interface FolderFloatingContentProps {
   viewMode: "grid" | "list";
-  children: Tool[];
+  children: LinkItem[];
   draggingToolId: number | null;
   listItemSize: number;
   onPointerDown: (toolId: number, event: React.PointerEvent) => void;
-  onContextMenu: (event: React.MouseEvent, tool: Tool) => void;
-  onToolClick: (tool: Tool) => void;
+  onContextMenu: (event: React.MouseEvent, item: LinkItem) => void;
+  onToolClick: (item: LinkItem) => void;
 }
 
 export function FolderFloatingContent({
@@ -33,7 +33,7 @@ export function FolderFloatingContent({
             onPointerDown={(event) => onPointerDown(item.id, event)}
           >
             <WidgetTool
-              tool={item}
+              item={item}
               compact
               layout="list"
               onContextMenu={(event) => onContextMenu(event, item)}
@@ -54,7 +54,7 @@ export function FolderFloatingContent({
           onPointerDown={(event) => onPointerDown(item.id, event)}
         >
           <WidgetTool
-            tool={item}
+            item={item}
             onContextMenu={(event) => onContextMenu(event, item)}
             onClick={() => onToolClick(item)}
           />

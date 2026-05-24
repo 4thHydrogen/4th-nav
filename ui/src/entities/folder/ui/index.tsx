@@ -1,25 +1,23 @@
 import { useRef } from "react";
 import { Folder } from "lucide-react";
 import "./index.css";
-import type { Tool } from "../../../types";
+import type { FolderItem, LinkItem } from "../../panel/types";
 import { parseSize } from "../../tool/ui/WidgetTool";
 import { FolderGridPreview } from "./FolderGridPreview";
 import { FolderListPreview } from "./FolderListPreview";
 import { FolderOpenButton } from "./FolderOpenButton";
 
 interface WidgetFolderProps {
-  folder: Tool;
-  childrenTools: Tool[];
+  folder: FolderItem;
   listItemSize: number;
   onOpen: () => void;
-  onOpenChild: (tool: Tool) => void;
-  onContextMenu: (e: React.MouseEvent, tool: Tool) => void;
+  onOpenChild: (item: LinkItem) => void;
+  onContextMenu: (e: React.MouseEvent, item: LinkItem) => void;
 }
 
-const WidgetFolder = ({ folder, childrenTools, listItemSize, onOpen, onOpenChild, onContextMenu }: WidgetFolderProps) => {
-
+const WidgetFolder = ({ folder, listItemSize, onOpen, onOpenChild, onContextMenu }: WidgetFolderProps) => {
   const [w, h] = parseSize(folder.size);
-  const isEmpty = childrenTools.length === 0;
+  const isEmpty = folder.children.length === 0;
   const mouseDownPos = useRef<{ x: number; y: number } | null>(null);
 
   const folderTint = folder.folderTint || undefined;
@@ -33,7 +31,7 @@ const WidgetFolder = ({ folder, childrenTools, listItemSize, onOpen, onOpenChild
         onMouseDown={(e) => {
           if (e.button === 1) {
             e.preventDefault();
-            childrenTools.forEach((child) => {
+            folder.children.forEach((child) => {
               if (child.url) window.open(child.url, "_blank", "noopener,noreferrer");
             });
             return;
@@ -50,7 +48,7 @@ const WidgetFolder = ({ folder, childrenTools, listItemSize, onOpen, onOpenChild
           onOpen();
         }}
         onAuxClick={(e) => { if (e.button === 1) e.preventDefault(); }}
-        onContextMenu={(e) => onContextMenu(e, folder)}
+        onContextMenu={(e) => e.stopPropagation()}
       >
         {isEmpty ? (
           <div className="widget-folder-empty">
@@ -58,7 +56,7 @@ const WidgetFolder = ({ folder, childrenTools, listItemSize, onOpen, onOpenChild
           </div>
         ) : isListMode ? (
           <FolderListPreview
-            childrenTools={childrenTools}
+            children={folder.children}
             itemSize={listItemSize}
             maxRows={h}
             onOpenChild={onOpenChild}
@@ -66,7 +64,7 @@ const WidgetFolder = ({ folder, childrenTools, listItemSize, onOpen, onOpenChild
           />
         ) : (
           <FolderGridPreview
-            childrenTools={childrenTools}
+            children={folder.children}
             cols={w}
             rows={h}
             onOpenChild={onOpenChild}

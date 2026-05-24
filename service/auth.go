@@ -6,22 +6,16 @@ import (
 	"github.com/4thHydrogen/4th-nav/utils"
 )
 
-func GetApiTokens() []types.Token {
-	results, err := repository.GetActiveAPITokens()
-	utils.CheckErr(err)
-	return results
+func GetApiTokens() ([]types.Token, error) {
+	return repository.GetActiveAPITokens()
 }
 
-func HasApiToken(token string) bool {
-	exists, err := repository.ExistsActiveAPIToken(token)
-	utils.CheckErr(err)
-	return exists
+func HasApiToken(token string) (bool, error) {
+	return repository.ExistsActiveAPIToken(token)
 }
 
-func GetUser(name string) types.User {
-	user, err := repository.GetUserByName(name)
-	utils.CheckErr(err)
-	return user
+func GetUser(name string) (types.User, error) {
+	return repository.GetUserByName(name)
 }
 
 func AddApiTokenInDB(data types.Token) error {

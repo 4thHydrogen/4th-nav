@@ -1,32 +1,34 @@
 import { DragOverlay } from "@dnd-kit/core";
 import WidgetFolder from "../../entities/folder/ui";
 import WidgetTool from "../../entities/tool/ui/WidgetTool";
-import type { Tool } from "../../types";
+import type { PanelItem, LinkItem } from "../../entities/panel/types";
+import { isFolderItem } from "../../entities/panel/types";
 
 interface ToolDragOverlayProps {
   activeId: string | null;
-  activeTool: Tool | null;
+  activeItem: PanelItem | null;
   itemStyle?: { width: number; height: number };
   cellWidth: number;
   rowHeight: number;
   margin: readonly [number, number];
-  childrenMap: Record<number, Tool[]>;
   listItemSize: number;
 }
 
 export function ToolDragOverlay({
   activeId,
-  activeTool,
+  activeItem,
   itemStyle,
   cellWidth,
   rowHeight,
   margin,
-  childrenMap,
   listItemSize,
 }: ToolDragOverlayProps) {
+  const handleChildContextMenu = (e: React.MouseEvent, item: LinkItem) => {};
+  const handleChildOpen = (item: LinkItem) => {};
+
   return (
     <DragOverlay dropAnimation={null}>
-      {activeId && activeTool ? (
+      {activeId && activeItem ? (
         <div
           className="widget-grid-drag-overlay"
           style={{
@@ -38,17 +40,16 @@ export function ToolDragOverlay({
             "--cell-gap-y": `${margin[1]}px`,
           } as React.CSSProperties}
         >
-          {activeTool.type === "folder" ? (
+          {isFolderItem(activeItem) ? (
             <WidgetFolder
-              folder={activeTool}
-              childrenTools={childrenMap[activeTool.id] ?? []}
+              folder={activeItem}
               listItemSize={listItemSize}
               onOpen={() => {}}
-              onOpenChild={() => {}}
-              onContextMenu={() => {}}
+              onOpenChild={handleChildOpen}
+              onContextMenu={handleChildContextMenu}
             />
           ) : (
-            <WidgetTool tool={activeTool} onContextMenu={() => {}} onClick={() => {}} />
+            <WidgetTool item={activeItem} onContextMenu={() => {}} onClick={() => {}} />
           )}
         </div>
       ) : null}

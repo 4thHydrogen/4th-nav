@@ -29,7 +29,11 @@ func JWTMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		if service.HasApiToken(rawToken) {
+		if ok, err := service.HasApiToken(rawToken); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"success": false, "errorMessage": "token verification failed"})
+			c.Abort()
+			return
+		} else if ok {
 			c.Set("username", "apiToken")
 			c.Set("uid", 1)
 			c.Next()

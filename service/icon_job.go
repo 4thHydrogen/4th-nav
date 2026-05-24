@@ -63,7 +63,10 @@ func RefreshMissingIcons() error {
 	iconJobStatus = IconJobStatus{Running: true}
 	iconJobMu.Unlock()
 
-	tools := GetAllTool()
+	tools, err := GetAllTool()
+	if err != nil {
+		return fmt.Errorf("failed to get tools: %w", err)
+	}
 	var targets []types.Tool
 	for _, t := range tools {
 		if t.Type == "folder" || t.Url == "" || t.Url == "admin" {
@@ -91,7 +94,10 @@ func RefreshAllIcons(force bool, clearCache bool) error {
 	if clearCache {
 		ClearIconCache("cache-only")
 	}
-	tools := GetAllTool()
+	tools, err := GetAllTool()
+	if err != nil {
+		return fmt.Errorf("failed to get tools: %w", err)
+	}
 	var targets []types.Tool
 	for _, t := range tools {
 		if t.Type == "folder" || t.Url == "" || t.Url == "admin" {

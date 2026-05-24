@@ -19,7 +19,11 @@ func LoginHandler(c *gin.Context) {
 		})
 		return
 	}
-	user := service.GetUser(data.Name)
+	user, err := service.GetUser(data.Name)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "errorMessage": err.Error()})
+		return
+	}
 	if user.Name == "" {
 		c.JSON(200, gin.H{
 			"success":      false,

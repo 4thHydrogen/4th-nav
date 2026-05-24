@@ -3,19 +3,14 @@ package service
 import (
 	"github.com/4thHydrogen/4th-nav/repository"
 	"github.com/4thHydrogen/4th-nav/types"
-	"github.com/4thHydrogen/4th-nav/utils"
 )
 
-func GetAllSearchEngines() []types.SearchEngine {
-	results, err := repository.GetAllSearchEngines()
-	utils.CheckErr(err)
-	return results
+func GetAllSearchEngines() ([]types.SearchEngine, error) {
+	return repository.GetAllSearchEngines()
 }
 
-func GetEnabledSearchEngines() []types.SearchEngine {
-	results, err := repository.GetEnabledSearchEngines()
-	utils.CheckErr(err)
-	return results
+func GetEnabledSearchEngines() ([]types.SearchEngine, error) {
+	return repository.GetEnabledSearchEngines()
 }
 
 func AddSearchEngine(data types.SearchEngine) (int64, error) {

@@ -4,6 +4,7 @@ import { Loading } from "../../shared/ui/Loading";
 import CategoryFilter from "./CategoryFilter";
 import MobileCategoryMenu from "./MobileCategoryMenu";
 import type { Tool } from "../../types";
+import type { PanelItem } from "../../entities/panel/types";
 import type { GridLayoutConfig } from "../../pages/home/useHomeLayoutVars";
 
 interface HomeWorkspaceProps {
@@ -50,6 +51,13 @@ export function HomeWorkspace({
   onMoveOutOfFolder,
   onMergeToFolder,
 }: HomeWorkspaceProps) {
+  const handleItemContextMenu = (event: React.MouseEvent, item: PanelItem) => {
+    const tool = allTools.find((t) => t.id === item.id);
+    if (tool) {
+      onContextMenu(event, tool);
+    }
+  };
+
   return (
     <>
       {!isSearching && (
@@ -90,8 +98,8 @@ export function HomeWorkspace({
               noImageMode={noImageMode}
               listItemSize={listItemSize}
               layoutConfig={layoutConfig}
-              onToolClick={() => onResetSearch()}
-              onToolContextMenu={onContextMenu}
+              onItemClick={() => onResetSearch()}
+              onItemContextMenu={handleItemContextMenu}
               onMoveToFolder={onMoveToFolder}
               onMoveOutOfFolder={onMoveOutOfFolder}
               onMergeToFolder={onMergeToFolder}

@@ -17,7 +17,10 @@ func AddCategory(data types.AddCategoryDto) error {
 		return nil
 	}
 
-	existingCategories := GetAllCategories()
+	existingCategories, err := GetAllCategories()
+	if err != nil {
+		return err
+	}
 	names := make([]string, 0, len(existingCategories))
 	for _, category := range existingCategories {
 		names = append(names, category.Name)
@@ -33,8 +36,6 @@ func DeleteCategory(id int) error {
 	return repository.DeleteCategory(id)
 }
 
-func GetAllCategories() []types.Category {
-	results, err := repository.GetAllCategories()
-	utils.CheckErr(err)
-	return results
+func GetAllCategories() ([]types.Category, error) {
+	return repository.GetAllCategories()
 }

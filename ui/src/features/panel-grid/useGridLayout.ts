@@ -1,6 +1,4 @@
-import { useMemo, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import type { LayoutItemDto, Tool } from "../../types";
-import { fetchUpdateLayout } from "../../shared/api/tool";
+import { useMemo, useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
   buildLayout,
   compactLayout,
@@ -10,18 +8,19 @@ import {
 } from "../../features/grid-layout/model/layout";
 import { gridToPixels, pixelsToGrid } from "../../features/grid-layout/model/geometry";
 import type { GridLayout } from "../../features/grid-layout/model/collision";
+import type { PanelItem } from "../../entities/panel/types";
 
 export type { GridLayout };
 export type { LayoutSourceItem };
 export { buildLayout, compactLayout, moveItem, resizeLayoutItem, gridToPixels, pixelsToGrid };
 
-function toLayoutSourceItems(tools: Tool[]): LayoutSourceItem[] {
-  return tools.map((tool) => ({
-    id: String(tool.id),
-    sort: tool.sort,
-    size: tool.size,
-    gridX: tool.gridX,
-    gridY: tool.gridY,
+function toLayoutSourceItems(items: PanelItem[]): LayoutSourceItem[] {
+  return items.map((item) => ({
+    id: String(item.id),
+    sort: item.sort,
+    size: item.size,
+    gridX: item.gridX,
+    gridY: item.gridY,
   }));
 }
 
@@ -58,7 +57,7 @@ export function useContainerWidth() {
 }
 
 export function useGridLayout(
-  tools: Tool[],
+  items: PanelItem[],
   config?: { rowHeight: number; margin: [number, number] }
 ) {
   const { wrapperRef, gridRef, width } = useContainerWidth();
@@ -67,39 +66,39 @@ export function useGridLayout(
   const rowHeight = config?.rowHeight ?? ROW_HEIGHT;
   const margin: [number, number] = config?.margin ?? [...MARGIN] as [number, number];
 
-  const prevToolsRef = useRef<Tool[]>([]);
+  const prevItemsRef = useRef<PanelItem[]>([]);
   const currentLayoutRef = useRef<GridLayout[]>([]);
 
   const initialLayout = useMemo(() => {
     if (width <= 0) return [];
 
-    const prev = prevToolsRef.current;
-    if (prev.length === tools.length && prev.length > 0 && currentLayoutRef.current.length > 0) {
+    const prev = prevItemsRef.current;
+    if (prev.length === items.length && prev.length > 0 && currentLayoutRef.current.length > 0) {
       let changedId: string | null = null;
       let changedW = 0;
       let changedH = 0;
       let onlySizeChange = true;
 
-      const prevMap = new Map(prev.map((tool) => [tool.id, tool]));
-      for (const tool of tools) {
-        const previous = prevMap.get(tool.id);
+      const prevMap = new Map(prev.map((item) => [item.id, item]));
+      for (const item of items) {
+        const previous = prevMap.get(item.id);
         if (!previous) {
           onlySizeChange = false;
           break;
         }
-        if (previous.size !== tool.size) {
+        if (previous.size !== item.size) {
           if (changedId !== null) {
             onlySizeChange = false;
             break;
           }
-          changedId = String(tool.id);
-          [changedW, changedH] = tool.size.split("x").map(Number) as [number, number];
+          changedId = String(item.id);
+          [changedW, changedH] = item.size.split("x").map(Number) as [number, number];
         }
         if (
-          previous.gridX !== tool.gridX ||
-          previous.gridY !== tool.gridY ||
-          previous.sort !== tool.sort ||
-          previous.type !== tool.type
+          previous.gridX !== item.gridX ||
+          previous.gridY !== item.gridY ||
+          previous.sort !== item.sort ||
+          previous.kind !== item.kind
         ) {
           onlySizeChange = false;
           break;
@@ -111,9 +110,9 @@ export function useGridLayout(
       }
     }
 
-    prevToolsRef.current = tools;
-    return buildLayout(toLayoutSourceItems(tools), cols);
-  }, [tools, cols, width]);
+    prevItemsRef.current = items;
+    return buildLayout(toLayoutSourceItems(items), cols);
+  }, [items, cols, width]);
 
   const [layout, setLayout] = useState<GridLayout[]>([]);
   currentLayoutRef.current = layout;
@@ -121,51 +120,12 @@ export function useGridLayout(
   const prevLayoutKeyRef = useRef("");
 
   useLayoutEffect(() => {
-    prevToolsRef.current = tools;
+    prevItemsRef.current = items;
     const key = initialLayout.map((item) => `${item.i}:${item.x},${item.y},${item.w},${item.h}`).join("|");
     if (key === prevLayoutKeyRef.current) return;
     prevLayoutKeyRef.current = key;
     setLayout(initialLayout);
-  }, [initialLayout, tools]);
-
-  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const lastSaved = useRef("");
-
-  const saveLayout = useCallback((items: GridLayout[]) => {
-    const snapshot = JSON.stringify(items);
-    if (snapshot === lastSaved.current) return;
-    lastSaved.current = snapshot;
-
-    if (saveTimer.current) clearTimeout(saveTimer.current);
-    saveTimer.current = setTimeout(() => {
-      const dto: LayoutItemDto[] = items.map((item) => ({
-        id: Number(item.i),
-        gridX: item.x,
-        gridY: item.y,
-        w: item.w,
-        h: item.h,
-      }));
-      fetchUpdateLayout(dto).catch((err) => {
-        console.error("Failed to save layout:", err);
-      });
-    }, 500);
-  }, []);
-
-  const isClampMode = useMemo(() => {
-    const maxOriginalGridX = tools.reduce(
-      (maxValue, tool) => Math.max(maxValue, tool.gridX >= 0 ? tool.gridX : -1),
-      -1
-    );
-    return maxOriginalGridX >= 0 && maxOriginalGridX >= cols;
-  }, [tools, cols]);
-
-  const updateLayout = useCallback(
-    (next: GridLayout[]) => {
-      setLayout(next);
-      if (!isClampMode) saveLayout(next);
-    },
-    [saveLayout, isClampMode]
-  );
+  }, [initialLayout, items]);
 
   const cellWidth = cols > 0 ? (width - (cols - 1) * margin[0]) / cols : 0;
   const totalHeight = useMemo(() => {
@@ -177,7 +137,6 @@ export function useGridLayout(
   return {
     layout,
     setLayout,
-    updateLayout,
     wrapperRef,
     gridRef,
     width,
@@ -185,7 +144,6 @@ export function useGridLayout(
     totalHeight,
     cellWidth,
     isReady: width > 0,
-    isClampMode,
     rowHeight,
     margin,
   };

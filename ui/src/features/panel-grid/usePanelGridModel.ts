@@ -1,27 +1,19 @@
 import { useMemo } from "react";
 import type { Tool } from "../../types";
-import type { GridLayout } from "../grid-layout/model/collision";
-import { buildChildrenMap } from "../../entities/panel/adapter";
+import type { PanelItem } from "../../entities/panel/types";
+import { adaptPanelItems } from "../../entities/panel/adapter";
 
-export function usePanelGridModel(tools: Tool[], allTools: Tool[], layout: GridLayout[]) {
-  const toolsMap = useMemo(() => {
-    const map = new Map<string, Tool>();
-    tools.forEach((tool) => map.set(String(tool.id), tool));
-    return map;
-  }, [tools]);
-
-  const folderIds = useMemo(
-    () => new Set(tools.filter((tool) => tool.type === "folder").map((tool) => String(tool.id))),
-    [tools]
+export function usePanelGridModel(tools: Tool[], allTools: Tool[]) {
+  const panelItems = useMemo(
+    () => adaptPanelItems(tools, allTools),
+    [tools, allTools]
   );
 
-  const childrenMap = useMemo(() => buildChildrenMap(allTools), [allTools]);
-
-  const layoutMap = useMemo(() => {
-    const map = new Map<string, GridLayout>();
-    layout.forEach((item) => map.set(item.i, item));
+  const itemsMap = useMemo(() => {
+    const map = new Map<string, PanelItem>();
+    panelItems.forEach((item) => map.set(String(item.id), item));
     return map;
-  }, [layout]);
+  }, [panelItems]);
 
-  return { toolsMap, folderIds, childrenMap, layoutMap };
+  return { panelItems, itemsMap };
 }

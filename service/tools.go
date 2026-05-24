@@ -11,23 +11,25 @@ import (
 	"github.com/4thHydrogen/4th-nav/utils"
 )
 
-// Note: utils is still used by GetAllTool, GetToolLogoUrlById (read-only functions not changed in this pass)
-
 func ImportTools(data []types.Tool) error {
 	var categories []string
 	for _, v := range data {
 		if v.Category != "" && strings.TrimSpace(v.Category) != "" && !utils.In(v.Category, categories) {
 			categories = append(categories, v.Category)
 		}
-		if err := repository.ImportTool(v); err != nil {
-			return err
-		}
 	}
+
+	if err := repository.ImportToolsTx(data); err != nil {
+		return fmt.Errorf("import tools transaction: %w", err)
+	}
+
 	for _, category := range categories {
 		dto := types.AddCategoryDto{Name: category}
-		// TODO: handle AddCategory error
-		AddCategory(dto)
+		if err := AddCategory(dto); err != nil {
+			logger.LogError("failed to add category during import: %v", err)
+		}
 	}
+
 	go func(data []types.Tool) {
 		sem := make(chan struct{}, 4)
 		var wg sync.WaitGroup
@@ -70,7 +72,7 @@ func AddTool(data types.AddToolDto) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
-	logger.LogInfo("鏂板宸ュ叿: %s", data.Name)
+	logger.LogInfo("新增工具: %s", data.Name)
 
 	if data.Logo != "" {
 		UpdateImg(data.Logo)
@@ -79,16 +81,12 @@ func AddTool(data types.AddToolDto) (int64, error) {
 	return id, nil
 }
 
-func GetAllTool() []types.Tool {
-	results, err := repository.GetAllTools()
-	utils.CheckErr(err)
-	return results
+func GetAllTool() ([]types.Tool, error) {
+	return repository.GetAllTools()
 }
 
-func GetToolLogoUrlById(id int) string {
-	logo, err := repository.GetToolLogoURLByID(id)
-	utils.CheckErr(err)
-	return logo
+func GetToolLogoUrlById(id int) (string, error) {
+	return repository.GetToolLogoURLByID(id)
 }
 
 func UpdateToolIcon(id int64, logo string) error {

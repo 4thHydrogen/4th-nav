@@ -7,7 +7,8 @@ import {
   type DragMoveEvent,
   type DragStartEvent,
 } from "@dnd-kit/core";
-import type { Tool } from "../../types";
+import type { PanelItem } from "../../entities/panel/types";
+import { isFolderItem } from "../../entities/panel/types";
 import {
   MARGIN,
   ROW_HEIGHT,
@@ -20,10 +21,8 @@ interface UseGridDragParams {
   gridRef: React.RefObject<HTMLDivElement | null>;
   layout: GridLayout[];
   setLayout: (next: GridLayout[]) => void;
-  updateLayout: (next: GridLayout[]) => void;
   layoutMap: Map<string, GridLayout>;
-  toolsMap: Map<string, Tool>;
-  folderIds: Set<string>;
+  itemsMap: Map<string, PanelItem>;
   cols: number;
   expandedFolderId: number | null;
   setExpandedFolderId: (id: number | null) => void;
@@ -43,7 +42,7 @@ export interface GridDragResult {
   activeId: string | null;
   altHeld: boolean;
   dropTargetId: string | null;
-  activeTool: Tool | null;
+  activeItem: PanelItem | null;
   handleDragStart: (event: DragStartEvent) => void;
   handleDragMove: (event: DragMoveEvent) => void;
   handleDragEnd: (event: DragEndEvent) => void;
@@ -64,30 +63,28 @@ function hasLayoutChanged(next: GridLayout[], current: GridLayout[]) {
 function resetDragState(
   setActiveId: (id: string | null) => void,
   setDropTargetId: (id: string | null) => void,
-  activeToolRef: React.MutableRefObject<Tool | null>,
+  activeItemRef: React.MutableRefObject<PanelItem | null>,
   originLayoutRef: React.MutableRefObject<GridLayout[]>
 ) {
   setActiveId(null);
   setDropTargetId(null);
-  activeToolRef.current = null;
+  activeItemRef.current = null;
   originLayoutRef.current = [];
 }
 
 function resolveDropAction({
-  activeTool,
+  activeItem,
   activeId,
   dropTargetId,
-  toolsMap,
-  folderIds,
+  itemsMap,
   layoutMap,
   onMoveToFolder,
   onMergeToFolder,
 }: {
-  activeTool: Tool | null;
+  activeItem: PanelItem | null;
   activeId: string;
   dropTargetId: string | null;
-  toolsMap: Map<string, Tool>;
-  folderIds: Set<string>;
+  itemsMap: Map<string, PanelItem>;
   layoutMap: Map<string, GridLayout>;
   onMoveToFolder: (toolId: number, folderId: number) => void;
   onMergeToFolder: (
@@ -97,26 +94,26 @@ function resolveDropAction({
     pos2: { x: number; y: number }
   ) => void;
 }) {
-  if (!activeTool || !dropTargetId) {
+  if (!activeItem || !dropTargetId) {
     return false;
   }
 
-  const targetTool = toolsMap.get(dropTargetId);
-  if (!targetTool) {
+  const targetItem = itemsMap.get(dropTargetId);
+  if (!targetItem) {
     return false;
   }
 
-  if (targetTool.type === "folder" && activeTool.type !== "folder") {
-    onMoveToFolder(activeTool.id, targetTool.id);
+  if (isFolderItem(targetItem) && !isFolderItem(activeItem)) {
+    onMoveToFolder(activeItem.id, targetItem.id);
     return true;
   }
 
-  if (!folderIds.has(activeId) && targetTool.type !== "folder") {
+  if (!isFolderItem(activeItem) && !isFolderItem(targetItem)) {
     const sourceLayout = layoutMap.get(activeId);
     const targetLayout = layoutMap.get(dropTargetId);
     onMergeToFolder(
-      activeTool.id,
-      targetTool.id,
+      activeItem.id,
+      targetItem.id,
       { x: sourceLayout?.x ?? 0, y: sourceLayout?.y ?? 0 },
       { x: targetLayout?.x ?? 0, y: targetLayout?.y ?? 0 }
     );
@@ -130,10 +127,8 @@ export function useGridDrag({
   gridRef,
   layout,
   setLayout,
-  updateLayout,
   layoutMap,
-  toolsMap,
-  folderIds,
+  itemsMap,
   cols,
   expandedFolderId,
   setExpandedFolderId,
@@ -146,7 +141,7 @@ export function useGridDrag({
   const [altHeld, setAltHeld] = useState(false);
   const [dropTargetId, setDropTargetId] = useState<string | null>(null);
   const altRef = useRef(false);
-  const activeToolRef = useRef<Tool | null>(null);
+  const activeItemRef = useRef<PanelItem | null>(null);
   const layoutRef = useRef(layout);
   const originLayoutRef = useRef<GridLayout[]>([]);
 
@@ -200,10 +195,10 @@ export function useGridDrag({
       const id = String(event.active.id);
       setActiveId(id);
       setDropTargetId(null);
-      activeToolRef.current = toolsMap.get(id) ?? null;
+      activeItemRef.current = itemsMap.get(id) ?? null;
       originLayoutRef.current = cloneLayout(layoutRef.current);
     },
-    [toolsMap]
+    [itemsMap]
   );
 
   const handleDragMove = useCallback(
@@ -251,35 +246,33 @@ export function useGridDrag({
       const handledAsFolderAction =
         altRef.current &&
         resolveDropAction({
-          activeTool: activeToolRef.current,
+          activeItem: activeItemRef.current,
           activeId: id,
           dropTargetId,
-          toolsMap,
-          folderIds,
+          itemsMap,
           layoutMap,
           onMoveToFolder,
           onMergeToFolder,
         });
 
       if (!handledAsFolderAction) {
-        updateLayout(layoutRef.current);
+        setLayout(layoutRef.current);
       }
 
       resetDragState(
         setActiveId,
         setDropTargetId,
-        activeToolRef,
+        activeItemRef,
         originLayoutRef
       );
     },
     [
       dropTargetId,
-      folderIds,
       layoutMap,
       onMergeToFolder,
       onMoveToFolder,
-      toolsMap,
-      updateLayout,
+      itemsMap,
+      setLayout,
     ]
   );
 
@@ -287,19 +280,19 @@ export function useGridDrag({
     resetDragState(
       setActiveId,
       setDropTargetId,
-      activeToolRef,
+      activeItemRef,
       originLayoutRef
     );
   }, []);
 
-  const activeTool = activeId ? toolsMap.get(activeId) ?? null : null;
+  const activeItem = activeId ? itemsMap.get(activeId) ?? null : null;
 
   return {
     sensors,
     activeId,
     altHeld,
     dropTargetId,
-    activeTool,
+    activeItem,
     handleDragStart,
     handleDragMove,
     handleDragEnd,

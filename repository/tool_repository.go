@@ -299,6 +299,51 @@ func ImportTool(data types.Tool) error {
 	return err
 }
 
+func ImportToolsTx(tools []types.Tool) error {
+	tx, err := database.DB.Begin()
+	if err != nil {
+		return err
+	}
+
+	stmt, err := tx.Prepare(`
+		INSERT INTO nav_table (id, name, category, url, logo, description, sort, hide, view_mode, type, parent_id, size, folder_tint, grid_x, grid_y, folder_view_mode, folder_item_size)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+	`)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	defer stmt.Close()
+
+	for _, data := range tools {
+		_, err = stmt.Exec(
+			data.Id,
+			data.Name,
+			data.Category,
+			data.Url,
+			data.Logo,
+			data.Description,
+			data.Sort,
+			data.Hide,
+			types.NormalizeViewMode(data.ViewMode),
+			types.NormalizeToolType(data.Type),
+			data.ParentId,
+			types.NormalizeToolSize(data.Size),
+			data.FolderTint,
+			types.NormalizeGrid(data.GridX),
+			types.NormalizeGrid(data.GridY),
+			types.NormalizeFolderViewMode(data.FolderViewMode),
+			types.NormalizeFolderItemSize(data.FolderItemSize),
+		)
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("insert tool id %d: %w", data.Id, err)
+		}
+	}
+
+	return tx.Commit()
+}
+
 func UpdateTool(data types.UpdateToolDto) error {
 	_, err := database.DB.Exec(`
 		UPDATE nav_table

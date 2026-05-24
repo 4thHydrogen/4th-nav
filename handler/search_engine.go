@@ -11,9 +11,14 @@ import (
 )
 
 func GetAllSearchEnginesHandler(c *gin.Context) {
+	engines, err := service.GetAllSearchEngines()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "errorMessage": err.Error()})
+		return
+	}
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
-		"data":    service.GetAllSearchEngines(),
+		"data":    engines,
 	})
 }
 

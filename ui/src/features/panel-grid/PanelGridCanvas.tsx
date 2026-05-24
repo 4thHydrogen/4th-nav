@@ -7,7 +7,8 @@ import { motion } from "framer-motion";
 import WidgetFolder from "../../entities/folder/ui";
 import WidgetTool from "../../entities/tool/ui/WidgetTool";
 import { FolderPopupHost } from "../folder-popup/FolderPopupHost";
-import type { Tool } from "../../types";
+import type { PanelItem, LinkItem, FolderItem } from "../../entities/panel/types";
+import { isFolderItem } from "../../entities/panel/types";
 
 export interface PanelGridItemStyle {
   left: number;
@@ -23,27 +24,27 @@ interface PanelGridCanvasProps {
   cellWidth: number;
   rowHeight: number;
   margin: readonly [number, number];
-  tools: Tool[];
+  items: PanelItem[];
   activeId: string | null;
   dropTargetId: string | null;
   itemStyles: Map<string, PanelGridItemStyle>;
-  childrenMap: Record<number, Tool[]>;
   listItemSize: number;
-  onToolClick: (tool: Tool) => void;
-  onToolContextMenu: (e: React.MouseEvent, tool: Tool) => void;
-  onFolderOpen: (tool: Tool) => void;
+  onItemClick: (item: PanelItem) => void;
+  onItemContextMenu: (e: React.MouseEvent, item: PanelItem) => void;
+  onFolderOpen: (item: FolderItem) => void;
   folderPopup: {
     isOpen: boolean;
-    folder: Tool | null;
-    childrenTools: Tool[];
+    folder: FolderItem | null;
     anchorRect: DOMRect | null;
     onClose: () => void;
     onMoveOut: (toolId: number) => void;
+    onContextMenu: (e: React.MouseEvent, item: LinkItem) => void;
+    onOpenTool: (item: LinkItem) => void;
   };
 }
 
 interface DraggableItemProps {
-  tool: Tool;
+  item: PanelItem;
   style: PanelGridItemStyle | undefined;
   isDropTarget: boolean;
   isDragging: boolean;
@@ -56,7 +57,7 @@ interface DraggableItemProps {
 }
 
 function DraggableItem({
-  tool,
+  item,
   style,
   isDropTarget,
   isDragging,
@@ -78,7 +79,7 @@ function DraggableItem({
   return (
     <motion.div
       ref={setRefs}
-      data-grid-id={tool.id}
+      data-grid-id={item.id}
       data-tool-id={dataToolId}
       className={`widget-grid-item${isDragging ? " widget-grid-item-dragging" : ""}${isDropTarget ? " widget-drop-target" : ""}`}
       style={{ position: "absolute" }}
@@ -110,14 +111,13 @@ export function PanelGridCanvas({
   cellWidth,
   rowHeight,
   margin,
-  tools,
+  items,
   activeId,
   dropTargetId,
   itemStyles,
-  childrenMap,
   listItemSize,
-  onToolClick,
-  onToolContextMenu,
+  onItemClick,
+  onItemContextMenu,
   onFolderOpen,
   folderPopup,
 }: PanelGridCanvasProps) {
@@ -138,22 +138,19 @@ export function PanelGridCanvas({
         "--cell-gap-y": `${margin[1]}px`,
       } as React.CSSProperties}
     >
-      {tools.map((tool) => {
-        const key = String(tool.id);
-        const isFolder = tool.type === "folder";
-        const children = isFolder ? childrenMap[tool.id] || [] : [];
+      {items.map((item) => {
+        const key = String(item.id);
 
         return (
           <GridItemHost
             key={key}
-            tool={tool}
+            item={item}
             itemStyle={itemStyles.get(key)}
             isDragging={activeId === key}
             isDropTarget={dropTargetId === key}
-            childrenTools={children}
             listItemSize={listItemSize}
-            onToolClick={onToolClick}
-            onToolContextMenu={onToolContextMenu}
+            onItemClick={onItemClick}
+            onItemContextMenu={onItemContextMenu}
             onFolderOpen={onFolderOpen}
           />
         );
@@ -162,12 +159,11 @@ export function PanelGridCanvas({
       <FolderPopupHost
         isOpen={folderPopup.isOpen}
         folder={folderPopup.folder}
-        childrenTools={folderPopup.childrenTools}
         listItemSize={listItemSize}
         anchorRect={folderPopup.anchorRect}
         onClose={folderPopup.onClose}
-        onOpenTool={onToolClick}
-        onContextMenu={onToolContextMenu}
+        onOpenTool={folderPopup.onOpenTool}
+        onContextMenu={folderPopup.onContextMenu}
         onMoveOut={folderPopup.onMoveOut}
       />
     </div>
@@ -175,57 +171,62 @@ export function PanelGridCanvas({
 }
 
 function GridItemHost({
-  tool,
+  item,
   itemStyle,
   isDragging,
   isDropTarget,
-  childrenTools,
   listItemSize,
-  onToolClick,
-  onToolContextMenu,
+  onItemClick,
+  onItemContextMenu,
   onFolderOpen,
 }: {
-  tool: Tool;
+  item: PanelItem;
   itemStyle: PanelGridItemStyle | undefined;
   isDragging: boolean;
   isDropTarget: boolean;
-  childrenTools: Tool[];
   listItemSize: number;
-  onToolClick: (tool: Tool) => void;
-  onToolContextMenu: (e: React.MouseEvent, tool: Tool) => void;
-  onFolderOpen: (tool: Tool) => void;
+  onItemClick: (item: PanelItem) => void;
+  onItemContextMenu: (e: React.MouseEvent, item: PanelItem) => void;
+  onFolderOpen: (item: FolderItem) => void;
 }) {
   const { attributes, listeners, setNodeRef: setDragRef } = useDraggable({
-    id: String(tool.id),
+    id: String(item.id),
   });
-  const { setNodeRef: setDropRef } = useDroppable({ id: String(tool.id) });
+  const { setNodeRef: setDropRef } = useDroppable({ id: String(item.id) });
+
+  const handleChildContextMenu = (e: React.MouseEvent, child: LinkItem) => {
+    onItemContextMenu(e, child);
+  };
+
+  const handleChildOpen = (child: LinkItem) => {
+    onItemClick(child);
+  };
 
   return (
     <DraggableItem
-      tool={tool}
+      item={item}
       style={itemStyle}
       isDropTarget={isDropTarget}
       isDragging={isDragging}
-      dataToolId={String(tool.id)}
+      dataToolId={String(item.id)}
       setDragRef={setDragRef}
       setDropRef={setDropRef}
       attributes={attributes}
       listeners={listeners}
     >
-      {tool.type === "folder" ? (
+      {isFolderItem(item) ? (
         <WidgetFolder
-          folder={tool}
-          childrenTools={childrenTools}
+          folder={item}
           listItemSize={listItemSize}
-          onOpen={() => onFolderOpen(tool)}
-          onOpenChild={onToolClick}
-          onContextMenu={onToolContextMenu}
+          onOpen={() => onFolderOpen(item)}
+          onOpenChild={handleChildOpen}
+          onContextMenu={handleChildContextMenu}
         />
       ) : (
         <WidgetTool
-          tool={tool}
-          onContextMenu={onToolContextMenu}
-          onClick={() => onToolClick(tool)}
+          item={item}
+          onContextMenu={(e) => onItemContextMenu(e, item)}
+          onClick={() => onItemClick(item)}
         />
       )}
     </DraggableItem>

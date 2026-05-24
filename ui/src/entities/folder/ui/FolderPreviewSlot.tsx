@@ -1,13 +1,13 @@
 import ToolIcon from "../../../shared/ui/ToolIcon";
 import type { PreviewSlot } from "./folderPreview";
-import type { Tool } from "../../../types";
+import type { LinkItem } from "../../panel/types";
 import { useRef } from "react";
 import { getJumpTarget } from "../../../utils/setting";
 
 interface FolderPreviewSlotProps {
   slot: PreviewSlot;
-  onOpenChild: (tool: Tool) => void;
-  onContextMenu: (e: React.MouseEvent, tool: Tool) => void;
+  onOpenChild: (item: LinkItem) => void;
+  onContextMenu: (e: React.MouseEvent, item: LinkItem) => void;
 }
 
 export function FolderPreviewSlot({ slot, onOpenChild, onContextMenu }: FolderPreviewSlotProps) {
@@ -15,11 +15,11 @@ export function FolderPreviewSlot({ slot, onOpenChild, onContextMenu }: FolderPr
     return (
       <div className="widget-folder-overflow">
         <div className="widget-folder-overflow-grid">
-          {slot.tools!.slice(0, 3).map((tool) => (
-            <span key={tool.id} className="widget-folder-overflow-cell">
+          {slot.items!.slice(0, 3).map((item) => (
+            <span key={item.id} className="widget-folder-overflow-cell">
               <ToolIcon
-                logo={tool.logo}
-                name={tool.name}
+                logo={item.logo}
+                name={item.name}
                 fill
                 fallbackFontSize={8}
               />
@@ -38,16 +38,16 @@ export function FolderPreviewSlot({ slot, onOpenChild, onContextMenu }: FolderPr
   }
 
   // tool slot
-  const tool = slot.tool!;
+  const item = slot.item!;
   const mouseDownPos = useRef<{ x: number; y: number } | null>(null);
 
   return (
     <a
       className="widget-folder-child"
-      href={tool.url}
+      href={item.url}
       target={getJumpTarget() === "blank" ? "_blank" : "_self"}
       rel="noreferrer"
-      title={tool.name}
+      title={item.name}
       draggable={false}
       onDragStart={(e) => e.preventDefault()}
       onMouseDown={(e) => {
@@ -65,17 +65,17 @@ export function FolderPreviewSlot({ slot, onOpenChild, onContextMenu }: FolderPr
             return;
           }
         }
-        onOpenChild(tool);
+        onOpenChild(item);
       }}
       onContextMenu={(e) => {
         e.stopPropagation();
-        onContextMenu(e, tool);
+        onContextMenu(e, item);
       }}
     >
       <span className="widget-folder-child-icon">
         <ToolIcon
-          logo={tool.logo}
-          name={tool.name}
+          logo={item.logo}
+          name={item.name}
           fill
           radius={6}
           fallbackFontSize={14}

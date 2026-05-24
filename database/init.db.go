@@ -1,3 +1,10 @@
+// Migration rules (as of 2026-05-24):
+//
+// 1. runColumnUpgrades/runAdditionalColumnUpgrades exist for backward compatibility
+//    with databases created before the migration system was introduced.
+// 2. All new fields, new tables, and schema changes MUST go through runMigrations().
+// 3. Do NOT add new business fields to runColumnUpgrades or runAdditionalColumnUpgrades.
+// 4. Migration files must be idempotent and support stable upgrades from any prior version.
 package database
 
 import (

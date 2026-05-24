@@ -1,26 +1,26 @@
 import { useMemo } from "react";
-import type { Tool } from "../../../types";
+import type { LinkItem } from "../../panel/types";
 import { buildFolderPreviewSlots, previewGridCols, previewGridRows } from "./folderPreview";
 import { FolderPreviewSlot } from "./FolderPreviewSlot";
 
 interface FolderGridPreviewProps {
-  childrenTools: Tool[];
+  children: LinkItem[];
   cols: number;
   rows: number;
-  onOpenChild: (tool: Tool) => void;
-  onContextMenu: (e: React.MouseEvent, tool: Tool) => void;
+  onOpenChild: (item: LinkItem) => void;
+  onContextMenu: (e: React.MouseEvent, item: LinkItem) => void;
 }
 
 export function FolderGridPreview({
-  childrenTools,
+  children,
   cols,
   rows,
   onOpenChild,
   onContextMenu,
 }: FolderGridPreviewProps) {
   const slots = useMemo(
-    () => buildFolderPreviewSlots(childrenTools, cols, rows),
-    [childrenTools, cols, rows],
+    () => buildFolderPreviewSlots(children, cols, rows),
+    [children, cols, rows],
   );
 
   const gridCols = previewGridCols(cols, rows);
@@ -36,7 +36,7 @@ export function FolderGridPreview({
     >
       {slots.map((slot, i) => (
         <FolderPreviewSlot
-          key={slot.tool?.id ?? `slot-${i}`}
+          key={slot.item?.id ?? `slot-${i}`}
           slot={slot}
           onOpenChild={onOpenChild}
           onContextMenu={onContextMenu}

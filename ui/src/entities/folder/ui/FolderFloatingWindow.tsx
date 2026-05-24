@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Folder, LayoutGrid, List, X } from "lucide-react";
 import { motion } from "framer-motion";
-import type { FolderViewMode, Tool } from "../../../types";
 import { useUpdateFolderSettings } from "../../../queries";
 import { getJumpTarget } from "../../../utils/setting";
 import { FloatingPortal } from "../../../shared/ui/overlay/FloatingPortal";
@@ -12,22 +11,22 @@ import {
   getFolderDragHint,
   getFolderViewToggleTitle,
 } from "./folderFloatingWindowUtils";
+import type { FolderItem, LinkItem } from "../../panel/types";
+import type { FolderViewMode } from "../../../types";
 import "./folder-floating-window.css";
 
 interface FolderFloatingWindowProps {
-  folder: Tool;
-  children: Tool[];
+  folder: FolderItem;
   listItemSize: number;
   folderCardRect: DOMRect | null;
   onClose: () => void;
-  onOpenTool: (tool: Tool) => void;
-  onContextMenu: (e: React.MouseEvent, tool: Tool) => void;
+  onOpenTool: (item: LinkItem) => void;
+  onContextMenu: (e: React.MouseEvent, item: LinkItem) => void;
   onMoveOut: (toolId: number) => void;
 }
 
 export default function FolderFloatingWindow({
   folder,
-  children,
   listItemSize,
   folderCardRect,
   onClose,
@@ -71,20 +70,20 @@ export default function FolderFloatingWindow({
   }, [folder.id, updateFolderSettings, viewMode]);
 
   const handleToolClick = useCallback(
-    (tool: Tool) => {
+    (item: LinkItem) => {
       if (didDragRef.current) {
         didDragRef.current = false;
         return;
       }
 
-      if (tool.url) {
+      if (item.url) {
         window.open(
-          tool.url,
+          item.url,
           getJumpTarget() === "blank" ? "_blank" : "_self",
           "noopener,noreferrer"
         );
       }
-      onOpenTool(tool);
+      onOpenTool(item);
     },
     [onOpenTool]
   );
@@ -156,6 +155,8 @@ export default function FolderFloatingWindow({
     [onMoveOut]
   );
 
+  const children = folder.children;
+
   return (
     <FloatingPortal>
       <motion.div
@@ -188,7 +189,7 @@ export default function FolderFloatingWindow({
       >
         <div
           className="folder-floating-header"
-          onContextMenu={(event) => onContextMenu(event, folder)}
+          onContextMenu={(event) => event.stopPropagation()}
         >
           <span className="folder-floating-title">
             <Folder size={14} />

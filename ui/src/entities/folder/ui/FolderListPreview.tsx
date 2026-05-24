@@ -1,18 +1,18 @@
 import { useMemo } from "react";
 import ToolIcon from "../../../shared/ui/ToolIcon";
 import { getJumpTarget } from "../../../utils/setting";
-import type { Tool } from "../../../types";
+import type { LinkItem } from "../../panel/types";
 
 interface FolderListPreviewProps {
-  childrenTools: Tool[];
+  children: LinkItem[];
   itemSize: number;
   maxRows: number;
-  onOpenChild: (tool: Tool) => void;
-  onContextMenu: (e: React.MouseEvent, tool: Tool) => void;
+  onOpenChild: (item: LinkItem) => void;
+  onContextMenu: (e: React.MouseEvent, item: LinkItem) => void;
 }
 
 export function FolderListPreview({
-  childrenTools,
+  children,
   itemSize,
   maxRows,
   onOpenChild,
@@ -25,8 +25,8 @@ export function FolderListPreview({
     return Math.max(1, Math.floor(innerHeight / itemSize));
   }, [maxRows, itemSize]);
 
-  const overflow = Math.max(0, childrenTools.length - visibleCount);
-  const visible = childrenTools.slice(0, visibleCount);
+  const overflow = Math.max(0, children.length - visibleCount);
+  const visible = children.slice(0, visibleCount);
 
   return (
     <div
@@ -34,10 +34,10 @@ export function FolderListPreview({
       style={{ "--folder-list-item-size": `${itemSize}px` } as React.CSSProperties}
       onClick={(e) => e.stopPropagation()}
     >
-      {visible.map((child) => (
+      {visible.map((item) => (
         <FolderListPreviewItem
-          key={child.id}
-          tool={child}
+          key={item.id}
+          item={item}
           itemSize={itemSize}
           onOpenChild={onOpenChild}
           onContextMenu={onContextMenu}
@@ -51,20 +51,20 @@ export function FolderListPreview({
 }
 
 function FolderListPreviewItem({
-  tool,
+  item,
   itemSize,
   onOpenChild,
   onContextMenu,
 }: {
-  tool: Tool;
+  item: LinkItem;
   itemSize: number;
-  onOpenChild: (tool: Tool) => void;
-  onContextMenu: (e: React.MouseEvent, tool: Tool) => void;
+  onOpenChild: (item: LinkItem) => void;
+  onContextMenu: (e: React.MouseEvent, item: LinkItem) => void;
 }) {
   return (
     <a
       className="widget-folder-list-item"
-      href={tool.url}
+      href={item.url}
       target={getJumpTarget() === "blank" ? "_blank" : "_self"}
       rel="noreferrer"
       draggable={false}
@@ -74,26 +74,26 @@ function FolderListPreviewItem({
       onClick={(e) => {
         e.preventDefault();
         e.stopPropagation();
-        if (tool.url) {
-          window.open(tool.url, getJumpTarget() === "blank" ? "_blank" : "_self", "noopener,noreferrer");
+        if (item.url) {
+          window.open(item.url, getJumpTarget() === "blank" ? "_blank" : "_self", "noopener,noreferrer");
         }
-        onOpenChild(tool);
+        onOpenChild(item);
       }}
       onContextMenu={(e) => {
         e.stopPropagation();
-        onContextMenu(e, tool);
+        onContextMenu(e, item);
       }}
       style={{ height: itemSize }}
     >
       <ToolIcon
-        logo={tool.logo}
-        name={tool.name}
+        logo={item.logo}
+        name={item.name}
         size={itemSize - 6}
         radius={3}
         className="widget-folder-list-item-icon"
         fallbackFontSize={8}
       />
-      <span className="widget-folder-list-item-name">{tool.name}</span>
+      <span className="widget-folder-list-item-name">{item.name}</span>
     </a>
   );
 }

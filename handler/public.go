@@ -13,8 +13,16 @@ import (
 )
 
 func GetAllHandler(c *gin.Context) {
-	tools := service.GetAllTool()
-	categories := service.GetAllCategories()
+	tools, err := service.GetAllTool()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "errorMessage": err.Error()})
+		return
+	}
+	categories, err := service.GetAllCategories()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "errorMessage": err.Error()})
+		return
+	}
 	if !utils.IsLogin(c) {
 		tools = utils.FilterHideTools(tools, categories)
 		categories = utils.FilterHideCates(categories)
@@ -47,7 +55,11 @@ func GetLogoImgHandler(c *gin.Context) {
 		return
 	}
 
-	img := service.GetImgFromDB(imgURL)
+	img, err := service.GetImgFromDB(imgURL)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "errorMessage": err.Error()})
+		return
+	}
 	if img.Value == "" {
 		cached, err := service.FetchAndCacheImage(imgURL)
 		if err != nil {
@@ -130,8 +142,13 @@ func ManifastHanlder(c *gin.Context) {
 }
 
 func GetEnabledSearchEnginesHandler(c *gin.Context) {
+	engines, err := service.GetEnabledSearchEngines()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "errorMessage": err.Error()})
+		return
+	}
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
-		"data":    service.GetEnabledSearchEngines(),
+		"data":    engines,
 	})
 }
