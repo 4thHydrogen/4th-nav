@@ -32,6 +32,7 @@ func columnExists(tableName string, columnName string) bool {
 func InitDB() {
 	var err error
 	utils.PathExistsOrCreate("./data")
+	utils.PathExistsOrCreate("./data/background-cache")
 
 	dbPath := filepath.Join("./data", "nav.db")
 	dbPath += "?_journal=WAL&_timeout=5000&_busy_timeout=5000&_txlock=immediate"

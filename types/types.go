@@ -93,3 +93,30 @@ type SiteConfig struct {
 	Density            string `json:"density"`
 	FolderListItemSize int    `json:"folderListItemSize"`
 }
+
+// 背景缓存记录
+type BackgroundCache struct {
+	Id              int    `json:"id"`
+	Source          string `json:"source"`
+	Theme           string `json:"theme"`
+	Filename        string `json:"filename"`
+	OriginalUrl     string `json:"originalUrl"`
+	Photographer    string `json:"photographer"`
+	PhotographerUrl string `json:"photographerUrl"`
+	PhotoPageUrl    string `json:"photoPageUrl"`
+	AvgColor        string `json:"avgColor"`
+	ContentType     string `json:"contentType"`
+	FileSize        int    `json:"fileSize"`
+	ExpiresAt       int64  `json:"expiresAt"`
+	CreatedAt       int64  `json:"createdAt"`
+}
+
+// 已解析的背景图片响应
+type ResolvedBackground struct {
+	LocalUrl        string `json:"localUrl"`
+	OriginalUrl     string `json:"originalUrl"`
+	Photographer    string `json:"photographer"`
+	PhotographerUrl string `json:"photographerUrl"`
+	PhotoPageUrl    string `json:"photoPageUrl"`
+	AvgColor        string `json:"avgColor"`
+}

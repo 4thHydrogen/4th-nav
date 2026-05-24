@@ -11,7 +11,6 @@ export default function HomeBackground({ setting, refreshKey }: HomeBackgroundPr
     <Background
       url={setting?.backgroundUrl ?? ""}
       enabled={setting?.enableBackground === true}
-      pexelsApiKey={setting?.pexelsApiKey ?? ""}
       refreshKey={refreshKey}
     />
   );

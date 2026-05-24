@@ -1,19 +1,27 @@
 import { useEffect, useState, useCallback } from "react";
-import { parsePexelsUrl, fetchPexelsImage, getCurrentTheme, getCachedPexelsImage } from "../../utils/pexels";
+import { getCurrentTheme } from "../../utils/pexels";
+import {
+  fetchCurrentBackground,
+  refreshBackground,
+  type ResolvedBackground,
+} from "./api/resolveBackground";
+import { useBackgroundAccentColors } from "./model/useBackgroundAccentColors";
 import "./background.css";
 
 interface BackgroundProps {
   url: string;
   enabled: boolean;
-  pexelsApiKey?: string;
   refreshKey?: number;
 }
 
-const BING_API = "https://bing.biturl.top/?resolution=3840&format=image";
-
-const Background = ({ url, enabled, pexelsApiKey, refreshKey }: BackgroundProps) => {
+const Background = ({ url, enabled, refreshKey }: BackgroundProps) => {
   const [imageUrl, setImageUrl] = useState<string>("");
   const [loaded, setLoaded] = useState(false);
+  const [attribution, setAttribution] = useState<ResolvedBackground | null>(
+    null
+  );
+
+  useBackgroundAccentColors(imageUrl || null);
 
   const loadImageWithFade = useCallback((src: string) => {
     const img = new Image();
@@ -27,54 +35,55 @@ const Background = ({ url, enabled, pexelsApiKey, refreshKey }: BackgroundProps)
     img.src = src;
   }, []);
 
+  const applyResult = useCallback(
+    (result: ResolvedBackground | null) => {
+      if (result?.localUrl) {
+        setAttribution(result);
+        loadImageWithFade(result.localUrl);
+      }
+    },
+    [loadImageWithFade]
+  );
+
   useEffect(() => {
     setLoaded(false);
     if (!enabled || !url) {
       setImageUrl("");
+      setAttribution(null);
       return;
     }
 
-    const lowerUrl = url.toLowerCase().trim();
+    const theme = getCurrentTheme();
+    fetchCurrentBackground(theme)
+      .then((result) => {
+        if (result?.localUrl) {
+          applyResult(result);
+          return;
+        }
+        // No cache — trigger a backend refresh
+        return refreshBackground(url, theme).then((fresh) => {
+          applyResult(fresh);
+        });
+      })
+      .catch(() => {});
+  }, [url, enabled, refreshKey, applyResult]);
 
-    // Pexels mode
-    const { isPexels, query } = parsePexelsUrl(url);
-    if (isPexels) {
-      if (!pexelsApiKey) {
-        setImageUrl("");
-        return;
-      }
-      const theme = getCurrentTheme();
-      fetchPexelsImage(pexelsApiKey, query, theme)
-        .then(loadImageWithFade)
-        .catch(() => {});
-      return;
-    }
-
-    // Bing mode
-    if (lowerUrl === "bing" || lowerUrl.includes("bing.com")) {
-      fetch(BING_API, { redirect: "follow" })
-        .then((res) => {
-          if (res.url) loadImageWithFade(res.url);
-        })
-        .catch(() => loadImageWithFade(url));
-      return;
-    }
-
-    // Direct URL
-    loadImageWithFade(url);
-  }, [url, enabled, pexelsApiKey, refreshKey, loadImageWithFade]);
-
-  // Re-fetch from Pexels when theme changes
+  // Re-fetch when theme changes
   useEffect(() => {
     if (!enabled || !url) return;
-    const { isPexels, query } = parsePexelsUrl(url);
-    if (!isPexels || !pexelsApiKey) return;
 
     const observer = new MutationObserver(() => {
       const theme = getCurrentTheme();
-      // Keep old image until new one is ready
-      fetchPexelsImage(pexelsApiKey, query, theme)
-        .then(loadImageWithFade)
+      fetchCurrentBackground(theme)
+        .then((result) => {
+          if (result?.localUrl) {
+            applyResult(result);
+            return;
+          }
+          return refreshBackground(url, theme).then((fresh) => {
+            applyResult(fresh);
+          });
+        })
         .catch(() => {});
     });
 
@@ -84,20 +93,9 @@ const Background = ({ url, enabled, pexelsApiKey, refreshKey }: BackgroundProps)
     });
 
     return () => observer.disconnect();
-  }, [url, enabled, pexelsApiKey, refreshKey, loadImageWithFade]);
-
-  // Get attribution data
-  const getAttribution = useCallback(() => {
-    if (!url) return null;
-    const { isPexels, query } = parsePexelsUrl(url);
-    if (!isPexels) return null;
-    const theme = getCurrentTheme();
-    return getCachedPexelsImage(theme, query);
-  }, [url]);
+  }, [url, enabled, refreshKey, applyResult]);
 
   if (!enabled) return null;
-
-  const attribution = imageUrl ? getAttribution() : null;
 
   return (
     <>
@@ -111,7 +109,7 @@ const Background = ({ url, enabled, pexelsApiKey, refreshKey }: BackgroundProps)
       {attribution && attribution.photographer && (
         <a
           className="pexels-credit"
-          href={attribution.photoUrl}
+          href={attribution.photoPageUrl}
           target="_blank"
           rel="noopener noreferrer"
         >

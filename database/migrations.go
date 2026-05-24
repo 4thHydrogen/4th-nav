@@ -24,6 +24,11 @@ var migrations = []migration{
 		name: "add icon provider system columns",
 		run:  migration_2026_05_24_icon_provider,
 	},
+	{
+		id:   "2026_05_24_background_cache",
+		name: "create background_cache table for local wallpaper caching",
+		run:  migration_2026_05_24_background_cache,
+	},
 }
 
 func ensureSchemaMigrationsTable() error {

@@ -108,3 +108,12 @@ type DockItem struct {
 	Category    string `json:"category"`
 	Description string `json:"description"`
 }
+
+type BackgroundRefreshDto struct {
+	Source string `json:"source"`
+	Theme  string `json:"theme"`
+}
+
+type BackgroundTestKeyDto struct {
+	Key string `json:"key" binding:"required"`
+}

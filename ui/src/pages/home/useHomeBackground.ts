@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
-import { clearPexelsCache, parsePexelsUrl } from "../../utils/pexels";
+import { parsePexelsUrl } from "../../utils/pexels";
+import { refreshBackground } from "../../features/background/api/resolveBackground";
 
 export function useHomeBackground(backgroundUrl?: string, enableBackground?: boolean) {
   const isPexels = useMemo(() => {
@@ -9,9 +10,13 @@ export function useHomeBackground(backgroundUrl?: string, enableBackground?: boo
 
   const [bgRefreshKey, setBgRefreshKey] = useState(0);
 
-  const handleRefreshBg = useCallback(() => {
-    const { query } = parsePexelsUrl(backgroundUrl ?? "");
-    clearPexelsCache(query);
+  const handleRefreshBg = useCallback(async () => {
+    if (!backgroundUrl) return;
+    try {
+      await refreshBackground(backgroundUrl, undefined);
+    } catch {
+      // silent — the home page refresh is best-effort
+    }
     setBgRefreshKey((value) => value + 1);
   }, [backgroundUrl]);
 

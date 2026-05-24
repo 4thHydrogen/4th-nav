@@ -35,6 +35,8 @@ func RegisterPublicRoutes(api *gin.RouterGroup) {
 	api.GET("/logout", handler.LogoutHandler)
 	api.GET("/img", handler.GetLogoImgHandler)
 	api.GET("/searchEngines", handler.GetEnabledSearchEnginesHandler)
+	api.GET("/background/current", handler.GetCurrentBackgroundHandler)
+	api.GET("/background/cache/:filename", handler.ServeBackgroundCacheHandler)
 }
 
 func RegisterAdminRoutes(admin *gin.RouterGroup) {
@@ -79,6 +81,11 @@ func RegisterAdminRoutes(admin *gin.RouterGroup) {
 	admin.DELETE("/searchEngine/:id", handler.DeleteSearchEngineHandler)
 	admin.PUT("/searchEngines/sort", handler.UpdateSearchEngineSortHandler)
 
+	// Background cache routes
+	admin.POST("/background/refresh", handler.RefreshBackgroundHandler)
+	admin.POST("/background/cache/clear", handler.ClearBackgroundCacheHandler)
+	admin.POST("/background/test-key", handler.TestPexelsKeyHandler)
+
 	// Dock routes
 	admin.GET("/dock", handler.GetDockItemsHandler)
 	admin.POST("/dock", handler.AddDockItemHandler)
@@ -91,7 +98,7 @@ func NewHTTPServer(addr, port string, handler http.Handler) *http.Server {
 		Addr:         addr + ":" + port,
 		Handler:      handler,
 		ReadTimeout:  3 * time.Second,
-		WriteTimeout: 3 * time.Second,
-		IdleTimeout:  3 * time.Second,
+		WriteTimeout: 10 * time.Second,
+		IdleTimeout:  30 * time.Second,
 	}
 }

@@ -12,13 +12,12 @@ import {
   fetchUpdateUser,
 } from "../../shared/api/setting";
 import { useIconJobPolling } from "../../pages/admin/hooks/useIconJobPolling";
+import { getCurrentTheme } from "../../utils/pexels";
 import {
-  clearAllPexelsCache,
-  clearPexelsCache,
-  fetchPexelsImage,
-  getCurrentTheme,
-  parsePexelsUrl,
-} from "../../utils/pexels";
+  clearBackgroundCache,
+  refreshBackground,
+  testPexelsKey,
+} from "../background/api/resolveBackground";
 
 interface UseSettingsPanelOptions {
   store: AdminApiData | null;
@@ -57,6 +56,12 @@ export function useSettingsPanel({ store, reload }: UseSettingsPanelOptions) {
       try {
         await fetchUpdateSetting(values);
         message.success("站点设置已更新");
+
+        // Trigger background refresh if backgroundUrl changed
+        if (values.backgroundUrl) {
+          const theme = getCurrentTheme();
+          refreshBackground(values.backgroundUrl, theme).catch(() => {});
+        }
       } catch {
         message.warning("更新站点设置失败");
       } finally {
@@ -89,7 +94,7 @@ export function useSettingsPanel({ store, reload }: UseSettingsPanelOptions) {
 
     setTestingPexelsKey(true);
     try {
-      await fetchPexelsImage(apiKey, "test", getCurrentTheme());
+      await testPexelsKey(apiKey);
       message.success("API Key 有效，连接成功");
     } catch {
       message.error("API Key 无效或网络异常，请检查后重试");
@@ -98,23 +103,26 @@ export function useSettingsPanel({ store, reload }: UseSettingsPanelOptions) {
     }
   }, [settingForm]);
 
-  const handleRefreshWallpaper = useCallback(() => {
-    const bgUrl = settingForm.getFieldValue("backgroundUrl") || "";
-    const { isPexels, query } = parsePexelsUrl(bgUrl);
-
-    if (isPexels) {
-      clearPexelsCache(query);
-    } else {
-      clearAllPexelsCache();
+  const handleRefreshWallpaper = useCallback(async () => {
+    try {
+      const bgUrl = settingForm.getFieldValue("backgroundUrl") || "";
+      const theme = getCurrentTheme();
+      await refreshBackground(bgUrl, theme);
+      message.success("壁纸已刷新");
+    } catch {
+      message.warning("刷新壁纸失败");
+    } finally {
+      reload();
     }
-
-    reload();
-    message.success("壁纸缓存已刷新，稍后生效");
   }, [reload, settingForm]);
 
-  const handleClearWallpaperCache = useCallback(() => {
-    clearAllPexelsCache();
-    message.success("已清除全部壁纸缓存");
+  const handleClearWallpaperCache = useCallback(async () => {
+    try {
+      await clearBackgroundCache();
+      message.success("已清除全部壁纸缓存");
+    } catch {
+      message.warning("清除壁纸缓存失败");
+    }
   }, []);
 
   const handleRefreshMissingIcons = useCallback(async () => {

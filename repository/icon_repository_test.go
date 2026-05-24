@@ -49,7 +49,7 @@ func TestUpdateIconStatus(t *testing.T) {
 		t.Fatalf("seed tool: %v", err)
 	}
 
-	if err := UpdateIconStatus(3, "failed", "boom"); err != nil {
+	if err := UpdateIconStatus(3, "failed", "boom", "local"); err != nil {
 		t.Fatalf("update icon status: %v", err)
 	}
 
