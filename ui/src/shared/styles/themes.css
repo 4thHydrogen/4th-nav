@@ -23,11 +23,13 @@
   --surface-panel-saturate: 1.2;
   --surface-panel-shadow: 0 20px 60px rgba(15, 23, 42, 0.12);
 
+  --surface-menu-bg: rgba(255, 255, 255, 0.88);
   --surface-overlay-bg: rgba(0, 0, 0, 0.15);
   --surface-overlay-blur: 4px;
 }
 
 body.dark-mode {
+  --surface-menu-bg: rgba(30, 32, 38, 0.88);
   --surface-input-text: rgba(255, 255, 255, 0.6);
   --surface-widget-bg: rgba(15, 23, 42, 0.24);
   --surface-widget-border: rgba(255, 255, 255, 0.1);
@@ -42,6 +44,7 @@ body.dark-mode {
 
 body.has-background,
 body.surface-effects {
+  --surface-menu-bg: rgba(30, 32, 38, 0.85);
   --surface-topbar-bg: rgba(255, 255, 255, 0.55);
   --surface-input-bg: rgba(255, 255, 255, 0.45);
   --surface-input-border: rgba(255, 255, 255, 0.3);

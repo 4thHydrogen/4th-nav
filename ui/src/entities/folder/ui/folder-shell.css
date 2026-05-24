@@ -39,7 +39,7 @@
   transition:
     width 220ms cubic-bezier(0.22, 1, 0.36, 1),
     height 220ms cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.15s ease;
+    transform 0.2s ease;
   overflow: hidden;
   position: relative;
   padding: var(--folder-padding);
@@ -55,7 +55,6 @@
 
 .widget-folder:hover {
   transform: translateY(-2px);
-  box-shadow: none;
 }
 
 .widget-folder-empty {
