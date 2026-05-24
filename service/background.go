@@ -36,7 +36,7 @@ type pexelsAttribution struct {
 
 type pexelsPhoto struct {
 	Src struct {
-		Large2x string `json:"large2x"`
+		Original string `json:"original"`
 	} `json:"src"`
 	Photographer    string `json:"photographer"`
 	PhotographerUrl string `json:"photographer_url"`
@@ -216,24 +216,16 @@ func resolvePexelsUrl(source string, theme string) (string, pexelsAttribution, e
 	query := extractPexelsQuery(source)
 	if query == "" {
 		if theme == "dark" {
-			query = "abstract glass dark gradient"
+			query = "nature dark"
 		} else {
-			query = "nature landscape"
+			query = "nature light"
 		}
-	}
-
-	var color string
-	if theme == "dark" {
-		color = "black"
-	} else {
-		color = "white"
 	}
 
 	params := url.Values{
 		"query":       {query},
 		"orientation": {"landscape"},
 		"size":        {"large"},
-		"color":       {color},
 		"per_page":    {"30"},
 		"page":        {fmt.Sprintf("%d", rand.Intn(defaultPexelsPage)+1)},
 	}
@@ -274,7 +266,7 @@ func resolvePexelsUrl(source string, theme string) (string, pexelsAttribution, e
 		AvgColor:        photo.AvgColor,
 	}
 
-	return photo.Src.Large2x, attr, nil
+	return photo.Src.Original, attr, nil
 }
 
 func extractPexelsQuery(source string) string {

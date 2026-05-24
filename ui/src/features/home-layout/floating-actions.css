@@ -38,6 +38,67 @@
   height: 24px;
 }
 
+/* Refresh button states */
+.floating-action-btn.is-loading svg {
+  animation: refresh-spin 0.8s linear infinite;
+}
+
+.floating-action-btn.is-loading,
+.floating-action-btn:disabled {
+  cursor: wait;
+  opacity: 0.75;
+}
+
+.floating-action-btn.is-success {
+  color: #4ade80;
+}
+
+.floating-action-btn.is-error {
+  color: #f87171;
+}
+
+@keyframes refresh-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Refresh wrapper + error toast */
+.floating-action-refresh {
+  position: relative;
+}
+
+.background-refresh-toast {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  right: 0;
+  min-width: max-content;
+  max-width: 260px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: var(--surface-panel-solid-bg, rgba(24, 32, 38, 0.92));
+  color: #ffb4b4;
+  font-size: 12px;
+  line-height: 1.4;
+  pointer-events: none;
+  white-space: nowrap;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  animation: toast-in 0.2s ease-out;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* responsive */
 @media (max-width: 1060px) {
   .floating-actions { right: 10px; bottom: 14px; }

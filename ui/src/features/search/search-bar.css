@@ -5,10 +5,10 @@
   --engine-button-size: 26px;
   --engine-badge-size: 22px;
 
-  --search-glow-border: rgba(120, 210, 255, 0.62);
-  --search-glow-border-focus: rgba(135, 220, 255, 0.78);
-  --search-glow-opacity: 0.45;
-  --search-glow-opacity-focus: 0.58;
+  --search-glow-border: rgba(var(--search-glow-1), 0.25);
+  --search-glow-border-focus: rgba(var(--search-glow-1), 0.52);
+  --search-glow-opacity: 0.22;
+  --search-glow-opacity-focus: 0.55;
 
   width: 100%;
   overflow: visible;
@@ -43,8 +43,8 @@
 
   box-shadow:
     inset 0 1px 1px rgba(255, 255, 255, 0.16),
-    0 0 8px rgba(var(--search-glow-1), 0.45),
-    0 0 18px rgba(var(--search-glow-1), 0.24);
+    0 0 6px rgba(var(--search-glow-1), 0.20),
+    0 0 14px rgba(var(--search-glow-1), 0.08);
 
   transition:
     border-color 0.18s ease,
@@ -88,29 +88,34 @@
 .search-wrapper::after {
   content: "";
   position: absolute;
-  inset: 1px;
+  inset: 0;
   border-radius: inherit;
   pointer-events: none;
   z-index: 0;
-
-  background:
+  padding: 1px;
+  background: var(
+    --search-edge-light-map,
     linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.14),
-      transparent 42%
-    ),
-    radial-gradient(
-      circle at 8% 50%,
-      rgba(var(--search-glow-3), 0.12),
-      transparent 26%
-    ),
-    radial-gradient(
-      circle at 88% 50%,
-      rgba(var(--search-glow-2), 0.12),
-      transparent 22%
-    );
+      90deg,
+      rgba(var(--search-glow-1), 0.10),
+      rgba(var(--search-glow-1), 0.18),
+      rgba(var(--search-glow-1), 0.10)
+    )
+  );
 
-  opacity: 0.72;
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+
+  opacity: 0.30;
+  transition: opacity 0.18s ease;
+}
+
+.search-wrapper:hover::after,
+.search-wrapper:focus-within::after {
+  opacity: 1.0;
 }
 
 .search-icon,
@@ -124,8 +129,8 @@
   border-color: var(--search-glow-border-focus);
   box-shadow:
     inset 0 1px 1px rgba(255, 255, 255, 0.18),
-    0 0 10px rgba(var(--search-glow-1), 0.55),
-    0 0 22px rgba(var(--search-glow-1), 0.32);
+    0 0 8px rgba(var(--search-glow-1), 0.45),
+    0 0 18px rgba(var(--search-glow-1), 0.24);
 }
 
 .search-wrapper:focus-within::before {
@@ -133,15 +138,15 @@
 }
 
 .search-wrapper:hover {
-  border-color: rgba(var(--search-glow-1), 0.78);
+  border-color: rgba(var(--search-glow-1), 0.52);
   box-shadow:
-    inset 0 1px 1px rgba(255, 255, 255, 0.20),
-    0 0 10px rgba(var(--search-glow-1), 0.52),
-    0 0 22px rgba(var(--search-glow-1), 0.28);
+    inset 0 1px 1px rgba(255, 255, 255, 0.18),
+    0 0 8px rgba(var(--search-glow-1), 0.45),
+    0 0 18px rgba(var(--search-glow-1), 0.24);
 }
 
 .search-wrapper:hover::before {
-  opacity: 0.52;
+  opacity: 0.55;
 }
 
 .search-icon {

@@ -9,6 +9,9 @@ interface FloatingActionsProps {
   onThemeSwitch: () => void;
   showRefresh?: boolean;
   onRefresh?: () => void;
+  isRefreshing?: boolean;
+  refreshStatus?: "idle" | "loading" | "success" | "error";
+  refreshMessage?: string;
 }
 
 const ThemeIcon = ({ theme }: { theme: Theme }) => {
@@ -23,18 +26,33 @@ const FloatingActions = ({
   onThemeSwitch,
   showRefresh,
   onRefresh,
+  isRefreshing,
+  refreshStatus,
+  refreshMessage,
 }: FloatingActionsProps) => {
   return (
     <div className="floating-actions">
       {showRefresh && onRefresh && (
-        <button
-          className="floating-action-btn"
-          onClick={onRefresh}
-          title="换一张背景图"
-          aria-label="换一张背景图"
-        >
-          <RefreshCw size={18} />
-        </button>
+        <div className="floating-action-refresh">
+          <button
+            className={`floating-action-btn${
+              isRefreshing ? " is-loading" : ""
+            }${refreshStatus === "success" ? " is-success" : ""}${
+              refreshStatus === "error" ? " is-error" : ""
+            }`}
+            onClick={onRefresh}
+            disabled={isRefreshing}
+            title={isRefreshing ? "正在获取新壁纸" : "换一张背景图"}
+            aria-label={isRefreshing ? "正在获取新壁纸" : "换一张背景图"}
+          >
+            <RefreshCw size={18} />
+          </button>
+          {refreshStatus === "error" && refreshMessage && (
+            <div className="background-refresh-toast is-error">
+              {refreshMessage}
+            </div>
+          )}
+        </div>
       )}
       <button
         className="floating-action-btn"

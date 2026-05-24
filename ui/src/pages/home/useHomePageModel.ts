@@ -50,7 +50,15 @@ export function useHomePageModel() {
   const { theme, handleThemeSwitch } = useHomeTheme();
   const layoutConfig = useHomeLayoutVars(data?.siteConfig);
 
-  const { bgRefreshKey, handleRefreshBg, showRefresh } = useHomeBackground(
+  const {
+    bgRefreshKey,
+    handleRefreshBg,
+    showRefresh,
+    refreshStatus: bgRefreshStatus,
+    refreshMessage: bgRefreshMessage,
+    isRefreshing: isRefreshingBg,
+    onAutoRefreshStateChange,
+  } = useHomeBackground(
     data?.setting?.backgroundUrl,
     data?.setting?.enableBackground
   );
@@ -130,6 +138,10 @@ export function useHomePageModel() {
     bgRefreshKey,
     handleRefreshBg,
     showRefresh,
+    bgRefreshStatus,
+    bgRefreshMessage,
+    isRefreshingBg,
+    onAutoRefreshStateChange,
 
     // Derived data
     showGithub,

@@ -11,8 +11,8 @@ const DEFAULT_COLORS: AccentColors = {
 };
 
 const MAX_DIM = 64;
-const MIN_SATURATION = 0.15;
-const MIN_LIGHTNESS = 0.1;
+const MIN_SATURATION = 0.04;
+const MIN_LIGHTNESS = 0.02;
 const MAX_LIGHTNESS = 0.9;
 const HUE_BUCKETS = 36;
 const HUE_BUCKET_SIZE = 360 / HUE_BUCKETS;
@@ -102,10 +102,23 @@ function sampleDominantColors(img: HTMLImageElement): AccentColors {
   if (selected.length < 3) return DEFAULT_COLORS;
 
   return {
-    glow1: [selected[0].r, selected[0].g, selected[0].b],
-    glow2: [selected[1].r, selected[1].g, selected[1].b],
-    glow3: [selected[2].r, selected[2].g, selected[2].b],
+    glow1: boostColor(selected[0]),
+    glow2: boostColor(selected[1]),
+    glow3: boostColor(selected[2]),
   };
+}
+
+const GLOW_SATURATION = 0.78;
+const GLOW_LIGHTNESS = 0.65;
+
+function boostColor(color: {
+  r: number;
+  g: number;
+  b: number;
+}): [number, number, number] {
+  const [h] = rgbToHsl(color.r / 255, color.g / 255, color.b / 255);
+  const [r, g, b] = hslToRgb(h, GLOW_SATURATION, GLOW_LIGHTNESS);
+  return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
 }
 
 function rgbToHsl(r: number, g: number, b: number): [number, number, number] {
@@ -137,4 +150,32 @@ function rgbToHsl(r: number, g: number, b: number): [number, number, number] {
 function hueDistance(a: number, b: number): number {
   const d = Math.abs(a - b);
   return Math.min(d, 360 - d);
+}
+
+function hslToRgb(
+  h: number,
+  s: number,
+  l: number
+): [number, number, number] {
+  const hn = h / 360;
+
+  if (s === 0) return [l, l, l];
+
+  const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+  const p = 2 * l - q;
+
+  const hue2rgb = (p: number, q: number, t: number) => {
+    if (t < 0) t += 1;
+    if (t > 1) t -= 1;
+    if (t < 1 / 6) return p + (q - p) * 6 * t;
+    if (t < 1 / 2) return q;
+    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+    return p;
+  };
+
+  return [
+    hue2rgb(p, q, hn + 1 / 3),
+    hue2rgb(p, q, hn),
+    hue2rgb(p, q, hn - 1 / 3),
+  ];
 }

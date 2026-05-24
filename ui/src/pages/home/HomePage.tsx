@@ -25,7 +25,11 @@ export default function HomePage() {
 
   return (
     <>
-      <HomeBackground setting={model.data?.setting} refreshKey={model.bgRefreshKey} />
+      <HomeBackground
+        setting={model.data?.setting}
+        refreshKey={model.bgRefreshKey}
+        onAutoRefreshStateChange={model.onAutoRefreshStateChange}
+      />
       <Helmet>
         <meta charSet="utf-8" />
         <link rel="icon" href={model.data?.setting?.favicon ?? "favicon.ico"} />
@@ -87,6 +91,9 @@ export default function HomePage() {
         onThemeSwitch={model.handleThemeSwitch}
         showRefresh={model.showRefresh}
         onRefresh={model.handleRefreshBg}
+        isRefreshing={model.isRefreshingBg}
+        refreshStatus={model.bgRefreshStatus}
+        refreshMessage={model.bgRefreshMessage}
       />
     </>
   );

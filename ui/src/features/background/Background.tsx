@@ -6,15 +6,25 @@ import {
   type ResolvedBackground,
 } from "./api/resolveBackground";
 import { useBackgroundAccentColors } from "./model/useBackgroundAccentColors";
+import { useSearchEdgeLightMap } from "../search/experiments/useSearchEdgeLightMap";
 import "./background.css";
 
 interface BackgroundProps {
   url: string;
   enabled: boolean;
   refreshKey?: number;
+  onAutoRefreshStateChange?: (
+    status: "idle" | "loading" | "success" | "error",
+    message?: string
+  ) => void;
 }
 
-const Background = ({ url, enabled, refreshKey }: BackgroundProps) => {
+const Background = ({
+  url,
+  enabled,
+  refreshKey,
+  onAutoRefreshStateChange,
+}: BackgroundProps) => {
   const [imageUrl, setImageUrl] = useState<string>("");
   const [loaded, setLoaded] = useState(false);
   const [attribution, setAttribution] = useState<ResolvedBackground | null>(
@@ -22,6 +32,7 @@ const Background = ({ url, enabled, refreshKey }: BackgroundProps) => {
   );
 
   useBackgroundAccentColors(imageUrl || null);
+  useSearchEdgeLightMap(imageUrl || null);
 
   const loadImageWithFade = useCallback((src: string) => {
     const img = new Image();
@@ -45,6 +56,28 @@ const Background = ({ url, enabled, refreshKey }: BackgroundProps) => {
     [loadImageWithFade]
   );
 
+  const handleBackgroundLoad = useCallback(
+    (theme: string) => {
+      fetchCurrentBackground(theme)
+        .then((result) => {
+          if (result?.localUrl) {
+            applyResult(result);
+            return;
+          }
+          onAutoRefreshStateChange?.("loading");
+          return refreshBackground(url, theme).then((fresh) => {
+            onAutoRefreshStateChange?.("success");
+            applyResult(fresh);
+          });
+        })
+        .catch((err) => {
+          const message = err instanceof Error ? err.message : "壁纸加载失败";
+          onAutoRefreshStateChange?.("error", message);
+        });
+    },
+    [url, applyResult, onAutoRefreshStateChange]
+  );
+
   useEffect(() => {
     setLoaded(false);
     if (!enabled || !url) {
@@ -53,38 +86,14 @@ const Background = ({ url, enabled, refreshKey }: BackgroundProps) => {
       return;
     }
 
-    const theme = getCurrentTheme();
-    fetchCurrentBackground(theme)
-      .then((result) => {
-        if (result?.localUrl) {
-          applyResult(result);
-          return;
-        }
-        // No cache — trigger a backend refresh
-        return refreshBackground(url, theme).then((fresh) => {
-          applyResult(fresh);
-        });
-      })
-      .catch(() => {});
-  }, [url, enabled, refreshKey, applyResult]);
+    handleBackgroundLoad(getCurrentTheme());
+  }, [url, enabled, refreshKey, handleBackgroundLoad]);
 
-  // Re-fetch when theme changes
   useEffect(() => {
     if (!enabled || !url) return;
 
     const observer = new MutationObserver(() => {
-      const theme = getCurrentTheme();
-      fetchCurrentBackground(theme)
-        .then((result) => {
-          if (result?.localUrl) {
-            applyResult(result);
-            return;
-          }
-          return refreshBackground(url, theme).then((fresh) => {
-            applyResult(fresh);
-          });
-        })
-        .catch(() => {});
+      handleBackgroundLoad(getCurrentTheme());
     });
 
     observer.observe(document.body, {
@@ -93,7 +102,7 @@ const Background = ({ url, enabled, refreshKey }: BackgroundProps) => {
     });
 
     return () => observer.disconnect();
-  }, [url, enabled, refreshKey, applyResult]);
+  }, [enabled, url, handleBackgroundLoad]);
 
   if (!enabled) return null;
 
