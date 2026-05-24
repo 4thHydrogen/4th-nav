@@ -28,12 +28,11 @@
   justify-content: center;
   border-radius: var(--folder-child-radius);
   overflow: hidden;
-  background: var(--widget-icon-bg);
   transition: transform 0.15s ease;
 }
 
 .widget-folder-child:hover .widget-folder-child-icon {
-  transform: scale(1.08);
+  transform: scale(1.1);
 }
 
 .widget-folder-child-icon img {

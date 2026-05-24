@@ -101,27 +101,21 @@
   box-shadow: none !important;
 }
 
-.desktop-workspace {
+.desktop-workspace-shell {
+  position: relative;
   flex: 1;
   min-height: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-  scrollbar-width: none;
   width: min(1280px, 100%);
   margin: 0 auto var(--home-bottom-safe-area);
   box-sizing: border-box;
-  mask-image: linear-gradient(
-    to bottom,
-    black 0%,
-    black calc(100% - 32px),
-    transparent 100%
-  );
-  -webkit-mask-image: linear-gradient(
-    to bottom,
-    black 0%,
-    black calc(100% - 32px),
-    transparent 100%
-  );
+}
+
+.desktop-workspace {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  box-sizing: border-box;
 }
 
 .desktop-workspace::-webkit-scrollbar {
@@ -233,6 +227,7 @@ body.surface-effects .desktop-search-shell input::placeholder {
     height: 42px;
   }
 
+  .desktop-workspace-shell,
   .desktop-workspace,
   .desktop-workspace-flat {
     width: 100%;

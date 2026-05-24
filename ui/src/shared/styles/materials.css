@@ -9,11 +9,14 @@
   overflow: hidden;
 }
 
+.material-folder > * {
+  position: relative;
+}
+
 .material-folder::before {
   content: "";
   position: absolute;
   inset: 0;
   pointer-events: none;
   background: var(--material-folder-highlight);
-  mix-blend-mode: screen;
 }

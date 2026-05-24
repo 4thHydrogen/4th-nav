@@ -77,7 +77,8 @@ export function HomeWorkspace({
         />
       )}
 
-      <section className="desktop-workspace">
+      <div className="desktop-workspace-shell">
+        <section className="desktop-workspace">
         <div className="desktop-content-shell">
           {isLoading ? (
             <div className="desktop-loading-shell" key="loading">
@@ -105,7 +106,8 @@ export function HomeWorkspace({
             />
           )}
         </div>
-      </section>
+        </section>
+      </div>
     </>
   );
 }

@@ -11,9 +11,9 @@
   --surface-widget-saturate: 1.2;
   --surface-widget-shadow: none;
 
-  --surface-folder-bg: rgba(255, 255, 255, 0.08);
-  --surface-folder-border: rgba(255, 255, 255, 0.06);
-  --surface-folder-blur: 18px;
+  --surface-folder-bg: rgba(255, 255, 255, 0.06);
+  --surface-folder-border: rgba(255, 255, 255, 0.10);
+  --surface-folder-blur: 24px;
   --surface-folder-saturate: 1.2;
   --surface-folder-shadow: none;
 
@@ -33,8 +33,8 @@ body.dark-mode {
   --surface-input-text: rgba(255, 255, 255, 0.6);
   --surface-widget-bg: rgba(15, 23, 42, 0.24);
   --surface-widget-border: rgba(255, 255, 255, 0.1);
-  --surface-folder-bg: rgba(15, 23, 42, 0.22);
-  --surface-folder-border: rgba(255, 255, 255, 0.06);
+  --surface-folder-bg: rgba(15, 23, 42, 0.18);
+  --surface-folder-border: rgba(255, 255, 255, 0.10);
   --surface-panel-bg: rgba(30, 32, 38, 0.62);
   --surface-panel-border: rgba(255, 255, 255, 0.1);
   --surface-panel-shadow: 0 20px 60px rgba(0, 0, 0, 0.32);
@@ -51,8 +51,8 @@ body.surface-effects {
   --surface-input-text: rgba(255, 255, 255, 0.94);
   --surface-widget-bg: rgba(255, 255, 255, 0.1);
   --surface-widget-border: rgba(255, 255, 255, 0.14);
-  --surface-folder-bg: rgba(255, 255, 255, 0.08);
-  --surface-folder-border: rgba(255, 255, 255, 0.06);
+  --surface-folder-bg: rgba(255, 255, 255, 0.06);
+  --surface-folder-border: rgba(255, 255, 255, 0.10);
   --surface-panel-bg: rgba(30, 32, 38, 0.52);
   --surface-panel-border: rgba(255, 255, 255, 0.16);
   --surface-panel-shadow: 0 20px 60px rgba(0, 0, 0, 0.28);

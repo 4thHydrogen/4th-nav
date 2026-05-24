@@ -38,8 +38,7 @@
   transform-origin: top left;
   transition:
     width 220ms cubic-bezier(0.22, 1, 0.36, 1),
-    height 220ms cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.2s ease;
+    height 220ms cubic-bezier(0.22, 1, 0.36, 1);
   overflow: hidden;
   position: relative;
   padding: var(--folder-padding);
@@ -51,10 +50,6 @@
     saturate(var(--surface-folder-saturate, 1.2));
   border: 1px solid var(--surface-folder-border, rgba(255, 255, 255, 0.06));
   box-shadow: var(--surface-folder-shadow, none);
-}
-
-.widget-folder:hover {
-  transform: translateY(-2px);
 }
 
 .widget-folder-empty {
