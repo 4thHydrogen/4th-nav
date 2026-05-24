@@ -21,10 +21,11 @@ func AddCategoryHandler(c *gin.Context) {
 		})
 		return
 	}
+
 	service.AddCategory(data)
 	c.JSON(200, gin.H{
 		"success": true,
-		"message": "澧炲姞鍒嗙被鎴愬姛",
+		"message": "新增分类成功",
 	})
 }
 
@@ -33,10 +34,11 @@ func DeleteCategoryHandler(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success":      false,
-			"errorMessage": "鏃犳晥 ID",
+			"errorMessage": "无效的分类 ID",
 		})
 		return
 	}
+
 	if err := service.DeleteCategory(id); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"success":      false,
@@ -44,9 +46,10 @@ func DeleteCategoryHandler(c *gin.Context) {
 		})
 		return
 	}
+
 	c.JSON(200, gin.H{
 		"success": true,
-		"message": "鍒犻櫎鍒嗙被鎴愬姛",
+		"message": "删除分类成功",
 	})
 }
 
@@ -60,9 +63,10 @@ func UpdateCategoryHandler(c *gin.Context) {
 		})
 		return
 	}
+
 	service.UpdateCategory(data)
 	c.JSON(200, gin.H{
 		"success": true,
-		"message": "鏇存柊鍒嗙被鎴愬姛",
+		"message": "更新分类成功",
 	})
 }

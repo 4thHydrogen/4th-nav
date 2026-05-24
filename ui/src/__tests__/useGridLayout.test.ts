@@ -10,8 +10,8 @@ import {
   gridToPixels,
   pixelsToGrid,
   buildLayout,
-} from "../components/WidgetGrid/useGridLayout";
-import type { GridLayout } from "../components/WidgetGrid/useGridLayout";
+} from "../features/panel-grid/useGridLayout";
+import type { GridLayout } from "../features/panel-grid/useGridLayout";
 import type { Tool, ToolSize } from "../types";
 
 // ---------------------------------------------------------------------------

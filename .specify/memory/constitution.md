@@ -1,63 +1,124 @@
+<!--
+Sync Impact Report
+- Version change: 1.0.0 -> 2.0.0
+- Modified principles:
+  - Legacy implementation-specific rules -> "I. Canonical Contracts First"
+  - Legacy migration rule -> "II. Layered Backend Boundaries"
+  - Legacy state rule -> "III. Feature-Oriented Frontend"
+  - Legacy parameter rule -> "IV. Complete Migrations, No Dual Tracks"
+  - Legacy overlay rule -> "V. Unified Visual System and Verification"
+- Added sections:
+  - Additional Constraints
+  - Delivery Workflow
+- Removed sections:
+  - Overlay-specific development constraints
+- Templates requiring updates:
+  - [x] .specify/templates/plan-template.md
+  - [x] .specify/templates/spec-template.md
+  - [x] .specify/templates/tasks-template.md
+  - [ ] .specify/templates/commands/*.md (directory not present)
+- Follow-up TODOs:
+  - None
+-->
+
 # 4th-nav Constitution
 
 ## Core Principles
 
-### I. 基础设施必须被实际接入
+### I. Canonical Contracts First
+All runtime-facing contracts MUST use the canonical domain language of the
+current system. Public API responses, frontend page models, and admin forms MUST
+prefer `category`, `description`, `folderTint`, and `enableSurfaceEffects`
+instead of legacy names. Compatibility code is allowed only in database
+migrations, explicit adapter layers, or short-lived import/export boundaries.
 
-创建新的 hook、组件、工具函数时，必须在同一个 PR/任务中将其接入实际调用点。未被使用的抽象等同于技术债务。
+Rationale: the project became hard to maintain when old and new field names
+coexisted across handlers, components, tests, and CSS. The system stays
+understandable only when the live path speaks one language.
 
-**Why**: 曾创建 `useFloatingPanel` 状态机 hook 但未接入 WidgetGrid，导致文件夹浮窗仍用旧的 zustand popupPanel + useState 模式，浮层系统的基础设施写了等于白写。
+### II. Layered Backend Boundaries
+Backend code MUST preserve the `handler -> service -> repository -> database`
+boundary. Handlers own HTTP concerns only. Services own orchestration, business
+rules, and task coordination. Repositories own SQL. The `database/` package owns
+schema initialization and migrations only.
 
-**How to apply**: 每个新基础设施文件的创建，必须伴随至少一个消费者的迁移。代码审查时检查新文件是否有 import/use。
+Rationale: direct SQL in handlers and services made small changes cascade across
+the codebase. Clear layering keeps behavior, storage, and transport concerns
+isolated and easier to change safely.
 
-### II. 迁移必须彻底，不留双轨
+### III. Feature-Oriented Frontend
+Frontend code MUST keep page composition, feature workflows, shared utilities,
+and entity adapters separate. Pages compose features. Features own workflows and
+UI slices. Shared modules hold reusable UI, tokens, hooks, and API clients.
+Entity adapters normalize transport data before it reaches page-level UI.
+Server-state belongs in React Query; transient UI state belongs in Zustand or
+local component state.
 
-当决定从方案 A 迁移到方案 B 时，必须在同一任务中完成：删除旧代码、清理旧状态、清理旧文件。不要保留"标记 deprecated"的中间态。
+Rationale: the project became fragile when giant components consumed raw API
+payloads directly and mixed layout, folder, overlay, and toolbar concerns.
 
-**Why**: 曾将 FolderPopupPanel 迁移到 FolderFloatingWindow + FloatingPortal，但保留 FolderPopupPanel 目录、保留 ui.ts 中的 popupPanel/openPopupPanel/closePopupPanel 状态、保留 WidgetGrid 中的 folderCardRect useState。导致状态分散在 3 处（zustand popupPanel + useState expandedFolderId + useState folderCardRect），快速点击时产生竞态。
+### IV. Complete Migrations, No Dual Tracks
+When replacing an implementation, the same task MUST remove the old entry
+points, old state, dead CSS, and obsolete files unless a short-lived bridge is
+strictly required. Such bridges MUST be isolated and named as compatibility
+layers, not left embedded inside normal runtime code.
 
-**How to apply**: 迁移清单必须包含：(1) 新实现接入 (2) 旧代码删除 (3) 旧 state 清理 (4) 旧文件删除。全部完成才算迁移完成。
+Rationale: half-finished migrations were the main source of regressions and
+"fix one place, break another" behavior. Cleanup is part of the feature, not a
+follow-up aspiration.
 
-### III. 状态单一来源
+### V. Unified Visual System and Verification
+All new or modified UI MUST consume the shared token and surface system before
+introducing component-local colors, blur values, spacing, or radii. When a CSS
+file grows large, it SHOULD be split into shell/content/state modules rather than
+kept as a monolith. Every completed change MUST be verified with the project's
+standard commands for the touched layers.
 
-同一个 UI 状态（如"当前打开的文件夹"）只能有一个权威来源。派生状态从权威来源计算，不要独立维护。
+Rationale: ad hoc visual values and oversized style files made the UI drift and
+slowed routine maintenance. Shared tokens and disciplined verification keep the
+interface consistent and lower-risk.
 
-**Why**: 文件夹浮窗的"打开状态"被拆在 `popupPanel.visible`、`expandedFolderId`、`folderCardRect` 三处，导致快速点击时三者不同步，出现幽灵 hover 和无法关闭的 bug。
+## Additional Constraints
 
-**How to apply**: 设计状态时先问"谁是权威来源？"。如果发现同一概念在多处维护，立即合并。派生值用 useMemo/selector 计算，不用独立 state。
+- Project-owned workflow files such as `.specify/` MUST remain versioned. Local
+  assistant guidance and caches such as `.agents/`, `AGENTS.md`, `.codex/`,
+  `.claude/`, `.tmp/`, and `.serena/cache/` SHOULD remain unversioned unless the
+  team explicitly adopts them as shared tooling.
+- The frontend build output is the repository-root `public/` directory. Vite,
+  Docker, Makefile, and Go `embed` wiring MUST agree on that output path.
+- Public-facing docs and runtime messages MUST be readable and free of encoding
+  corruption. Broken text in README files, startup flags, admin copy, or handler
+  messages counts as a quality defect.
+- Dead components, unused folders, and abandoned compatibility shells MUST be
+  removed once they are no longer referenced.
 
-### IV. 不要忽略文档中的明确参数
+## Delivery Workflow
 
-当 spec/文档明确指定了数值、方向、placement 等参数时，必须严格遵循，不要自作主张替换。
-
-**Why**: 文档明确要求搜索引擎菜单 placement 为 `right-start`（从按钮右侧展开），实现时用了 `bottom-end`（从按钮下方展开），导致菜单位置和动画方向不符合设计预期。
-
-**How to apply**: 实现前对照文档逐项检查参数。如果文档参数不合理，先与用户讨论确认后再修改文档，不要悄悄替换。
-
-### V. 浮层统一管理
-
-所有浮动 UI（文件夹浮窗、下拉菜单、右键菜单、tooltip）必须通过统一的浮层系统管理：
-- 渲染位置：`FloatingPortal` → `#app-overlay-root`
-- 定位：`placement.ts` viewport 约束计算
-- 外部点击：`useOutsidePointerDown` pointerdown capture
-- 状态：`useFloatingPanel` 状态机
-- 层级：CSS z-index token（不用局部 z-index 数值）
-
-**Why**: 分散管理的浮层会因 stacking context、overflow、z-index 竞争导致各种交互 bug。
-
-**How to apply**: 新增任何浮动 UI 前，先检查 OverlayLayer/ 是否已有适用的基础设施。如果没有，先扩展基础设施再实现功能。
-
-## Development Constraints
-
-- z-index 必须使用 CSS token（`--z-*`），不写局部数值
-- 浮层定位只依赖 viewport 坐标（`DOMRect` + `window.innerWidth/Height`），不依赖父容器尺寸
-- `pointer-events: none` 只在 `body.overlay-open` 时应用到主内容区，不应用到浮层本身
-- 快速点击竞态用 `instanceId` 防护，不用 `setTimeout` 延迟
+1. Read the relevant spec, plan, and local guidance before modifying code.
+2. Keep changes scoped and reversible, but finish the migration you start.
+3. If a change affects public contracts, update the corresponding adapters,
+   forms, tests, and docs in the same task.
+4. Required verification:
+   - Frontend/source changes: `ui/node_modules/.bin/tsc.cmd --noEmit -p ui/tsconfig.json`
+   - Backend/source changes: `go test ./...`
+   - Build chain, embed path, or deployment changes: `corepack pnpm build`
+5. If a verification step cannot run because of environment limits, document the
+   exact missing proof rather than implying success.
 
 ## Governance
 
-- 违反以上原则的代码不应被合并
-- 迁移任务必须包含清理步骤，不允许保留双轨
-- 新基础设施必须伴随消费者接入
+This constitution overrides conflicting local habits and historical patterns.
+Every plan, task list, and implementation review MUST check for compliance.
 
-**Version**: 1.0.0 | **Ratified**: 2026-05-23 | **Last Amended**: 2026-05-23
+Amendment policy:
+- MAJOR: redefine or replace a principle, or change governance in a breaking way
+- MINOR: add a principle or materially expand a required practice
+- PATCH: clarifications, wording cleanup, or non-semantic refinements
+
+Compliance expectations:
+- Plans MUST call out any constitutional tension before implementation starts.
+- Tasks that replace an older system MUST include cleanup and removal work.
+- Reviews SHOULD block changes that reintroduce dual-track contracts, layer
+  violations, or unverified build/deploy changes.
+
+**Version**: 2.0.0 | **Ratified**: 2026-05-23 | **Last Amended**: 2026-05-24

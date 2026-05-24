@@ -1,17 +1,13 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 @import "./shared/styles/tokens.css";
 @import "./shared/styles/themes.css";
 @import "./shared/styles/surfaces.css";
 @import "./shared/styles/materials.css";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
-  --width-small: 500px;
-  --width-medium: 700px;
-  --width-large: 1060px;
-
-  /* 颜色 token */
+  /* Color tokens */
   --bg-primary: #ffffff;
   --bg-card: #fafbfc;
   --bg-card-hover: #ffffff;
@@ -27,54 +23,11 @@
   --text-secondary: #8a92a6;
   --text-muted: #86909c;
   --text-tag: #878a95;
-  --shadow-card: 6px 6px 12px 0px #eceef4;
+  --shadow-card: 6px 6px 12px 0 #eceef4;
   --color-record: #bbb;
-
-  /* 背景图片 */
-  --bg-topbar: rgba(255, 255, 255, 0.55);
-  --bg-input-bg: rgba(255, 255, 255, 0.45);
-  --border-input-bg: rgba(255, 255, 255, 0.3);
-
-  /* z-index 层级 */
-  --z-background: -10;
-  --z-base: 0;
-  --z-grid: 10;
-  --z-sticky: 100;
-  --z-dock: 200;
-  --z-folder-overlay: 700;
-  --z-folder-window: 800;
-  --z-dropdown: 900;
-  --z-floating-menu: 1000;
-  --z-context-menu: 1100;
-  --z-popover: 1200;
-  --z-modal: 1300;
-  --z-toast: 1400;
-  --z-tooltip: 1500;
-
-  /* Surface tokens — unified surface system */
-  --surface-widget-bg: rgba(255, 255, 255, 0.12);
-  --surface-widget-border: rgba(255, 255, 255, 0.16);
-  --surface-widget-blur: 18px;
-  --surface-widget-saturate: 1.2;
-  --surface-widget-shadow: none;
-
-  --surface-folder-bg: rgba(255, 255, 255, 0.08);
-  --surface-folder-border: rgba(255, 255, 255, 0.06);
-  --surface-folder-blur: 18px;
-  --surface-folder-saturate: 1.2;
-  --surface-folder-shadow: none;
-
-  --surface-panel-bg: rgba(255, 255, 255, 0.42);
-  --surface-panel-border: rgba(255, 255, 255, 0.22);
-  --surface-panel-blur: 20px;
-  --surface-panel-saturate: 1.2;
-  --surface-panel-shadow: 0 20px 60px rgba(15, 23, 42, 0.12);
-
-  --surface-overlay-bg: rgba(0, 0, 0, 0.15);
-  --surface-overlay-blur: 4px;
 }
 
-/* Overlay root: all floating panels portal here */
+/* Overlay root */
 #app-overlay-root {
   pointer-events: none;
 }
@@ -104,83 +57,57 @@ code {
     monospace;
 }
 
-/* ===== 暗色模式 ===== */
 body.dark-mode {
   background-color: #121212;
   color: rgba(255, 255, 255, 0.6);
-
-  --surface-widget-bg: rgba(15, 23, 42, 0.24);
-  --surface-widget-border: rgba(255, 255, 255, 0.10);
-
-  --surface-folder-bg: rgba(15, 23, 42, 0.22);
-  --surface-folder-border: rgba(255, 255, 255, 0.06);
-
-  --surface-panel-bg: rgba(30, 32, 38, 0.62);
-  --surface-panel-border: rgba(255, 255, 255, 0.10);
-  --surface-panel-shadow: 0 20px 60px rgba(0, 0, 0, 0.32);
-
-  --surface-overlay-bg: rgba(0, 0, 0, 0.25);
-  --surface-overlay-blur: 6px;
-
 }
+
 body.dark-mode input {
   background-color: #222222;
   border: 1px solid #222222;
   color: rgba(255, 255, 255, 0.6);
 }
+
 body.dark-mode input:hover {
   background-color: #303030;
   border: 1px solid #303030;
 }
+
 body.dark-mode input:focus,
 body.dark-mode input:focus-visible {
   background-color: #3d3d3d;
   border: 1px solid #3d3d3d;
 }
 
-/* ===== Surface tokens: has-background / surface-effects ===== */
-body.has-background,
-body.surface-effects {
-  --surface-widget-bg: rgba(255, 255, 255, 0.10);
-  --surface-widget-border: rgba(255, 255, 255, 0.14);
-
-  --surface-folder-bg: rgba(255, 255, 255, 0.08);
-  --surface-folder-border: rgba(255, 255, 255, 0.06);
-
-  --surface-panel-bg: rgba(30, 32, 38, 0.52);
-  --surface-panel-border: rgba(255, 255, 255, 0.16);
-  --surface-panel-shadow: 0 20px 60px rgba(0, 0, 0, 0.28);
-
-  --surface-overlay-bg: rgba(0, 0, 0, 0.22);
-  --surface-overlay-blur: 8px;
-}
-
-/* ===== 背景图片模式 ===== */
+/* Wallpaper mode */
 body.has-background {
   background-color: transparent;
 }
+
 body.has-background .main {
   background: transparent;
 }
+
 body.has-background .topbar {
-  background: var(--bg-topbar);
-  backdrop-filter: var(--blur-sm);
-  -webkit-backdrop-filter: var(--blur-sm);
-}
-body.has-background input {
-  background: var(--bg-input-bg);
-  border: 1px solid var(--border-input-bg);
-  color: var(--text-primary);
-}
-body.has-background.dark-mode .topbar {
-  background: rgba(30, 30, 30, 0.5);
-  backdrop-filter: var(--blur-sm);
-  -webkit-backdrop-filter: var(--blur-sm);
-}
-body.has-background.dark-mode input {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: rgba(255, 255, 255, 0.8);
+  background: var(--surface-topbar-bg);
+  backdrop-filter: blur(var(--surface-topbar-blur));
+  -webkit-backdrop-filter: blur(var(--surface-topbar-blur));
 }
 
-/* ===== 毛玻璃效果 ===== */
+body.has-background input {
+  background: var(--surface-input-bg);
+  border: 1px solid var(--surface-input-border);
+  color: var(--surface-input-text);
+}
+
+body.has-background.dark-mode .topbar {
+  background: var(--surface-topbar-bg);
+  backdrop-filter: blur(var(--surface-topbar-blur));
+  -webkit-backdrop-filter: blur(var(--surface-topbar-blur));
+}
+
+body.has-background.dark-mode input {
+  background: var(--surface-input-bg);
+  border: 1px solid var(--surface-input-border);
+  color: var(--surface-input-text);
+}

@@ -1,14 +1,12 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { renderHook, act } from "@testing-library/react";
 import * as React from "react";
+import { act, renderHook } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
-// Stub OverlayProvider — useOverlayActivity returns a noop unregister
-vi.mock("../components/OverlayLayer/OverlayProvider", () => ({
+vi.mock("../shared/ui/overlay/OverlayProvider", () => ({
   useOverlayActivity: () => () => () => {},
 }));
 
-// Import after mock
-import { useFloatingPanel } from "../components/OverlayLayer/useFloatingPanel";
+import { useFloatingPanel } from "../shared/ui/overlay/useFloatingPanel";
 
 function createRect(x = 0, y = 0, w = 100, h = 40): DOMRect {
   return DOMRect.fromRect({ x, y, width: w, height: h });
@@ -40,10 +38,10 @@ describe("useFloatingPanel", () => {
       const rect = createRect();
 
       act(() => result.current.open(rect, 1));
-      const id1 = result.current.state.instanceId;
+      const firstId = result.current.state.instanceId;
 
       act(() => result.current.open(rect, 2));
-      expect(result.current.state.instanceId).toBeGreaterThan(id1);
+      expect(result.current.state.instanceId).toBeGreaterThan(firstId);
     });
   });
 
@@ -72,9 +70,7 @@ describe("useFloatingPanel", () => {
 
     it("is no-op when already closed", () => {
       const { result } = renderHook(() => useFloatingPanel<number>());
-
       act(() => result.current.close());
-
       expect(result.current.state.phase).toBe("closed");
     });
   });
@@ -91,7 +87,7 @@ describe("useFloatingPanel", () => {
       expect(result.current.isOpen).toBe(false);
     });
 
-    it("resets from opening -> closed (direct markClosed without close)", () => {
+    it("resets from opening -> closed", () => {
       const { result } = renderHook(() => useFloatingPanel<number>());
 
       act(() => result.current.open(createRect(), 1));
@@ -102,7 +98,7 @@ describe("useFloatingPanel", () => {
       expect(result.current.state.payload).toBeNull();
     });
 
-    it("resets from open -> closed (direct markClosed without close)", () => {
+    it("resets from open -> closed", () => {
       const { result } = renderHook(() => useFloatingPanel<number>());
 
       act(() => result.current.open(createRect(), 1));

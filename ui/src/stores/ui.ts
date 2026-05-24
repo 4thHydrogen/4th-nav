@@ -13,9 +13,6 @@ interface UIState {
   openContextMenu: (x: number, y: number, tool: Tool) => void;
   closeContextMenu: () => void;
 
-  openFolder: Tool | null;
-  setOpenFolder: (folder: Tool | null) => void;
-
   selectedCategories: Set<string>;
   toggleCategory: (cat: string) => void;
   clearFilters: () => void;
@@ -30,9 +27,6 @@ export const useUIStore = create<UIState>((set) => ({
     set({ contextMenu: { visible: true, x, y, tool } }),
   closeContextMenu: () =>
     set((s) => ({ contextMenu: { ...s.contextMenu, visible: false } })),
-
-  openFolder: null,
-  setOpenFolder: (folder) => set({ openFolder: folder }),
 
   selectedCategories: new Set<string>(),
   toggleCategory: (cat) =>

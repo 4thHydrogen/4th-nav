@@ -2,6 +2,7 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { ContentData, Tool } from "../types";
+
 Object.defineProperty(window, "matchMedia", {
   writable: true,
   value: vi.fn().mockImplementation((query: string) => ({
@@ -31,8 +32,6 @@ const storeState = {
   contextMenu: { visible: false, x: 0, y: 0, tool: null },
   openContextMenu: vi.fn(),
   closeContextMenu: vi.fn(),
-  openFolder: null,
-  setOpenFolder: vi.fn(),
   selectedCategories: new Set<string>(),
   toggleCategory: vi.fn(),
   clearFilters: vi.fn(),
@@ -52,12 +51,14 @@ const hooksMock = vi.hoisted(() => ({
 
 vi.mock("../pages/home/hooks", () => hooksMock);
 
-vi.mock("../components/Background", () => ({
-  default: () => <div data-testid="background" />,
-}));
-
-vi.mock("../components/SearchBar", () => ({
-  default: ({ searchString, setSearchText }: { searchString: string; setSearchText: (value: string) => void }) => (
+vi.mock("../features/search/SearchBar", () => ({
+  default: ({
+    searchString,
+    setSearchText,
+  }: {
+    searchString: string;
+    setSearchText: (value: string) => void;
+  }) => (
     <input
       aria-label="homepage-search"
       value={searchString}
@@ -66,40 +67,47 @@ vi.mock("../components/SearchBar", () => ({
   ),
 }));
 
-vi.mock("../components/TimeDateWidget", () => ({
+vi.mock("../features/home-layout/TimeDateWidget", () => ({
   default: () => <div data-testid="time-date-widget">12:30</div>,
 }));
 
-vi.mock("../components/ToolItem", () => ({
+vi.mock("../entities/tool/ui/ToolItem", () => ({
   default: ({ tool }: { tool: Tool }) => <a>{tool.name}</a>,
 }));
 
-vi.mock("../components/ToolContextMenu", () => ({
-  default: () => <div data-testid="tool-context-menu" />,
-}));
-
-vi.mock("../components/FloatingActions", () => ({
+vi.mock("../features/home-layout/FloatingActions", () => ({
   default: () => <div data-testid="floating-actions" />,
 }));
 
-
-vi.mock("../components/WidgetGrid", () => ({
-  default: () => <div data-testid="widget-grid" />,
+vi.mock("../features/background/HomeBackground", () => ({
+  default: () => <div data-testid="background" />,
 }));
 
-vi.mock("../components/CategoryFilter", () => ({
+vi.mock("../features/panel-grid/PanelGrid", () => ({
+  default: () => <div data-testid="panel-grid" />,
+}));
+
+vi.mock("../features/dock/Dock", () => ({
+  default: () => <div data-testid="dock" />,
+}));
+
+vi.mock("../features/context-menu/ToolMenu", () => ({
+  default: () => <div data-testid="tool-menu" />,
+}));
+
+vi.mock("../features/home-layout/CategoryFilter", () => ({
   default: () => <div data-testid="category-filter" />,
 }));
 
-vi.mock("../components/DockBar", () => ({
-  default: () => <div data-testid="dock-bar" />,
+vi.mock("../features/home-layout/MobileCategoryMenu", () => ({
+  default: () => <div data-testid="mobile-category-menu" />,
 }));
 
-vi.mock("../components/FolderOverlay", () => ({
-  default: () => <div data-testid="folder-overlay" />,
+vi.mock("../features/settings/SettingsButton", () => ({
+  default: () => <div data-testid="settings-button" />,
 }));
 
-vi.mock("../components/Loading", () => ({
+vi.mock("../shared/ui/Loading", () => ({
   Loading: () => <div data-testid="loading" />,
 }));
 
@@ -162,7 +170,7 @@ const buildData = (): ContentData => ({
   dockItems: [],
 });
 
-describe("Content desktop workspace rendering", () => {
+describe("HomePage desktop workspace rendering", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     queryMocks.useContentQuery.mockReturnValue({

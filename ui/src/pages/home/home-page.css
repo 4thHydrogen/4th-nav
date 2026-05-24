@@ -24,10 +24,6 @@
 }
 
 .desktop-page {
-  --desktop-surface: rgba(255, 255, 255, 0.72);
-  --desktop-surface-strong: rgba(255, 255, 255, 0.86);
-  --desktop-border: rgba(15, 23, 42, 0.08);
-  --desktop-shadow: 0 24px 70px rgba(15, 23, 42, 0.1);
   --dock-safe-area: 96px;
   --record-safe-area: 24px;
   --home-bottom-safe-area: calc(var(--dock-safe-area) + var(--record-safe-area));
@@ -94,7 +90,7 @@
   margin: 0;
 }
 
-.desktop-search-shell .search-wraper {
+.desktop-search-shell .search-wrapper {
   width: 100%;
   background: var(--surface-widget-bg, rgba(255, 255, 255, 0.12));
   backdrop-filter: blur(var(--surface-widget-blur, 18px))
@@ -106,7 +102,7 @@
   color: var(--text-primary);
 }
 
-.desktop-search-shell .search-wraper:focus-within {
+.desktop-search-shell .search-wrapper:focus-within {
   border-color: rgba(99, 102, 241, 0.4);
   box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
 }
@@ -172,11 +168,9 @@
   min-width: 0;
 }
 
-body.dark-mode .desktop-page {
-  --desktop-surface: rgba(32, 34, 38, 0.78);
-  --desktop-surface-strong: rgba(40, 42, 48, 0.92);
-  --desktop-border: rgba(255, 255, 255, 0.08);
-  --desktop-shadow: 0 24px 70px rgba(0, 0, 0, 0.32);
+body.dark-mode .desktop-page,
+body.has-background .desktop-page,
+body.surface-effects .desktop-page {
   --widget-bg: rgba(255, 255, 255, 0.06);
   --widget-bg-hover: rgba(255, 255, 255, 0.1);
   --widget-text: rgba(255, 255, 255, 0.85);
@@ -195,36 +189,12 @@ body.dark-mode .desktop-page {
   --widget-scrollbar: rgba(255, 255, 255, 0.15);
 }
 
-body.dark-mode .desktop-search-shell .search-wraper {
+body.dark-mode .desktop-search-shell .search-wrapper {
   color: rgba(255, 255, 255, 0.88);
 }
 
-body.has-background .desktop-page,
-body.surface-effects .desktop-page {
-  --desktop-surface: rgba(255, 255, 255, 0.08);
-  --desktop-surface-strong: rgba(255, 255, 255, 0.14);
-  --desktop-border: rgba(255, 255, 255, 0.12);
-  --desktop-shadow: 0 24px 70px rgba(0, 0, 0, 0.22);
-  --widget-bg: rgba(255, 255, 255, 0.06);
-  --widget-bg-hover: rgba(255, 255, 255, 0.1);
-  --widget-text: rgba(255, 255, 255, 0.85);
-  --widget-text-muted: rgba(255, 255, 255, 0.6);
-  --widget-text-faint: rgba(255, 255, 255, 0.4);
-  --widget-text-subtle: rgba(255, 255, 255, 0.3);
-  --widget-border: rgba(255, 255, 255, 0.08);
-  --widget-icon-bg: rgba(255, 255, 255, 0.08);
-  --widget-icon-bg-hover: rgba(255, 255, 255, 0.15);
-  --widget-overlay-bg: rgba(30, 32, 38, 0.92);
-  --widget-overlay-border: rgba(255, 255, 255, 0.1);
-  --widget-overlay-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-  --widget-panel-bg: rgba(30, 32, 38, 0.65);
-  --widget-badge-bg: rgba(0, 0, 0, 0.5);
-  --widget-badge-text: rgba(255, 255, 255, 0.85);
-  --widget-scrollbar: rgba(255, 255, 255, 0.15);
-}
-
-body.has-background .desktop-search-shell .search-wraper,
-body.surface-effects .desktop-search-shell .search-wraper {
+body.has-background .desktop-search-shell .search-wrapper,
+body.surface-effects .desktop-search-shell .search-wrapper {
   color: rgba(255, 255, 255, 0.94);
 }
 
@@ -271,7 +241,7 @@ body.surface-effects .desktop-search-shell input::placeholder {
     padding: 0;
   }
 
-  .desktop-search-shell .search-wraper {
+  .desktop-search-shell .search-wrapper {
     height: 42px;
   }
 

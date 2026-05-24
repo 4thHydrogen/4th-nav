@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import { useUIStore } from "../stores/ui";
 import type { Tool } from "../types";
 
@@ -31,7 +31,6 @@ const mockFolder: Tool = {
 
 const initialState = {
   contextMenu: { visible: false, x: 0, y: 0, tool: null },
-  openFolder: null,
   selectedCategories: new Set<string>(),
   searchValue: "",
 };
@@ -48,10 +47,6 @@ describe("useUIStore", () => {
       expect(contextMenu.x).toBe(0);
       expect(contextMenu.y).toBe(0);
       expect(contextMenu.tool).toBeNull();
-    });
-
-    it("has openFolder as null", () => {
-      expect(useUIStore.getState().openFolder).toBeNull();
     });
 
     it("has an empty selectedCategories Set", () => {
@@ -97,29 +92,6 @@ describe("useUIStore", () => {
       expect(contextMenu.x).toBe(30);
       expect(contextMenu.y).toBe(40);
       expect(contextMenu.tool).toEqual(mockFolder);
-    });
-  });
-
-  describe("openFolder / setOpenFolder", () => {
-    it("setOpenFolder sets the folder", () => {
-      useUIStore.getState().setOpenFolder(mockFolder);
-
-      expect(useUIStore.getState().openFolder).toEqual(mockFolder);
-    });
-
-    it("setting null clears the folder", () => {
-      useUIStore.getState().setOpenFolder(mockFolder);
-      useUIStore.getState().setOpenFolder(null);
-
-      expect(useUIStore.getState().openFolder).toBeNull();
-    });
-
-    it("setting a new folder replaces the old one", () => {
-      useUIStore.getState().setOpenFolder(mockTool);
-      useUIStore.getState().setOpenFolder(mockFolder);
-
-      expect(useUIStore.getState().openFolder).toEqual(mockFolder);
-      expect(useUIStore.getState().openFolder!.id).toBe(2);
     });
   });
 

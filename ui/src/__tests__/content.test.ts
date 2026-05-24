@@ -97,7 +97,9 @@ describe("Content filtering and grouping logic", () => {
     const groups: Record<string, Tool[]> = {};
     visible.forEach((item) => {
       const category = item.category || "未分类";
-      if (!groups[category]) groups[category] = [];
+      if (!groups[category]) {
+        groups[category] = [];
+      }
       groups[category].push(item);
     });
     expect(Object.keys(groups)).toEqual(["开发", "设计"]);
@@ -111,16 +113,22 @@ describe("Content filtering and grouping logic", () => {
     const groups: Record<string, Tool[]> = {};
     visible.forEach((item) => {
       const category = item.category || "未分类";
-      if (!groups[category]) groups[category] = [];
+      if (!groups[category]) {
+        groups[category] = [];
+      }
       groups[category].push(item);
     });
 
     const ordered: Record<string, Tool[]> = {};
     categoryOrder.forEach((category) => {
-      if (groups[category]) ordered[category] = groups[category];
+      if (groups[category]) {
+        ordered[category] = groups[category];
+      }
     });
     Object.keys(groups).forEach((category) => {
-      if (!ordered[category]) ordered[category] = groups[category];
+      if (!ordered[category]) {
+        ordered[category] = groups[category];
+      }
     });
 
     expect(Object.keys(ordered)).toEqual(["设计", "开发"]);

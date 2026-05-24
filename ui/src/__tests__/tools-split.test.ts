@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import type { DataType } from "../pages/admin/tabs/Tools/DraggableRow";
 import type { Category } from "../types";
+import type { DataType } from "../features/admin-tools/DraggableRow";
 
 describe("DataType interface", () => {
   it("accepts objects with id, name, sort and extra fields", () => {
@@ -43,13 +43,13 @@ describe("ToolFormModal types", () => {
 
 describe("Tools component structure", () => {
   it("DraggableRow module exports Row and DragHandle", async () => {
-    const mod = await import("../pages/admin/tabs/Tools/DraggableRow");
+    const mod = await import("../features/admin-tools/DraggableRow");
     expect(typeof mod.Row).toBe("function");
     expect(typeof mod.DragHandle).toBe("function");
   });
 
   it("ToolFormModal module exports default component", async () => {
-    const mod = await import("../pages/admin/tabs/Tools/ToolFormModal");
+    const mod = await import("../features/admin-tools/ToolFormModal");
     expect(mod.default).toBeDefined();
   });
 

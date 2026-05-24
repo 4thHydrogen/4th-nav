@@ -134,6 +134,5 @@ requirements.txt
 .agents/
 .codex/
 .claude/
-.specify/
 .tmp/
 AGENTS.md

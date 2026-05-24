@@ -1,4 +1,4 @@
-import ToolContextMenu from "../../components/ToolContextMenu";
+import ToolContextMenu from "./index";
 import type { Tool, ToolViewMode } from "../../types";
 
 interface ContextMenuState {

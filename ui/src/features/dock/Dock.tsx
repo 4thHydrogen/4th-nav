@@ -1,4 +1,4 @@
-import DockBar from "../../components/DockBar";
+import DockBar from "./DockBar";
 import type { DockItem } from "../../types";
 
 interface DockProps {

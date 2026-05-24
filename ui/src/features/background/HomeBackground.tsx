@@ -1,4 +1,4 @@
-import Background from "../../components/Background";
+import Background from "./Background";
 import type { Setting } from "../../types";
 
 interface HomeBackgroundProps {

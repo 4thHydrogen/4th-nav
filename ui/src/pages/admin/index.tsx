@@ -1,6 +1,14 @@
 import { useEffect, useState } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { Home, LayoutGrid, LogOut, Package, Search, Settings, Star } from "lucide-react";
+import {
+  Home,
+  LayoutGrid,
+  LogOut,
+  Package,
+  Search,
+  Settings,
+  Star,
+} from "lucide-react";
 import { Sidebar, type MenuItem } from "./components/sidebar";
 import "./index.css";
 import { useOnce } from "../../utils/useOnce";
@@ -65,18 +73,26 @@ export const AdminPage = () => {
   return (
     <div className="admin-page min-h-screen bg-gray-50">
       <header className="bg-white border-b border-gray-200">
-        <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+        <div className="mx-auto max-w-[1920px] px-4 sm:px-6 lg:px-8">
+          <div className="flex h-16 items-center justify-between">
             <div className="flex items-center">
-              <h1 className="text-xl font-semibold text-gray-900">4th Nav 管理系统</h1>
+              <h1 className="text-xl font-semibold text-gray-900">
+                4th Nav 管理系统
+              </h1>
             </div>
 
             <div className="flex items-center space-x-4">
-              <Link to="/" className="flex items-center px-3 py-2 text-sm text-gray-700 hover:text-gray-900">
+              <Link
+                to="/"
+                className="flex items-center px-3 py-2 text-sm text-gray-700 hover:text-gray-900"
+              >
                 <Home size={16} className="mr-2" />
                 返回首页
               </Link>
-              <button onClick={handleLogout} className="flex items-center px-3 py-2 text-sm text-gray-700 hover:text-gray-900">
+              <button
+                onClick={handleLogout}
+                className="flex items-center px-3 py-2 text-sm text-gray-700 hover:text-gray-900"
+              >
                 <LogOut size={16} className="mr-2" />
                 退出登录
               </button>
@@ -85,10 +101,14 @@ export const AdminPage = () => {
         </div>
       </header>
 
-      <div className="flex flex-1 w-full mx-auto h-[calc(100vh-64px)]">
-        <Sidebar items={menuItems} currentKey={currentKey} onChange={setCurrentKey} />
+      <div className="mx-auto flex h-[calc(100vh-64px)] w-full flex-1">
+        <Sidebar
+          items={menuItems}
+          currentKey={currentKey}
+          onChange={setCurrentKey}
+        />
         <main className="flex-1 overflow-auto">
-          <div className="p-4 h-full">
+          <div className="h-full p-4">
             <Outlet />
           </div>
         </main>

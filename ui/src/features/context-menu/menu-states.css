@@ -1,0 +1,31 @@
+.tool-context-menu-item:hover {
+  background: var(--widget-icon-bg, rgba(255, 255, 255, 0.1));
+}
+
+.tool-context-menu-submenu-flyout .tool-context-menu-item.active {
+  background: var(--widget-icon-bg, rgba(99, 102, 241, 0.12));
+  font-weight: 600;
+}
+
+.size-picker-option:hover {
+  background: var(--widget-icon-bg, rgba(120, 130, 150, 0.08));
+  border-color: var(--widget-border, rgba(120, 130, 150, 0.2));
+}
+
+.size-picker-option.active {
+  border-color: var(--widget-accent, rgba(99, 102, 241, 0.5));
+  background: var(--widget-icon-bg, rgba(99, 102, 241, 0.08));
+}
+
+.size-picker-option.active .size-picker-label {
+  color: var(--widget-text);
+  font-weight: 600;
+}
+
+.tool-context-menu-danger {
+  color: #e53e3e;
+}
+
+.tool-context-menu-danger:hover {
+  background: rgba(229, 62, 62, 0.08);
+}

@@ -23,7 +23,7 @@ func main() {
 
 	router := server.NewRouter(fs)
 
-	logger.LogInfo("应用启动成功，网址: http://localhost:%s", *port)
+	logger.LogInfo("应用启动成功，地址: http://localhost:%s", *port)
 	srv := server.NewHTTPServer(*addr, *port, router)
 
 	if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {

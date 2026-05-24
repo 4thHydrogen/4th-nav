@@ -1,30 +1,46 @@
 # 4th Nav
 
-轻量自部署导航页。适合作为浏览器主页或团队内部书签管理工具。
+一个轻量的自部署导航页项目，适合作为浏览器首页、团队书签面板，或个人工具入口。
 
 ## 技术栈
 
-- **后端**: Go + Gin + SQLite
-- **前端**: React + Vite + TypeScript + Ant Design + React Query + Zustand
-- **构建**: Docker 多阶段构建
-- **部署**: 单体服务，Go 后端嵌入前端静态文件
+- 后端：Go + Gin + SQLite
+- 前端：React 18 + Vite + TypeScript + Ant Design
+- 数据获取：React Query
+- 瞬时界面状态：Zustand
+- 构建与部署：单体服务，Go 嵌入前端静态资源
+
+## 当前架构
+
+### 后端
+
+- `handler/`：HTTP 参数解析、响应编码
+- `service/`：业务编排与规则
+- `repository/`：SQLite 访问
+- `database/`：建库、迁移、初始化
+- `types/`：公共 DTO 与领域结构
+
+### 前端
+
+- `pages/`：页面入口（首页、后台、登录）
+- `features/`：业务功能模块
+- `components/`：仍在复用的通用组件
+- `shared/`：API、样式 token、基础 UI
+- `entities/`：前端 normalize / adapter 层
 
 ## 功能
 
 - 导航工具展示与管理
+- 分类与排序
+- Dock 快捷访问
+- 文件夹分组与展开
+- 网格布局拖拽
+- 搜索引擎切换
+- 主题与背景图
+- PWA / Service Worker 支持
 - 后台管理界面
-- 分类管理
-- 工具管理（增删改查、拖拽排序）
-- 搜索引擎集成
-- Dock 栏快捷访问
-- 文件夹组织
-- 布局拖拽
-- 主题切换（亮色/暗色/自动）
-- 背景图（支持 Pexels）
-- PWA / Service Worker 离线支持
-- 导入导出
 - API Token 支持
-- 移动端适配
+- 导入导出
 
 ## 本地开发
 
@@ -34,7 +50,7 @@
 go run .
 ```
 
-默认端口 6412，可通过 `-port` 参数指定：
+默认监听 `6412` 端口，也可以自定义：
 
 ```bash
 go run . -port 8080
@@ -44,11 +60,34 @@ go run . -port 8080
 
 ```bash
 cd ui
-pnpm install
-pnpm dev
+corepack pnpm install
+corepack pnpm dev
 ```
 
-前端开发服务器会代理 `/api` 请求到后端。
+前端开发服务器默认运行在 `2333`，并代理 `/api` 到本地后端。
+
+## 构建
+
+### 一键构建
+
+```bash
+make build
+```
+
+这会：
+
+1. 构建前端并输出到仓库根目录 `public/`
+2. 构建 Go 二进制 `nav`
+
+### 手动构建
+
+```bash
+cd ui
+corepack pnpm install --frozen-lockfile
+corepack pnpm build
+cd ..
+go build -o nav .
+```
 
 ## Docker 部署
 
@@ -62,41 +101,31 @@ docker run -d \
   4thhydrogen/4th-nav:latest
 ```
 
-打开浏览器访问 http://localhost:6412
+部署后访问 [http://localhost:6412](http://localhost:6412)。
 
 ## 环境变量
 
 | 变量 | 说明 | 默认值 |
-|------|------|--------|
-| `JWT_SECRET` | JWT 签名密钥，**生产环境必须配置**，否则重启后登录态失效 | 随机生成 |
+| --- | --- | --- |
+| `JWT_SECRET` | JWT 签名密钥。生产环境必须固定配置。 | 启动时随机生成 |
 
 ## 数据目录
 
-数据存储在 `/app/data` 目录下：
+默认数据目录为 `/app/data`：
 
-- `nav.db` - SQLite 数据库
+- `nav.db`：SQLite 数据库
 
-使用 Docker 部署时，请通过 `-v` 挂载持久化存储。
+Docker 部署时请务必通过 `-v` 做持久化挂载。
 
-## 默认账号
+## 默认账户
 
-- 用户名: `admin`
-- 密码: `admin`
+- 用户名：`admin`
+- 密码：`admin`
 
-首次登录后请立即在后台修改密码。
-
-## 构建发布
-
-```bash
-# 构建前端
-cd ui && pnpm install --frozen-lockfile && pnpm build && cd ..
-
-# 构建 Go 二进制
-go build -o nav .
-```
+首次登录后请立即修改密码。
 
 ## 注意事项
 
-- **JWT_SECRET**: 生产环境务必配置固定的 `JWT_SECRET`，否则每次重启服务后已登录用户的 token 会失效
-- 数据库为 SQLite，适合个人或小团队使用，不建议高并发场景
-- 单二进制部署，Go 后端会将前端静态文件嵌入到二进制中
+- 生产环境必须固定 `JWT_SECRET`，否则服务重启后已有登录态会失效
+- 前端构建产物输出到根目录 `public/`，Go 服务通过 `embed` 直接提供静态资源
+- 本项目适合个人或小团队场景，不建议直接用于高并发部署

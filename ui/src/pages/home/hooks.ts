@@ -33,18 +33,23 @@ export function useSearch(data: ContentData | null) {
   );
 
   const filteredData = useMemo(() => {
-    if (!data?.tools) return [];
+    if (!data?.tools) {
+      return [];
+    }
+
     return data.tools
       .filter((item: Tool) => currTag === ALL_TOOLS_CATEGORY || item.category === currTag)
       .filter((item: Tool) => {
-        if (searchString === "") return true;
+        if (searchString === "") {
+          return true;
+        }
         return (
           mutiSearch(item.name, searchString) ||
           mutiSearch(item.description, searchString) ||
           mutiSearch(item.url, searchString)
         );
       });
-  }, [data, currTag, searchString]);
+  }, [currTag, data?.tools, searchString]);
 
   const restoreTag = useCallback((categories: string[]) => {
     const tagInLocalStorage = window.localStorage.getItem("tag");
@@ -70,6 +75,7 @@ export function useCategoryObserver(groupedData: Record<string, Tool[]> | null) 
       setVisibleCategory("");
       return;
     }
+
     const categories = Object.keys(groupedData);
     const observer = new IntersectionObserver(
       (entries) => {
@@ -89,7 +95,9 @@ export function useCategoryObserver(groupedData: Record<string, Tool[]> | null) 
 
     categories.forEach((category) => {
       const element = document.getElementById(`category-${category}`);
-      if (element) observer.observe(element);
+      if (element) {
+        observer.observe(element);
+      }
     });
 
     if (categories.length > 0) {
@@ -124,7 +132,9 @@ export function useKeyboardNavigation(
   const onKeyEnter = useCallback(
     (event: KeyboardEvent) => {
       if (event.key === "Enter") {
-        if (!searchString.trim()) return;
+        if (!searchString.trim()) {
+          return;
+        }
         if (selectedEngine) {
           const url = generateSearchUrl(
             selectedEngine.baseUrl,
@@ -135,10 +145,13 @@ export function useKeyboardNavigation(
           resetSearch();
         }
       }
+
       if (event.ctrlKey || event.metaKey) {
         const cards = filteredDataRef.current;
         const num = Number(event.key);
-        if (Number.isNaN(num)) return;
+        if (Number.isNaN(num)) {
+          return;
+        }
         event.preventDefault();
         const index = Number(event.key) - 1;
         if (index >= 0 && index < cards.length) {
@@ -156,6 +169,7 @@ export function useKeyboardNavigation(
     } else {
       document.addEventListener("keydown", onKeyEnter);
     }
+
     return () => {
       document.removeEventListener("keydown", onKeyEnter);
     };
@@ -174,6 +188,7 @@ export function useBackgroundEffect(enableSurfaceEffects: boolean, enableBackgro
     body.classList.toggle("surface-effects", enableSurfaceEffects);
     body.classList.toggle("has-background", enableBackground);
     localStorage.setItem("nav-bg", enableBackground ? "1" : "0");
+
     return () => {
       body.classList.remove("surface-effects");
       body.classList.remove("has-background");

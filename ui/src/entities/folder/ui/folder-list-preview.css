@@ -1,0 +1,90 @@
+.widget-folder-list-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  width: 100%;
+  overflow: hidden;
+  padding-right: 28px;
+}
+
+.widget-folder-list-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 4px;
+  box-sizing: border-box;
+  overflow: hidden;
+  cursor: pointer;
+  border-radius: 6px;
+  text-decoration: none;
+  color: inherit;
+  transition:
+    background-color 0.15s ease,
+    transform 0.15s ease,
+    color 0.15s ease;
+}
+
+.widget-folder-list-item:hover {
+  background: var(--widget-icon-bg, rgba(120, 130, 150, 0.16));
+}
+
+.widget-folder-list-item-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  overflow: hidden;
+  background: var(--widget-icon-bg);
+  transition: transform 0.15s ease;
+}
+
+.widget-folder-list-item:hover .widget-folder-list-item-icon {
+  transform: scale(1.06);
+}
+
+.widget-folder-list-item-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 2px;
+}
+
+.widget-folder-list-item-char {
+  font-size: 8px;
+  font-weight: 600;
+  color: var(--widget-text-muted);
+}
+
+.widget-folder-list-item-name {
+  font-size: 10px;
+  color: var(--widget-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.widget-folder-list-overflow {
+  text-align: center;
+  font-size: 10px;
+  color: var(--widget-text-muted);
+  padding: 1px 0;
+  user-select: none;
+}
+
+.widget-folder-list-scrollable {
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+  padding-bottom: 18px;
+}
+
+.widget-folder-list-scrollable::-webkit-scrollbar {
+  width: 3px;
+}
+
+.widget-folder-list-scrollable::-webkit-scrollbar-thumb {
+  background: var(--widget-text-muted, #999);
+  border-radius: 2px;
+}

@@ -11,7 +11,7 @@ WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
-COPY --from=frontend-builder /app/ui/build ./public
+COPY --from=frontend-builder /app/public ./public
 RUN go build -o nav .
 
 FROM alpine:latest

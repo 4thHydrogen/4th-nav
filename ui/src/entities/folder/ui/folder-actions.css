@@ -1,0 +1,29 @@
+.widget-folder-open-trigger {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: var(--folder-open-trigger-size);
+  height: var(--folder-open-trigger-size);
+  border: none;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--widget-text-muted);
+  background: var(--folder-open-trigger-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  opacity: 0.72;
+  transition:
+    opacity 0.15s ease,
+    background-color 0.15s ease,
+    transform 0.15s ease;
+  z-index: 20;
+}
+
+.widget-folder-open-trigger:hover {
+  opacity: 1;
+  transform: scale(1.06);
+  background: var(--widget-icon-bg, rgba(120, 130, 150, 0.22));
+}

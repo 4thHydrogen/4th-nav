@@ -1,8 +1,8 @@
 import { useCallback } from "react";
 import { message } from "antd";
-import { fetchDeleteTool, fetchUpdateTool } from "../../shared/api/tool";
 import type { UpdateToolDto } from "../../types";
-import type { DataType } from "../../pages/admin/tabs/Tools/DraggableRow";
+import { fetchDeleteTool, fetchUpdateTool } from "../../shared/api/tool";
+import type { DataType } from "./DraggableRow";
 
 const normalizeRecord = (record: DataType) => ({
   ...record,
@@ -17,14 +17,14 @@ export function useToolBulkActions(
 ) {
   const handleBulkDelete = useCallback(async () => {
     try {
-      for (const each of selectedRows) {
+      for (const row of selectedRows) {
         try {
-          await fetchDeleteTool(each.id);
+          await fetchDeleteTool(row.id);
         } catch {}
       }
-      message.success("删除成功!");
+      message.success("删除成功");
     } catch {
-      message.warning("删除失败!");
+      message.warning("删除失败");
     } finally {
       reload();
     }
@@ -32,14 +32,17 @@ export function useToolBulkActions(
 
   const handleBulkResetLogo = useCallback(async () => {
     try {
-      for (const each of selectedRows) {
+      for (const row of selectedRows) {
         try {
-          await fetchUpdateTool({ ...normalizeRecord(each), logo: "" } as unknown as UpdateToolDto);
+          await fetchUpdateTool({
+            ...normalizeRecord(row),
+            logo: "",
+          } as unknown as UpdateToolDto);
         } catch {}
       }
-      message.success("重置成功!");
+      message.success("重置成功");
     } catch {
-      message.warning("重置失败!");
+      message.warning("重置失败");
     } finally {
       reload();
     }
@@ -47,14 +50,14 @@ export function useToolBulkActions(
 
   const handleBulkCacheLogo = useCallback(async () => {
     try {
-      for (const each of selectedRows) {
+      for (const row of selectedRows) {
         try {
-          await fetchUpdateTool(normalizeRecord(each) as unknown as UpdateToolDto);
+          await fetchUpdateTool(normalizeRecord(row) as unknown as UpdateToolDto);
         } catch {}
       }
-      message.success("缓存成功!");
+      message.success("缓存成功");
     } catch {
-      message.warning("缓存失败!");
+      message.warning("缓存失败");
     } finally {
       reload();
     }
