@@ -1,0 +1,2237 @@
+[
+  {
+    "keywords": [
+      "baidu.com"
+    ],
+    "icon": "/static/icons/engine/baidu.svg",
+    "name": "百度"
+  },
+  {
+    "keywords": [
+      "bing.com"
+    ],
+    "icon": "/static/icons/engine/bing.svg",
+    "name": "Bing"
+  },
+  {
+    "keywords": [
+      "duckduckgo.com",
+      "duck.com"
+    ],
+    "icon": "/static/icons/engine/DuckDuckGo.svg",
+    "name": "DuckDuckGo"
+  },
+  {
+    "keywords": [
+      "google.com",
+      "google.cn",
+      "google.com.hk"
+    ],
+    "icon": "/static/icons/engine/google.svg",
+    "name": "Google"
+  },
+  {
+    "keywords": [
+      "so.360.cn",
+      "360.cn",
+      "haosou.com"
+    ],
+    "icon": "/static/icons/engine/360.svg",
+    "name": "360搜索"
+  },
+  {
+    "keywords": [
+      "sogou.com"
+    ],
+    "icon": "/static/icons/engine/sougou.svg",
+    "name": "搜狗"
+  },
+  {
+    "keywords": [
+      "anthropic.com",
+      "claude.ai"
+    ],
+    "icon": "/static/icons/brand/anthropic.svg",
+    "name": "Anthropic"
+  },
+  {
+    "keywords": [
+      "huggingface.co"
+    ],
+    "icon": "/static/icons/brand/huggingface.svg",
+    "name": "Hugging Face"
+  },
+  {
+    "keywords": [
+      "airbnb.com",
+      "airbnb.cn"
+    ],
+    "icon": "/static/icons/brand/airbnb.svg",
+    "name": "Airbnb"
+  },
+  {
+    "keywords": [
+      "algolia.com",
+      "algolia.net"
+    ],
+    "icon": "/static/icons/brand/algolia.svg",
+    "name": "Algolia"
+  },
+  {
+    "keywords": [
+      "amazon.com",
+      "amazon.cn",
+      "amazon.co.jp",
+      "amazonaws.com",
+      "aws.amazon.com"
+    ],
+    "icon": "/static/icons/brand/amazon.svg",
+    "name": "Amazon"
+  },
+  {
+    "keywords": [
+      "apple.com",
+      "icloud.com",
+      "developer.apple.com"
+    ],
+    "icon": "/static/icons/brand/apple.svg",
+    "name": "Apple"
+  },
+  {
+    "keywords": [
+      "artstation.com"
+    ],
+    "icon": "/static/icons/brand/artstation.svg",
+    "name": "ArtStation"
+  },
+  {
+    "keywords": [
+      "asana.com"
+    ],
+    "icon": "/static/icons/brand/asana.svg",
+    "name": "Asana"
+  },
+  {
+    "keywords": [
+      "behance.net"
+    ],
+    "icon": "/static/icons/brand/behance.svg",
+    "name": "Behance"
+  },
+  {
+    "keywords": [
+      "bitbucket.org"
+    ],
+    "icon": "/static/icons/brand/bitbucket.svg",
+    "name": "Bitbucket"
+  },
+  {
+    "keywords": [
+      "booking.com"
+    ],
+    "icon": "/static/icons/brand/booking.svg",
+    "name": "Booking.com"
+  },
+  {
+    "keywords": [
+      "box.com"
+    ],
+    "icon": "/static/icons/brand/box.svg",
+    "name": "Box"
+  },
+  {
+    "keywords": [
+      "clickup.com"
+    ],
+    "icon": "/static/icons/brand/clickup.svg",
+    "name": "ClickUp"
+  },
+  {
+    "keywords": [
+      "cloudflare.com",
+      "workers.cloudflare.com"
+    ],
+    "icon": "/static/icons/brand/cloudflare.svg",
+    "name": "Cloudflare"
+  },
+  {
+    "keywords": [
+      "cloudinary.com"
+    ],
+    "icon": "/static/icons/brand/cloudinary.svg",
+    "name": "Cloudinary"
+  },
+  {
+    "keywords": [
+      "codesandbox.io"
+    ],
+    "icon": "/static/icons/brand/codesandbox.svg",
+    "name": "CodeSandbox"
+  },
+  {
+    "keywords": [
+      "codepen.io"
+    ],
+    "icon": "/static/icons/brand/codepen.svg",
+    "name": "CodePen"
+  },
+  {
+    "keywords": [
+      "confluence.atlassian.net",
+      "atlassian.com"
+    ],
+    "icon": "/static/icons/brand/confluence.svg",
+    "name": "Confluence"
+  },
+  {
+    "keywords": [
+      "crowdin.com"
+    ],
+    "icon": "/static/icons/brand/crowdin.svg",
+    "name": "Crowdin"
+  },
+  {
+    "keywords": [
+      "dailymotion.com"
+    ],
+    "icon": "/static/icons/brand/dailymotion.svg",
+    "name": "Dailymotion"
+  },
+  {
+    "keywords": [
+      "deepl.com"
+    ],
+    "icon": "/static/icons/brand/deepl.svg",
+    "name": "DeepL"
+  },
+  {
+    "keywords": [
+      "dev.to"
+    ],
+    "icon": "/static/icons/brand/devdotto.svg",
+    "name": "Dev.to"
+  },
+  {
+    "keywords": [
+      "deviantart.com"
+    ],
+    "icon": "/static/icons/brand/deviantart.svg",
+    "name": "DeviantArt"
+  },
+  {
+    "keywords": [
+      "discord.com",
+      "discord.gg"
+    ],
+    "icon": "/static/icons/brand/discord.svg",
+    "name": "Discord"
+  },
+  {
+    "keywords": [
+      "doordash.com"
+    ],
+    "icon": "/static/icons/brand/doordash.svg",
+    "name": "DoorDash"
+  },
+  {
+    "keywords": [
+      "dribbble.com"
+    ],
+    "icon": "/static/icons/brand/dribbble.svg",
+    "name": "Dribbble"
+  },
+  {
+    "keywords": [
+      "dropbox.com"
+    ],
+    "icon": "/static/icons/brand/dropbox.svg",
+    "name": "Dropbox"
+  },
+  {
+    "keywords": [
+      "element.io",
+      "app.element.io"
+    ],
+    "icon": "/static/icons/brand/element.svg",
+    "name": "Element"
+  },
+  {
+    "keywords": [
+      "evernote.com"
+    ],
+    "icon": "/static/icons/brand/evernote.svg",
+    "name": "Evernote"
+  },
+  {
+    "keywords": [
+      "etsy.com"
+    ],
+    "icon": "/static/icons/brand/etsy.svg",
+    "name": "Etsy"
+  },
+  {
+    "keywords": [
+      "feedly.com"
+    ],
+    "icon": "/static/icons/brand/feedly.svg",
+    "name": "Feedly"
+  },
+  {
+    "keywords": [
+      "figma.com"
+    ],
+    "icon": "/static/icons/brand/figma.svg",
+    "name": "Figma"
+  },
+  {
+    "keywords": [
+      "flickr.com"
+    ],
+    "icon": "/static/icons/brand/flickr.svg",
+    "name": "Flickr"
+  },
+  {
+    "keywords": [
+      "flipboard.com"
+    ],
+    "icon": "/static/icons/brand/flipboard.svg",
+    "name": "Flipboard"
+  },
+  {
+    "keywords": [
+      "500px.com"
+    ],
+    "icon": "/static/icons/brand/500px.svg",
+    "name": "500px"
+  },
+  {
+    "keywords": [
+      "github.com"
+    ],
+    "icon": "/static/icons/brand/github.svg",
+    "name": "GitHub"
+  },
+  {
+    "keywords": [
+      "gitlab.com"
+    ],
+    "icon": "/static/icons/brand/gitlab.svg",
+    "name": "GitLab"
+  },
+  {
+    "keywords": [
+      "goodreads.com"
+    ],
+    "icon": "/static/icons/brand/goodreads.svg",
+    "name": "Goodreads"
+  },
+  {
+    "keywords": [
+      "grammarly.com"
+    ],
+    "icon": "/static/icons/brand/grammarly.svg",
+    "name": "Grammarly"
+  },
+  {
+    "keywords": [
+      "gumroad.com"
+    ],
+    "icon": "/static/icons/brand/gumroad.svg",
+    "name": "Gumroad"
+  },
+  {
+    "keywords": [
+      "hackernews.com",
+      "news.ycombinator.com"
+    ],
+    "icon": "/static/icons/brand/hackernews.svg",
+    "name": "Hacker News"
+  },
+  {
+    "keywords": [
+      "hubspot.com"
+    ],
+    "icon": "/static/icons/brand/hubspot.svg",
+    "name": "HubSpot"
+  },
+  {
+    "keywords": [
+      "imdb.com"
+    ],
+    "icon": "/static/icons/brand/imdb.svg",
+    "name": "IMDb"
+  },
+  {
+    "keywords": [
+      "instagram.com"
+    ],
+    "icon": "/static/icons/brand/instagram.svg",
+    "name": "Instagram"
+  },
+  {
+    "keywords": [
+      "intercom.com",
+      "intercom.help"
+    ],
+    "icon": "/static/icons/brand/intercom.svg",
+    "name": "Intercom"
+  },
+  {
+    "keywords": [
+      "jira.atlassian.net",
+      "jira.com"
+    ],
+    "icon": "/static/icons/brand/jira.svg",
+    "name": "Jira"
+  },
+  {
+    "keywords": [
+      "kick.com"
+    ],
+    "icon": "/static/icons/brand/kick.svg",
+    "name": "Kick"
+  },
+  {
+    "keywords": [
+      "last.fm",
+      "lastfm.com"
+    ],
+    "icon": "/static/icons/brand/lastdotfm.svg",
+    "name": "Last.fm"
+  },
+  {
+    "keywords": [
+      "lemonsqueezy.com"
+    ],
+    "icon": "/static/icons/brand/lemonsqueezy.svg",
+    "name": "Lemon Squeezy"
+  },
+  {
+    "keywords": [
+      "letterboxd.com"
+    ],
+    "icon": "/static/icons/brand/letterboxd.svg",
+    "name": "Letterboxd"
+  },
+  {
+    "keywords": [
+      "lichess.org"
+    ],
+    "icon": "/static/icons/brand/lichess.svg",
+    "name": "Lichess"
+  },
+  {
+    "keywords": [
+      "linear.app"
+    ],
+    "icon": "/static/icons/brand/linear.svg",
+    "name": "Linear"
+  },
+  {
+    "keywords": [
+      "mailchimp.com"
+    ],
+    "icon": "/static/icons/brand/mailchimp.svg",
+    "name": "Mailchimp"
+  },
+  {
+    "keywords": [
+      "matrix.org",
+      "matrix.to"
+    ],
+    "icon": "/static/icons/brand/matrix.svg",
+    "name": "Matrix"
+  },
+  {
+    "keywords": [
+      "mattermost.com",
+      "mattermost.org"
+    ],
+    "icon": "/static/icons/brand/mattermost.svg",
+    "name": "Mattermost"
+  },
+  {
+    "keywords": [
+      "medium.com"
+    ],
+    "icon": "/static/icons/brand/medium.svg",
+    "name": "Medium"
+  },
+  {
+    "keywords": [
+      "meilisearch.com"
+    ],
+    "icon": "/static/icons/brand/meilisearch.svg",
+    "name": "Meilisearch"
+  },
+  {
+    "keywords": [
+      "meta.com",
+      "facebook.com",
+      "fb.com",
+      "fbcdn.net",
+      "m.facebook.com"
+    ],
+    "icon": "/static/icons/brand/meta.svg",
+    "name": "Meta"
+  },
+  {
+    "keywords": [
+      "microsoft.com",
+      "office.com",
+      "outlook.com",
+      "live.com",
+      "onenote.com",
+      "sharepoint.com",
+      "teams.microsoft.com"
+    ],
+    "icon": "/static/icons/brand/microsoft.svg",
+    "name": "Microsoft"
+  },
+  {
+    "keywords": [
+      "naver.com",
+      "naver.me"
+    ],
+    "icon": "/static/icons/brand/naver.svg",
+    "name": "Naver"
+  },
+  {
+    "keywords": [
+      "netflix.com"
+    ],
+    "icon": "/static/icons/brand/netflix.svg",
+    "name": "Netflix"
+  },
+  {
+    "keywords": [
+      "netlify.com"
+    ],
+    "icon": "/static/icons/brand/netlify.svg",
+    "name": "Netlify"
+  },
+  {
+    "keywords": [
+      "notion.so",
+      "notion.site"
+    ],
+    "icon": "/static/icons/brand/notion.svg",
+    "name": "Notion"
+  },
+  {
+    "keywords": [
+      "obsidian.md"
+    ],
+    "icon": "/static/icons/brand/obsidian.svg",
+    "name": "Obsidian"
+  },
+  {
+    "keywords": [
+      "patreon.com"
+    ],
+    "icon": "/static/icons/brand/patreon.svg",
+    "name": "Patreon"
+  },
+  {
+    "keywords": [
+      "paypal.com",
+      "paypal.me"
+    ],
+    "icon": "/static/icons/brand/paypal.svg",
+    "name": "PayPal"
+  },
+  {
+    "keywords": [
+      "pinterest.com",
+      "pin.it"
+    ],
+    "icon": "/static/icons/brand/pinterest.svg",
+    "name": "Pinterest"
+  },
+  {
+    "keywords": [
+      "pixabay.com"
+    ],
+    "icon": "/static/icons/brand/pixabay.svg",
+    "name": "Pixabay"
+  },
+  {
+    "keywords": [
+      "producthunt.com"
+    ],
+    "icon": "/static/icons/brand/producthunt.svg",
+    "name": "Product Hunt"
+  },
+  {
+    "keywords": [
+      "reddit.com",
+      "old.reddit.com",
+      "new.reddit.com"
+    ],
+    "icon": "/static/icons/brand/reddit.svg",
+    "name": "Reddit"
+  },
+  {
+    "keywords": [
+      "replit.com",
+      "repl.it"
+    ],
+    "icon": "/static/icons/brand/replit.svg",
+    "name": "Replit"
+  },
+  {
+    "keywords": [
+      "rottentomatoes.com"
+    ],
+    "icon": "/static/icons/brand/rottentomatoes.svg",
+    "name": "Rotten Tomatoes"
+  },
+  {
+    "keywords": [
+      "rumble.com"
+    ],
+    "icon": "/static/icons/brand/rumble.svg",
+    "name": "Rumble"
+  },
+  {
+    "keywords": [
+      "runkeeper.com"
+    ],
+    "icon": "/static/icons/brand/runkeeper.svg",
+    "name": "Runkeeper"
+  },
+  {
+    "keywords": [
+      "salesforce.com",
+      "force.com"
+    ],
+    "icon": "/static/icons/brand/salesforce.svg",
+    "name": "Salesforce"
+  },
+  {
+    "keywords": [
+      "shopify.com",
+      "myshopify.com"
+    ],
+    "icon": "/static/icons/brand/shopify.svg",
+    "name": "Shopify"
+  },
+  {
+    "keywords": [
+      "sketch.com"
+    ],
+    "icon": "/static/icons/brand/sketch.svg",
+    "name": "Sketch"
+  },
+  {
+    "keywords": [
+      "slack.com"
+    ],
+    "icon": "/static/icons/brand/slack.svg",
+    "name": "Slack"
+  },
+  {
+    "keywords": [
+      "snapchat.com"
+    ],
+    "icon": "/static/icons/brand/snapchat.svg",
+    "name": "Snapchat"
+  },
+  {
+    "keywords": [
+      "soundcloud.com"
+    ],
+    "icon": "/static/icons/brand/soundcloud.svg",
+    "name": "SoundCloud"
+  },
+  {
+    "keywords": [
+      "spotify.com",
+      "open.spotify.com"
+    ],
+    "icon": "/static/icons/brand/spotify.svg",
+    "name": "Spotify"
+  },
+  {
+    "keywords": [
+      "squarespace.com"
+    ],
+    "icon": "/static/icons/brand/squarespace.svg",
+    "name": "Squarespace"
+  },
+  {
+    "keywords": [
+      "stackoverflow.com"
+    ],
+    "icon": "/static/icons/brand/stackoverflow.svg",
+    "name": "Stack Overflow"
+  },
+  {
+    "keywords": [
+      "steamcommunity.com",
+      "store.steampowered.com",
+      "steampowered.com"
+    ],
+    "icon": "/static/icons/brand/steam.svg",
+    "name": "Steam"
+  },
+  {
+    "keywords": [
+      "strava.com"
+    ],
+    "icon": "/static/icons/brand/strava.svg",
+    "name": "Strava"
+  },
+  {
+    "keywords": [
+      "stripe.com"
+    ],
+    "icon": "/static/icons/brand/stripe.svg",
+    "name": "Stripe"
+  },
+  {
+    "keywords": [
+      "telegram.org",
+      "t.me",
+      "web.telegram.org"
+    ],
+    "icon": "/static/icons/brand/telegram.svg",
+    "name": "Telegram"
+  },
+  {
+    "keywords": [
+      "trello.com"
+    ],
+    "icon": "/static/icons/brand/trello.svg",
+    "name": "Trello"
+  },
+  {
+    "keywords": [
+      "tripadvisor.com",
+      "tripadvisor.cn"
+    ],
+    "icon": "/static/icons/brand/tripadvisor.svg",
+    "name": "TripAdvisor"
+  },
+  {
+    "keywords": [
+      "tumblr.com"
+    ],
+    "icon": "/static/icons/brand/tumblr.svg",
+    "name": "Tumblr"
+  },
+  {
+    "keywords": [
+      "twitch.tv"
+    ],
+    "icon": "/static/icons/brand/twitch.svg",
+    "name": "Twitch"
+  },
+  {
+    "keywords": [
+      "twitter.com",
+      "x.com",
+      "t.co"
+    ],
+    "icon": "/static/icons/brand/twitter.svg",
+    "name": "X / Twitter"
+  },
+  {
+    "keywords": [
+      "ubereats.com",
+      "uber.com"
+    ],
+    "icon": "/static/icons/brand/ubereats.svg",
+    "name": "Uber Eats"
+  },
+  {
+    "keywords": [
+      "unsplash.com"
+    ],
+    "icon": "/static/icons/brand/unsplash.svg",
+    "name": "Unsplash"
+  },
+  {
+    "keywords": [
+      "vercel.com",
+      "vercel.app",
+      "now.sh"
+    ],
+    "icon": "/static/icons/brand/vercel.svg",
+    "name": "Vercel"
+  },
+  {
+    "keywords": [
+      "webflow.com"
+    ],
+    "icon": "/static/icons/brand/webflow.svg",
+    "name": "Webflow"
+  },
+  {
+    "keywords": [
+      "wikipedia.org",
+      "wikimedia.org",
+      "zh.wikipedia.org",
+      "en.wikipedia.org"
+    ],
+    "icon": "/static/icons/brand/wikipedia.svg",
+    "name": "Wikipedia"
+  },
+  {
+    "keywords": [
+      "wix.com"
+    ],
+    "icon": "/static/icons/brand/wix.svg",
+    "name": "Wix"
+  },
+  {
+    "keywords": [
+      "wordpress.com",
+      "wordpress.org",
+      "wp.com"
+    ],
+    "icon": "/static/icons/brand/wordpress.svg",
+    "name": "WordPress"
+  },
+  {
+    "keywords": [
+      "youtube.com",
+      "youtu.be"
+    ],
+    "icon": "/static/icons/brand/youtube.svg",
+    "name": "YouTube"
+  },
+  {
+    "keywords": [
+      "zendesk.com"
+    ],
+    "icon": "/static/icons/brand/zendesk.svg",
+    "name": "Zendesk"
+  },
+  {
+    "keywords": [
+      "zulip.com",
+      "zulipchat.com"
+    ],
+    "icon": "/static/icons/brand/zulip.svg",
+    "name": "Zulip"
+  },
+  {
+    "keywords": [
+      "aliexpress.com",
+      "aliexpress.ru"
+    ],
+    "icon": "/static/icons/brand/aliexpress.svg",
+    "name": "AliExpress"
+  },
+  {
+    "keywords": [
+      "bandcamp.com"
+    ],
+    "icon": "/static/icons/brand/bandcamp.svg",
+    "name": "Bandcamp"
+  },
+  {
+    "keywords": [
+      "buymeacoffee.com"
+    ],
+    "icon": "/static/icons/brand/buymeacoffee.svg",
+    "name": "Buy Me a Coffee"
+  },
+  {
+    "keywords": [
+      "chess.com"
+    ],
+    "icon": "/static/icons/brand/chessdotcom.svg",
+    "name": "Chess.com"
+  },
+  {
+    "keywords": [
+      "epicgames.com",
+      "epicgames.store"
+    ],
+    "icon": "/static/icons/brand/epicgames.svg",
+    "name": "Epic Games"
+  },
+  {
+    "keywords": [
+      "ko-fi.com"
+    ],
+    "icon": "/static/icons/brand/ko-fi.svg",
+    "name": "Ko-fi"
+  },
+  {
+    "keywords": [
+      "opencollective.com"
+    ],
+    "icon": "/static/icons/brand/opencollective.svg",
+    "name": "Open Collective"
+  },
+  {
+    "keywords": [
+      "playstation.com"
+    ],
+    "icon": "/static/icons/brand/playstation.svg",
+    "name": "PlayStation"
+  },
+  {
+    "keywords": [
+      "signal.org",
+      "signal.me"
+    ],
+    "icon": "/static/icons/brand/signal.svg",
+    "name": "Signal"
+  },
+  {
+    "keywords": [
+      "whatsapp.com",
+      "web.whatsapp.com",
+      "wa.me"
+    ],
+    "icon": "/static/icons/brand/whatsapp.svg",
+    "name": "WhatsApp"
+  },
+  {
+    "keywords": [
+      "zoom.us"
+    ],
+    "icon": "/static/icons/brand/zoom.svg",
+    "name": "Zoom"
+  },
+  {
+    "keywords": [
+      "aliyun.com",
+      "alibaba.com",
+      "alibabacloud.com"
+    ],
+    "icon": "/static/icons/brand/aliyun.svg",
+    "name": "阿里云"
+  },
+  {
+    "keywords": [
+      "bilibili.com"
+    ],
+    "icon": "/static/icons/brand/bilibili.svg",
+    "name": "哔哩哔哩"
+  },
+  {
+    "keywords": [
+      "bytedance.com",
+      "byted.org"
+    ],
+    "icon": "/static/icons/brand/bytedance.svg",
+    "name": "字节跳动"
+  },
+  {
+    "keywords": [
+      "cloud.tencent.com",
+      "tencent.com"
+    ],
+    "icon": "/static/icons/brand/tencentcloud.png",
+    "name": "腾讯云"
+  },
+  {
+    "keywords": [
+      "csdn.net"
+    ],
+    "icon": "/static/icons/brand/csdn.svg",
+    "name": "CSDN"
+  },
+  {
+    "keywords": [
+      "douyin.com"
+    ],
+    "icon": "/static/icons/brand/douyin.svg",
+    "name": "抖音"
+  },
+  {
+    "keywords": [
+      "douban.com",
+      "book.douban.com",
+      "movie.douban.com",
+      "music.douban.com"
+    ],
+    "icon": "/static/icons/brand/douban.svg",
+    "name": "豆瓣"
+  },
+  {
+    "keywords": [
+      "gitee.com"
+    ],
+    "icon": "/static/icons/brand/gitee.svg",
+    "name": "Gitee"
+  },
+  {
+    "keywords": [
+      "huawei.com",
+      "huaweicloud.com"
+    ],
+    "icon": "/static/icons/brand/huawei.svg",
+    "name": "华为"
+  },
+  {
+    "keywords": [
+      "iqiyi.com"
+    ],
+    "icon": "/static/icons/brand/iqy.svg",
+    "name": "爱奇艺"
+  },
+  {
+    "keywords": [
+      "jdcloud.com",
+      "jd.com"
+    ],
+    "icon": "/static/icons/brand/jingdongyun.svg",
+    "name": "京东云"
+  },
+  {
+    "keywords": [
+      "js.design"
+    ],
+    "icon": "/static/icons/brand/jsdesign.svg",
+    "name": "即时设计"
+  },
+  {
+    "keywords": [
+      "juejin.cn",
+      "juejin.im"
+    ],
+    "icon": "/static/icons/brand/juejin.svg",
+    "name": "掘金"
+  },
+  {
+    "keywords": [
+      "kuaishou.com"
+    ],
+    "icon": "/static/icons/brand/kuaishou.svg",
+    "name": "快手"
+  },
+  {
+    "keywords": [
+      "le.com"
+    ],
+    "icon": "/static/icons/brand/leshi.svg",
+    "name": "乐视"
+  },
+  {
+    "keywords": [
+      "lenovo.com",
+      "lenovomm.com"
+    ],
+    "icon": "/static/icons/brand/lenovo.svg",
+    "name": "联想"
+  },
+  {
+    "keywords": [
+      "meituan.com",
+      "meishi.meituan.com"
+    ],
+    "icon": "/static/icons/brand/meituan.svg",
+    "name": "美团"
+  },
+  {
+    "keywords": [
+      "meizu.com"
+    ],
+    "icon": "/static/icons/brand/meizu.svg",
+    "name": "魅族"
+  },
+  {
+    "keywords": [
+      "mgtv.com"
+    ],
+    "icon": "/static/icons/brand/mangguo.svg",
+    "name": "芒果TV"
+  },
+  {
+    "keywords": [
+      "migu.cn"
+    ],
+    "icon": "/static/icons/brand/migu.svg",
+    "name": "咪咕"
+  },
+  {
+    "keywords": [
+      "music.163.com",
+      "163.com"
+    ],
+    "icon": "/static/icons/brand/wangyiyun.svg",
+    "name": "网易云音乐"
+  },
+  {
+    "keywords": [
+      "xiaohongshu.com",
+      "xhslink.com"
+    ],
+    "icon": "/static/icons/brand/xiaohongshu.svg",
+    "name": "小红书"
+  },
+  {
+    "keywords": [
+      "xiaomi.com",
+      "mi.com",
+      "xiaomiyoupin.com"
+    ],
+    "icon": "/static/icons/brand/xiaomi.svg",
+    "name": "小米"
+  },
+  {
+    "keywords": [
+      "zhihu.com",
+      "zhuanlan.zhihu.com"
+    ],
+    "icon": "/static/icons/brand/zhihu.svg",
+    "name": "知乎"
+  },
+  {
+    "keywords": [
+      "oppo.com",
+      "coloros.com",
+      "oppoer.com"
+    ],
+    "icon": "/static/icons/brand/oppo.svg",
+    "name": "OPPO"
+  },
+  {
+    "keywords": [
+      "vivo.com",
+      "vivo.com.cn"
+    ],
+    "icon": "/static/icons/brand/vivo.svg",
+    "name": "vivo"
+  },
+  {
+    "keywords": [
+      "oneplus.com",
+      "oneplus.cn"
+    ],
+    "icon": "/static/icons/brand/oneplus.svg",
+    "name": "一加"
+  },
+  {
+    "keywords": [
+      "taobao.com",
+      "tmall.com",
+      "taobao.org"
+    ],
+    "icon": "/static/icons/brand/taobao.svg",
+    "name": "淘宝"
+  },
+  {
+    "keywords": [
+      "tiktok.com",
+      "tiktokv.com"
+    ],
+    "icon": "/static/icons/brand/tiktok.svg",
+    "name": "TikTok"
+  },
+  {
+    "keywords": [
+      "qq.com",
+      "v.qq.com",
+      "y.qq.com"
+    ],
+    "icon": "/static/icons/brand/qq_symbol.png",
+    "name": "QQ"
+  },
+  {
+    "keywords": [
+      "weibo.com",
+      "weibo.cn"
+    ],
+    "icon": "/static/icons/brand/weibo.svg",
+    "name": "微博"
+  },
+  {
+    "keywords": [
+      "weixin.qq.com",
+      "wx.qq.com",
+      "wechat.com",
+      "mp.weixin.qq.com"
+    ],
+    "icon": "/static/icons/brand/weixin.svg",
+    "name": "微信"
+  },
+  {
+    "keywords": [
+      "youku.com"
+    ],
+    "icon": "/static/icons/brand/youku.svg",
+    "name": "优酷"
+  },
+  {
+    "keywords": [
+      "acfun.cn"
+    ],
+    "icon": "/static/icons/brand/acfun.svg",
+    "name": "AcFun"
+  },
+  {
+    "keywords": [
+      "pan.baidu.com",
+      "baidubce.com"
+    ],
+    "icon": "/static/icons/brand/baiduyun.svg",
+    "name": "百度云"
+  },
+  {
+    "keywords": [
+      "tianyancha.com"
+    ],
+    "icon": "/static/icons/brand/tsy.png",
+    "name": "天眼查"
+  },
+  {
+    "keywords": [
+      "volcengine.com"
+    ],
+    "icon": "/static/icons/brand/huoshanfanyi.png",
+    "name": "火山翻译"
+  },
+  {
+    "keywords": [
+      "imgurl.org"
+    ],
+    "icon": "/static/icons/brand/imgurl.png",
+    "name": "ImgURL"
+  },
+  {
+    "keywords": [
+      "mtab.cc"
+    ],
+    "icon": "/static/icons/brand/mtab.png",
+    "name": "Mtab"
+  },
+  {
+    "keywords": [
+      "onenav.com",
+      "onenav.cc"
+    ],
+    "icon": "/static/icons/brand/onenav.png",
+    "name": "OneNav"
+  },
+  {
+    "keywords": [
+      "ansible.com"
+    ],
+    "icon": "/static/icons/brand/ansible.svg",
+    "name": "Ansible"
+  },
+  {
+    "keywords": [
+      "auth0.com"
+    ],
+    "icon": "/static/icons/brand/auth0.svg",
+    "name": "Auth0"
+  },
+  {
+    "keywords": [
+      "circleci.com"
+    ],
+    "icon": "/static/icons/brand/circleci.svg",
+    "name": "CircleCI"
+  },
+  {
+    "keywords": [
+      "consul.io",
+      "consul.hashicorp.com"
+    ],
+    "icon": "/static/icons/brand/consul.svg",
+    "name": "Consul"
+  },
+  {
+    "keywords": [
+      "dart.dev",
+      "pub.dev"
+    ],
+    "icon": "/static/icons/brand/dart.svg",
+    "name": "Dart"
+  },
+  {
+    "keywords": [
+      "digitalocean.com"
+    ],
+    "icon": "/static/icons/brand/digitalocean.svg",
+    "name": "DigitalOcean"
+  },
+  {
+    "keywords": [
+      "docker.com",
+      "hub.docker.com",
+      "docs.docker.com"
+    ],
+    "icon": "/static/icons/brand/docker.svg",
+    "name": "Docker"
+  },
+  {
+    "keywords": [
+      "elasticsearch.org",
+      "elastic.co"
+    ],
+    "icon": "/static/icons/brand/elasticsearch.svg",
+    "name": "Elasticsearch"
+  },
+  {
+    "keywords": [
+      "firebase.google.com",
+      "firebaseapp.com"
+    ],
+    "icon": "/static/icons/brand/firebase.svg",
+    "name": "Firebase"
+  },
+  {
+    "keywords": [
+      "flutter.dev"
+    ],
+    "icon": "/static/icons/brand/flutter.svg",
+    "name": "Flutter"
+  },
+  {
+    "keywords": [
+      "go.dev",
+      "golang.org",
+      "pkg.go.dev"
+    ],
+    "icon": "/static/icons/brand/go.svg",
+    "name": "Go"
+  },
+  {
+    "keywords": [
+      "gradle.org",
+      "docs.gradle.org"
+    ],
+    "icon": "/static/icons/brand/gradle.svg",
+    "name": "Gradle"
+  },
+  {
+    "keywords": [
+      "grafana.com",
+      "grafana.net"
+    ],
+    "icon": "/static/icons/brand/grafana.svg",
+    "name": "Grafana"
+  },
+  {
+    "keywords": [
+      "helm.sh"
+    ],
+    "icon": "/static/icons/brand/helm.svg",
+    "name": "Helm"
+  },
+  {
+    "keywords": [
+      "hetzner.com",
+      "hetzner.cloud"
+    ],
+    "icon": "/static/icons/brand/hetzner.svg",
+    "name": "Hetzner"
+  },
+  {
+    "keywords": [
+      "jenkins.io"
+    ],
+    "icon": "/static/icons/brand/jenkins.svg",
+    "name": "Jenkins"
+  },
+  {
+    "keywords": [
+      "kafka.apache.org"
+    ],
+    "icon": "/static/icons/brand/kafka.svg",
+    "name": "Apache Kafka"
+  },
+  {
+    "keywords": [
+      "kotlinlang.org"
+    ],
+    "icon": "/static/icons/brand/kotlin.svg",
+    "name": "Kotlin"
+  },
+  {
+    "keywords": [
+      "kubernetes.io",
+      "k8s.io"
+    ],
+    "icon": "/static/icons/brand/kubernetes.svg",
+    "name": "Kubernetes"
+  },
+  {
+    "keywords": [
+      "airflow.apache.org"
+    ],
+    "icon": "/static/icons/brand/airflow.svg",
+    "name": "Apache Airflow"
+  },
+  {
+    "keywords": [
+      "spark.apache.org"
+    ],
+    "icon": "/static/icons/brand/spark.svg",
+    "name": "Apache Spark"
+  },
+  {
+    "keywords": [
+      "hadoop.apache.org"
+    ],
+    "icon": "/static/icons/brand/hadoop.svg",
+    "name": "Apache Hadoop"
+  },
+  {
+    "keywords": [
+      "maven.apache.org"
+    ],
+    "icon": "/static/icons/brand/maven.svg",
+    "name": "Apache Maven"
+  },
+  {
+    "keywords": [
+      "linkedin.com"
+    ],
+    "icon": "/static/icons/brand/linkedin.svg",
+    "name": "LinkedIn"
+  },
+  {
+    "keywords": [
+      "linode.com",
+      "linode.net",
+      "akamai.com"
+    ],
+    "icon": "/static/icons/brand/linode.svg",
+    "name": "Linode"
+  },
+  {
+    "keywords": [
+      "mongodb.com",
+      "mongodb.org",
+      "mongodb.net",
+      "cloud.mongodb.com"
+    ],
+    "icon": "/static/icons/brand/mongodb.svg",
+    "name": "MongoDB"
+  },
+  {
+    "keywords": [
+      "nginx.org",
+      "nginx.com"
+    ],
+    "icon": "/static/icons/brand/nginx.svg",
+    "name": "Nginx"
+  },
+  {
+    "keywords": [
+      "npmjs.com",
+      "npmjs.org",
+      "npm.im"
+    ],
+    "icon": "/static/icons/brand/npmjs.svg",
+    "name": "npm"
+  },
+  {
+    "keywords": [
+      "ovh.com",
+      "ovhcloud.com"
+    ],
+    "icon": "/static/icons/brand/ovh.svg",
+    "name": "OVHcloud"
+  },
+  {
+    "keywords": [
+      "packagist.org",
+      "packagist.com"
+    ],
+    "icon": "/static/icons/brand/packagist.svg",
+    "name": "Packagist"
+  },
+  {
+    "keywords": [
+      "php.net"
+    ],
+    "icon": "/static/icons/brand/php.svg",
+    "name": "PHP"
+  },
+  {
+    "keywords": [
+      "postgresql.org",
+      "postgrespro.ru"
+    ],
+    "icon": "/static/icons/brand/postgresql.svg",
+    "name": "PostgreSQL"
+  },
+  {
+    "keywords": [
+      "prometheus.io"
+    ],
+    "icon": "/static/icons/brand/prometheus.svg",
+    "name": "Prometheus"
+  },
+  {
+    "keywords": [
+      "pypi.org",
+      "pythonhosted.org"
+    ],
+    "icon": "/static/icons/brand/pypi.svg",
+    "name": "PyPI"
+  },
+  {
+    "keywords": [
+      "python.org",
+      "docs.python.org"
+    ],
+    "icon": "/static/icons/brand/python.svg",
+    "name": "Python"
+  },
+  {
+    "keywords": [
+      "rabbitmq.com"
+    ],
+    "icon": "/static/icons/brand/rabbitmq.svg",
+    "name": "RabbitMQ"
+  },
+  {
+    "keywords": [
+      "rancher.com",
+      "rancher.io"
+    ],
+    "icon": "/static/icons/brand/rancher.svg",
+    "name": "Rancher"
+  },
+  {
+    "keywords": [
+      "redis.io",
+      "redis.com",
+      "redislabs.com"
+    ],
+    "icon": "/static/icons/brand/redis.svg",
+    "name": "Redis"
+  },
+  {
+    "keywords": [
+      "rubygems.org"
+    ],
+    "icon": "/static/icons/brand/rubygems.svg",
+    "name": "RubyGems"
+  },
+  {
+    "keywords": [
+      "rust-lang.org",
+      "crates.io",
+      "docs.rs"
+    ],
+    "icon": "/static/icons/brand/rust.svg",
+    "name": "Rust"
+  },
+  {
+    "keywords": [
+      "supabase.com",
+      "supabase.co"
+    ],
+    "icon": "/static/icons/brand/supabase.svg",
+    "name": "Supabase"
+  },
+  {
+    "keywords": [
+      "swift.org",
+      "developer.apple.com/swift"
+    ],
+    "icon": "/static/icons/brand/swift.svg",
+    "name": "Swift"
+  },
+  {
+    "keywords": [
+      "terraform.io",
+      "hashicorp.com"
+    ],
+    "icon": "/static/icons/brand/terraform.svg",
+    "name": "Terraform"
+  },
+  {
+    "keywords": [
+      "travis-ci.org",
+      "travis-ci.com"
+    ],
+    "icon": "/static/icons/brand/travisci.svg",
+    "name": "Travis CI"
+  },
+  {
+    "keywords": [
+      "vaultproject.io",
+      "vault.hashicorp.com"
+    ],
+    "icon": "/static/icons/brand/vault.svg",
+    "name": "Vault"
+  },
+  {
+    "keywords": [
+      "vultr.com"
+    ],
+    "icon": "/static/icons/brand/vultr.svg",
+    "name": "Vultr"
+  },
+  {
+    "keywords": [
+      "github.io"
+    ],
+    "icon": "/static/icons/brand/githubactions.svg",
+    "name": "GitHub Actions"
+  },
+  {
+    "keywords": [],
+    "icon": "/static/icons/brand/gitlabci.svg",
+    "name": "GitLab CI"
+  },
+  {
+    "keywords": [
+      "angular.io",
+      "angular.dev"
+    ],
+    "icon": "/static/icons/brand/angular.svg",
+    "name": "Angular"
+  },
+  {
+    "keywords": [
+      "astro.build"
+    ],
+    "icon": "/static/icons/brand/astro.svg",
+    "name": "Astro"
+  },
+  {
+    "keywords": [
+      "babeljs.io"
+    ],
+    "icon": "/static/icons/brand/babel.svg",
+    "name": "Babel"
+  },
+  {
+    "keywords": [
+      "getbootstrap.com"
+    ],
+    "icon": "/static/icons/brand/bootstrap.svg",
+    "name": "Bootstrap"
+  },
+  {
+    "keywords": [
+      "bun.sh"
+    ],
+    "icon": "/static/icons/brand/bun.svg",
+    "name": "Bun"
+  },
+  {
+    "keywords": [
+      "chaijs.com"
+    ],
+    "icon": "/static/icons/brand/chai.svg",
+    "name": "Chai"
+  },
+  {
+    "keywords": [
+      "cypress.io"
+    ],
+    "icon": "/static/icons/brand/cypress.svg",
+    "name": "Cypress"
+  },
+  {
+    "keywords": [
+      "deno.com",
+      "deno.land"
+    ],
+    "icon": "/static/icons/brand/deno.svg",
+    "name": "Deno"
+  },
+  {
+    "keywords": [
+      "drizzle.team",
+      "orm.drizzle.team"
+    ],
+    "icon": "/static/icons/brand/drizzle.svg",
+    "name": "Drizzle"
+  },
+  {
+    "keywords": [
+      "electronjs.org"
+    ],
+    "icon": "/static/icons/brand/electron.svg",
+    "name": "Electron"
+  },
+  {
+    "keywords": [
+      "esbuild.github.io"
+    ],
+    "icon": "/static/icons/brand/esbuild.svg",
+    "name": "esbuild"
+  },
+  {
+    "keywords": [
+      "eslint.org"
+    ],
+    "icon": "/static/icons/brand/eslint.svg",
+    "name": "ESLint"
+  },
+  {
+    "keywords": [
+      "gatsbyjs.com",
+      "gatsbyjs.org"
+    ],
+    "icon": "/static/icons/brand/gatsby.svg",
+    "name": "Gatsby"
+  },
+  {
+    "keywords": [
+      "graphql.org",
+      "graphql.com"
+    ],
+    "icon": "/static/icons/brand/graphql.svg",
+    "name": "GraphQL"
+  },
+  {
+    "keywords": [
+      "jestjs.io"
+    ],
+    "icon": "/static/icons/brand/jest.svg",
+    "name": "Jest"
+  },
+  {
+    "keywords": [
+      "lesscss.org"
+    ],
+    "icon": "/static/icons/brand/less.svg",
+    "name": "Less"
+  },
+  {
+    "keywords": [
+      "lxqt.me",
+      "linux.org",
+      "kernel.org"
+    ],
+    "icon": "/static/icons/brand/linux.svg",
+    "name": "Linux"
+  },
+  {
+    "keywords": [
+      "mochajs.org"
+    ],
+    "icon": "/static/icons/brand/mocha.svg",
+    "name": "Mocha"
+  },
+  {
+    "keywords": [
+      "mobx.js.org"
+    ],
+    "icon": "/static/icons/brand/mobx.svg",
+    "name": "MobX"
+  },
+  {
+    "keywords": [
+      "nextjs.org",
+      "nextjs.test"
+    ],
+    "icon": "/static/icons/brand/nextdotjs.svg",
+    "name": "Next.js"
+  },
+  {
+    "keywords": [
+      "nodejs.org",
+      "nodejs.com"
+    ],
+    "icon": "/static/icons/brand/nodejs.svg",
+    "name": "Node.js"
+  },
+  {
+    "keywords": [
+      "nuxt.com",
+      "nuxtjs.org"
+    ],
+    "icon": "/static/icons/brand/nuxtdotjs.svg",
+    "name": "Nuxt"
+  },
+  {
+    "keywords": [
+      "postcss.org"
+    ],
+    "icon": "/static/icons/brand/postcss.svg",
+    "name": "PostCSS"
+  },
+  {
+    "keywords": [
+      "prisma.io"
+    ],
+    "icon": "/static/icons/brand/prisma.svg",
+    "name": "Prisma"
+  },
+  {
+    "keywords": [
+      "react.dev",
+      "reactjs.org",
+      "legacy.reactjs.org"
+    ],
+    "icon": "/static/icons/brand/react.svg",
+    "name": "React"
+  },
+  {
+    "keywords": [
+      "redux.js.org"
+    ],
+    "icon": "/static/icons/brand/redux.svg",
+    "name": "Redux"
+  },
+  {
+    "keywords": [
+      "rollupjs.org"
+    ],
+    "icon": "/static/icons/brand/rollupdotjs.svg",
+    "name": "Rollup"
+  },
+  {
+    "keywords": [
+      "rxjs.dev"
+    ],
+    "icon": "/static/icons/brand/rxjs.svg",
+    "name": "RxJS"
+  },
+  {
+    "keywords": [
+      "sass-lang.com"
+    ],
+    "icon": "/static/icons/brand/sass.svg",
+    "name": "Sass"
+  },
+  {
+    "keywords": [
+      "solidjs.com"
+    ],
+    "icon": "/static/icons/brand/solid.svg",
+    "name": "SolidJS"
+  },
+  {
+    "keywords": [
+      "svelte.dev"
+    ],
+    "icon": "/static/icons/brand/svelte.svg",
+    "name": "Svelte"
+  },
+  {
+    "keywords": [
+      "tailwindcss.com"
+    ],
+    "icon": "/static/icons/brand/tailwindcss.svg",
+    "name": "Tailwind CSS"
+  },
+  {
+    "keywords": [
+      "trpc.io"
+    ],
+    "icon": "/static/icons/brand/trpc.svg",
+    "name": "tRPC"
+  },
+  {
+    "keywords": [
+      "vitejs.dev",
+      "vite.dev"
+    ],
+    "icon": "/static/icons/brand/vite.svg",
+    "name": "Vite"
+  },
+  {
+    "keywords": [
+      "vuejs.org",
+      "vuejs.com",
+      "v3.vuejs.org"
+    ],
+    "icon": "/static/icons/brand/vue.svg",
+    "name": "Vue.js"
+  },
+  {
+    "keywords": [
+      "webpack.js.org"
+    ],
+    "icon": "/static/icons/brand/webpack.svg",
+    "name": "webpack"
+  },
+  {
+    "keywords": [
+      "remix.run"
+    ],
+    "icon": "/static/icons/brand/remix.svg",
+    "name": "Remix"
+  },
+  {
+    "keywords": [
+      "archlinux.org"
+    ],
+    "icon": "/static/icons/brand/archlinux.svg",
+    "name": "Arch Linux"
+  },
+  {
+    "keywords": [
+      "centos.org"
+    ],
+    "icon": "/static/icons/brand/centos.svg",
+    "name": "CentOS"
+  },
+  {
+    "keywords": [
+      "debian.org"
+    ],
+    "icon": "/static/icons/brand/debian.svg",
+    "name": "Debian"
+  },
+  {
+    "keywords": [
+      "fedoraproject.org"
+    ],
+    "icon": "/static/icons/brand/fedora.svg",
+    "name": "Fedora"
+  },
+  {
+    "keywords": [
+      "mariadb.org",
+      "mariadb.com"
+    ],
+    "icon": "/static/icons/brand/mariadb.svg",
+    "name": "MariaDB"
+  },
+  {
+    "keywords": [
+      "planetscale.com"
+    ],
+    "icon": "/static/icons/brand/planetscale.svg",
+    "name": "PlanetScale"
+  },
+  {
+    "keywords": [
+      "sqlite.org"
+    ],
+    "icon": "/static/icons/brand/sqlite.svg",
+    "name": "SQLite"
+  },
+  {
+    "keywords": [
+      "ubuntu.com"
+    ],
+    "icon": "/static/icons/brand/ubuntu.svg",
+    "name": "Ubuntu"
+  },
+  {
+    "keywords": [
+      "macos.local"
+    ],
+    "icon": "/static/icons/brand/macos.svg",
+    "name": "macOS"
+  },
+  {
+    "keywords": [
+      "git-scm.com"
+    ],
+    "icon": "/static/icons/brand/git.svg",
+    "name": "Git"
+  },
+  {
+    "keywords": [
+      "mercurial-scm.org"
+    ],
+    "icon": "/static/icons/brand/mercurial.svg",
+    "name": "Mercurial"
+  },
+  {
+    "keywords": [
+      "insomnia.rest"
+    ],
+    "icon": "/static/icons/brand/insomnia.svg",
+    "name": "Insomnia"
+  },
+  {
+    "keywords": [
+      "postman.com"
+    ],
+    "icon": "/static/icons/brand/postman.svg",
+    "name": "Postman"
+  },
+  {
+    "keywords": [
+      "swagger.io"
+    ],
+    "icon": "/static/icons/brand/swagger.svg",
+    "name": "Swagger"
+  },
+  {
+    "keywords": [
+      "bitwarden.com"
+    ],
+    "icon": "/static/icons/brand/bitwarden.svg",
+    "name": "Bitwarden"
+  },
+  {
+    "keywords": [
+      "keepassxc.org"
+    ],
+    "icon": "/static/icons/brand/keepassxc.svg",
+    "name": "KeePassXC"
+  },
+  {
+    "keywords": [
+      "lastpass.com"
+    ],
+    "icon": "/static/icons/brand/lastpass.svg",
+    "name": "LastPass"
+  },
+  {
+    "keywords": [
+      "proton.me",
+      "protonmail.com",
+      "protonvpn.com"
+    ],
+    "icon": "/static/icons/brand/protonmail.svg",
+    "name": "Proton"
+  },
+  {
+    "keywords": [
+      "godaddy.com"
+    ],
+    "icon": "/static/icons/brand/godaddy.svg",
+    "name": "GoDaddy"
+  },
+  {
+    "keywords": [
+      "namecheap.com"
+    ],
+    "icon": "/static/icons/brand/namecheap.svg",
+    "name": "Namecheap"
+  },
+  {
+    "keywords": [
+      "datadoghq.com",
+      "datadog.com"
+    ],
+    "icon": "/static/icons/brand/datadog.svg",
+    "name": "Datadog"
+  },
+  {
+    "keywords": [
+      "newrelic.com"
+    ],
+    "icon": "/static/icons/brand/newrelic.svg",
+    "name": "New Relic"
+  },
+  {
+    "keywords": [
+      "sentry.io"
+    ],
+    "icon": "/static/icons/brand/sentry.svg",
+    "name": "Sentry"
+  },
+  {
+    "keywords": [
+      "splunk.com"
+    ],
+    "icon": "/static/icons/brand/splunk.svg",
+    "name": "Splunk"
+  },
+  {
+    "keywords": [
+      "cloud.google.com",
+      "console.cloud.google.com",
+      "gcp.com"
+    ],
+    "icon": "/static/icons/brand/googlecloud.svg",
+    "name": "Google Cloud"
+  },
+  {
+    "keywords": [
+      "oracle.com",
+      "cloud.oracle.com"
+    ],
+    "icon": "/static/icons/brand/oracle.svg",
+    "name": "Oracle"
+  },
+  {
+    "keywords": [
+      "blender.org"
+    ],
+    "icon": "/static/icons/brand/blender.svg",
+    "name": "Blender"
+  },
+  {
+    "keywords": [
+      "vitess.io"
+    ],
+    "icon": "/static/icons/brand/vitess.svg",
+    "name": "Vitess"
+  },
+  {
+    "keywords": [
+      "caddyserver.com"
+    ],
+    "icon": "/static/icons/brand/caddy.svg",
+    "name": "Caddy"
+  },
+  {
+    "keywords": [
+      "drone.io",
+      "drone.github.io"
+    ],
+    "icon": "/static/icons/brand/drone.svg",
+    "name": "Drone"
+  },
+  {
+    "keywords": [
+      "emby.media"
+    ],
+    "icon": "/static/icons/brand/emby.svg",
+    "name": "Emby"
+  },
+  {
+    "keywords": [
+      "gitea.io",
+      "gitea.com",
+      "try.gitea.io"
+    ],
+    "icon": "/static/icons/brand/gitea.svg",
+    "name": "Gitea"
+  },
+  {
+    "keywords": [
+      "heimdall.site"
+    ],
+    "icon": "/static/icons/brand/heimdall.png",
+    "name": "Heimdall"
+  },
+  {
+    "keywords": [
+      "home-assistant.io",
+      "hass.io",
+      "homeassistant.local"
+    ],
+    "icon": "/static/icons/brand/homeassistant.svg",
+    "name": "Home Assistant"
+  },
+  {
+    "keywords": [
+      "gethomepage.dev",
+      "homepage.test"
+    ],
+    "icon": "/static/icons/brand/homepage.svg",
+    "name": "Homepage"
+  },
+  {
+    "keywords": [
+      "homarr.dev"
+    ],
+    "icon": "/static/icons/brand/homarr.svg",
+    "name": "Homarr"
+  },
+  {
+    "keywords": [
+      "jellyfin.org"
+    ],
+    "icon": "/static/icons/brand/jellyfin.svg",
+    "name": "Jellyfin"
+  },
+  {
+    "keywords": [
+      "nextcloud.com",
+      "nextcloud.local",
+      "cloud.nextcloud.com"
+    ],
+    "icon": "/static/icons/brand/nextcloud.svg",
+    "name": "Nextcloud"
+  },
+  {
+    "keywords": [
+      "openmediavault.org"
+    ],
+    "icon": "/static/icons/brand/openmediavault.svg",
+    "name": "OpenMediaVault"
+  },
+  {
+    "keywords": [
+      "owncloud.com",
+      "owncloud.org"
+    ],
+    "icon": "/static/icons/brand/owncloud.svg",
+    "name": "ownCloud"
+  },
+  {
+    "keywords": [
+      "plex.tv",
+      "app.plex.tv"
+    ],
+    "icon": "/static/icons/brand/plex.svg",
+    "name": "Plex"
+  },
+  {
+    "keywords": [
+      "portainer.io",
+      "portainer.business"
+    ],
+    "icon": "/static/icons/brand/portainer.svg",
+    "name": "Portainer"
+  },
+  {
+    "keywords": [
+      "radarr.video"
+    ],
+    "icon": "/static/icons/brand/radarr.svg",
+    "name": "Radarr"
+  },
+  {
+    "keywords": [
+      "sonarr.tv"
+    ],
+    "icon": "/static/icons/brand/sonarr.svg",
+    "name": "Sonarr"
+  },
+  {
+    "keywords": [
+      "traefik.io",
+      "traefik.local"
+    ],
+    "icon": "/static/icons/brand/traefik.svg",
+    "name": "Traefik"
+  },
+  {
+    "keywords": [
+      "truenas.com",
+      "freenas.org"
+    ],
+    "icon": "/static/icons/brand/truenas.svg",
+    "name": "TrueNAS"
+  },
+  {
+    "keywords": [
+      "unraid.net",
+      "unraid.local"
+    ],
+    "icon": "/static/icons/brand/unraid.svg",
+    "name": "Unraid"
+  },
+  {
+    "keywords": [
+      "vaultwarden.com",
+      "vaultwarden.local"
+    ],
+    "icon": "/static/icons/brand/vaultwarden.svg",
+    "name": "Vaultwarden"
+  },
+  {
+    "keywords": [
+      "mail.google.com",
+      "gmail.com",
+      "googlemail.com"
+    ],
+    "icon": "/static/icons/brand/gmail.svg",
+    "name": "Gmail"
+  },
+  {
+    "keywords": [
+      "drive.google.com"
+    ],
+    "icon": "/static/icons/brand/googledrive.svg",
+    "name": "Google Drive"
+  },
+  {
+    "keywords": [
+      "calendar.google.com"
+    ],
+    "icon": "/static/icons/brand/googlecalendar.svg",
+    "name": "Google Calendar"
+  }
+]

@@ -19,6 +19,11 @@ var migrations = []migration{
 		name: "rename legacy category, tool, and surface columns to canonical names",
 		run:  migration_2026_05_24,
 	},
+	{
+		id:   "2026_05_24_icon_provider",
+		name: "add icon provider system columns",
+		run:  migration_2026_05_24_icon_provider,
+	},
 }
 
 func ensureSchemaMigrationsTable() error {

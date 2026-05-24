@@ -9,10 +9,10 @@ import (
 	"github.com/4thHydrogen/4th-nav/types"
 )
 
-func UpdateIconStatus(id int64, status string, errMsg string) error {
+func UpdateIconStatus(id int64, status string, errMsg string, source string) error {
 	_, err := database.DB.Exec(
-		`UPDATE nav_table SET icon_status = ?, icon_error = ?, icon_updated_at = ? WHERE id = ?;`,
-		status, errMsg, time.Now().Unix(), id,
+		`UPDATE nav_table SET icon_status = ?, icon_error = ?, icon_updated_at = ?, icon_source = ? WHERE id = ?;`,
+		status, errMsg, time.Now().Unix(), source, id,
 	)
 	return err
 }

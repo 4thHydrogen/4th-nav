@@ -159,6 +159,10 @@ const buildData = (): ContentData => ({
     enableSurfaceEffects: false,
     pexelsApiKey: "",
     proxy: "",
+    iconProviderMode: "local-only",
+    brandfetchClientId: "",
+    enableBrandfetch: false,
+    enableIconHorse: false,
   },
   siteConfig: {
     id: 1,

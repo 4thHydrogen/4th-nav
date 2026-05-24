@@ -17,6 +17,10 @@ type Setting struct {
 	EnableSurfaceEffects bool   `json:"enableSurfaceEffects"`
 	PexelsApiKey         string `json:"pexelsApiKey"`
 	Proxy                string `json:"proxy"`
+	IconProviderMode     string `json:"iconProviderMode"`
+	BrandfetchClientID   string `json:"brandfetchClientId"`
+	EnableBrandfetch     bool   `json:"enableBrandfetch"`
+	EnableIconHorse      bool   `json:"enableIconHorse"`
 }
 
 type Token struct {
@@ -55,6 +59,10 @@ type Tool struct {
 	GridY          int    `json:"gridY"`
 	FolderViewMode string `json:"folderViewMode"`
 	FolderItemSize int    `json:"folderItemSize"`
+	IconStatus     string `json:"iconStatus"`
+	IconError      string `json:"iconError"`
+	IconUpdatedAt  int64  `json:"iconUpdatedAt"`
+	IconSource     string `json:"iconSource"`
 }
 
 type Category struct {

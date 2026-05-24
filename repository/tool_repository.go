@@ -25,7 +25,7 @@ func scanToolRow(scanner interface {
 	var folderViewMode interface{}
 	var folderItemSize interface{}
 
-	err := scanner.Scan(&tool.Id, &tool.Name, &tool.Url, &tool.Logo, &tool.Category, &tool.Description, &sort, &hide, &viewMode, &toolType, &parentID, &size, &folderTint, &gridX, &gridY, &folderViewMode, &folderItemSize)
+	err := scanner.Scan(&tool.Id, &tool.Name, &tool.Url, &tool.Logo, &tool.Category, &tool.Description, &sort, &hide, &viewMode, &toolType, &parentID, &size, &folderTint, &gridX, &gridY, &folderViewMode, &folderItemSize, &tool.IconStatus, &tool.IconError, &tool.IconUpdatedAt, &tool.IconSource)
 	if err != nil {
 		return types.Tool{}, err
 	}
@@ -84,7 +84,7 @@ func scanToolRow(scanner interface {
 
 func GetAllTools() ([]types.Tool, error) {
 	rows, err := database.DB.Query(`
-		SELECT id,name,url,logo,category,description,sort,hide,view_mode,type,parent_id,size,folder_tint,grid_x,grid_y,folder_view_mode,folder_item_size
+		SELECT id,name,url,logo,category,description,sort,hide,view_mode,type,parent_id,size,folder_tint,grid_x,grid_y,folder_view_mode,folder_item_size,icon_status,icon_error,icon_updated_at,icon_source
 		FROM nav_table
 		ORDER BY sort;
 	`)
@@ -108,7 +108,7 @@ func GetAllTools() ([]types.Tool, error) {
 
 func GetToolByID(id int64) (types.Tool, error) {
 	row := database.DB.QueryRow(`
-		SELECT id,name,url,logo,category,description,sort,hide,view_mode,type,parent_id,size,folder_tint,grid_x,grid_y,folder_view_mode,folder_item_size
+		SELECT id,name,url,logo,category,description,sort,hide,view_mode,type,parent_id,size,folder_tint,grid_x,grid_y,folder_view_mode,folder_item_size,icon_status,icon_error,icon_updated_at,icon_source
 		FROM nav_table
 		WHERE id = ?;
 	`, id)
@@ -228,8 +228,8 @@ func CreateTool(data types.AddToolDto) (int64, error) {
 	}
 
 	stmt, err := tx.Prepare(`
-		INSERT INTO nav_table (name, url, logo, category, description, sort, hide, view_mode, type, parent_id, size, folder_tint, grid_x, grid_y, folder_view_mode, folder_item_size)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+		INSERT INTO nav_table (name, url, logo, category, description, sort, hide, view_mode, type, parent_id, size, folder_tint, grid_x, grid_y, folder_view_mode, folder_item_size, icon_source)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 	`)
 	if err != nil {
 		tx.Rollback()
@@ -254,6 +254,7 @@ func CreateTool(data types.AddToolDto) (int64, error) {
 		types.NormalizeGrid(data.GridY),
 		types.NormalizeFolderViewMode(data.FolderViewMode),
 		types.NormalizeFolderItemSize(data.FolderItemSize),
+		"",
 	)
 	if err != nil {
 		tx.Rollback()
@@ -275,8 +276,8 @@ func CreateTool(data types.AddToolDto) (int64, error) {
 
 func ImportTool(data types.Tool) error {
 	_, err := database.DB.Exec(`
-		INSERT INTO nav_table (id, name, category, url, logo, description, sort, hide, view_mode, type, parent_id, size, folder_tint, grid_x, grid_y, folder_view_mode, folder_item_size)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+		INSERT INTO nav_table (id, name, category, url, logo, description, sort, hide, view_mode, type, parent_id, size, folder_tint, grid_x, grid_y, folder_view_mode, folder_item_size, icon_source)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 	`,
 		data.Id,
 		data.Name,
@@ -295,6 +296,7 @@ func ImportTool(data types.Tool) error {
 		types.NormalizeGrid(data.GridY),
 		types.NormalizeFolderViewMode(data.FolderViewMode),
 		types.NormalizeFolderItemSize(data.FolderItemSize),
+		data.IconSource,
 	)
 	return err
 }
@@ -306,8 +308,8 @@ func ImportToolsTx(tools []types.Tool) error {
 	}
 
 	stmt, err := tx.Prepare(`
-		INSERT INTO nav_table (id, name, category, url, logo, description, sort, hide, view_mode, type, parent_id, size, folder_tint, grid_x, grid_y, folder_view_mode, folder_item_size)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+		INSERT INTO nav_table (id, name, category, url, logo, description, sort, hide, view_mode, type, parent_id, size, folder_tint, grid_x, grid_y, folder_view_mode, folder_item_size, icon_source)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 	`)
 	if err != nil {
 		tx.Rollback()
@@ -334,6 +336,7 @@ func ImportToolsTx(tools []types.Tool) error {
 			types.NormalizeGrid(data.GridY),
 			types.NormalizeFolderViewMode(data.FolderViewMode),
 			types.NormalizeFolderItemSize(data.FolderItemSize),
+			data.IconSource,
 		)
 		if err != nil {
 			tx.Rollback()
@@ -351,8 +354,8 @@ func ImportToolsAndCategoriesTx(tools []types.Tool, categories []string) error {
 	}
 
 	toolStmt, err := tx.Prepare(`
-		INSERT INTO nav_table (id, name, category, url, logo, description, sort, hide, view_mode, type, parent_id, size, folder_tint, grid_x, grid_y, folder_view_mode, folder_item_size)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+		INSERT INTO nav_table (id, name, category, url, logo, description, sort, hide, view_mode, type, parent_id, size, folder_tint, grid_x, grid_y, folder_view_mode, folder_item_size, icon_source)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 	`)
 	if err != nil {
 		tx.Rollback()
@@ -379,6 +382,7 @@ func ImportToolsAndCategoriesTx(tools []types.Tool, categories []string) error {
 			types.NormalizeGrid(data.GridY),
 			types.NormalizeFolderViewMode(data.FolderViewMode),
 			types.NormalizeFolderItemSize(data.FolderItemSize),
+			data.IconSource,
 		)
 		if err != nil {
 			tx.Rollback()

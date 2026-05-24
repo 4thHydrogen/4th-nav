@@ -186,6 +186,53 @@ export function SiteSettingsCard({
           </Form.Item>
 
           <Divider orientation="left" style={{ margin: "16px 0 12px" }}>
+            图标获取
+          </Divider>
+          <div
+            style={{
+              padding: "0 0 12px",
+              color: "rgba(0,0,0,0.45)",
+              fontSize: 13,
+              lineHeight: 1.8,
+            }}
+          >
+            启用第三方增强后，工具域名会发送给 Brandfetch 或 Icon Horse 以获取图标。
+          </div>
+          <Form.Item
+            label="图标获取模式"
+            name="iconProviderMode"
+            tooltip="local-only：仅使用本地预设和网站自身图标；enhanced：额外启用第三方图标服务"
+          >
+            <Select
+              options={[
+                { label: "仅本地与网站自身", value: "local-only" },
+                { label: "第三方增强", value: "enhanced" },
+              ]}
+            />
+          </Form.Item>
+          <Form.Item
+            label="Brandfetch Client ID"
+            name="brandfetchClientId"
+            tooltip="在 brandfetch.io 注册后获取"
+          >
+            <Input placeholder="请输入 Brandfetch Client ID" />
+          </Form.Item>
+          <Form.Item
+            label="启用 Brandfetch"
+            name="enableBrandfetch"
+            tooltip="开启后将通过 Brandfetch API 获取品牌图标"
+          >
+            <Switch defaultChecked={Boolean(setting?.enableBrandfetch)} />
+          </Form.Item>
+          <Form.Item
+            label="启用 Icon Horse"
+            name="enableIconHorse"
+            tooltip="开启后将通过 Icon Horse 作为图标获取的备选来源"
+          >
+            <Switch defaultChecked={Boolean(setting?.enableIconHorse)} />
+          </Form.Item>
+
+          <Divider orientation="left" style={{ margin: "16px 0 12px" }}>
             图标管理
           </Divider>
           <Form.Item label="图标操作">

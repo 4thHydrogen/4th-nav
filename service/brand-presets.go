@@ -359,8 +359,7 @@ func init() {
 	brandPresets["vault.hashicorp.com"] = "/static/icons/brand/vault.svg"
 	brandPresets["vultr.com"] = "/static/icons/brand/vultr.svg"
 	brandPresets["github.io"] = "/static/icons/brand/githubactions.svg"
-	// Note: gitlab.com is already mapped above; the CI preset overrides it
-	brandPresets["gitlab.com"] = "/static/icons/brand/gitlabci.svg"
+	// Note: gitlab.com is mapped to GitLab above; the CI preset is kept for future CI-specific domains
 
 	// ========== 开发语言/框架 ==========
 	brandPresets["angular.io"] = "/static/icons/brand/angular.svg"
@@ -426,7 +425,7 @@ func init() {
 	brandPresets["planetscale.com"] = "/static/icons/brand/planetscale.svg"
 	brandPresets["sqlite.org"] = "/static/icons/brand/sqlite.svg"
 	brandPresets["ubuntu.com"] = "/static/icons/brand/ubuntu.svg"
-	brandPresets["developer.apple.com"] = "/static/icons/brand/macos.svg"
+	// Note: developer.apple.com is mapped to Apple above; macOS preset uses macos.local
 	brandPresets["macos.local"] = "/static/icons/brand/macos.svg"
 
 	// ========== 版本控制/工具 ==========
@@ -459,6 +458,11 @@ func init() {
 	brandPresets["cloud.google.com"] = "/static/icons/brand/googlecloud.svg"
 	brandPresets["console.cloud.google.com"] = "/static/icons/brand/googlecloud.svg"
 	brandPresets["gcp.com"] = "/static/icons/brand/googlecloud.svg"
+	brandPresets["mail.google.com"] = "/static/icons/brand/gmail.svg"
+	brandPresets["gmail.com"] = "/static/icons/brand/gmail.svg"
+	brandPresets["googlemail.com"] = "/static/icons/brand/gmail.svg"
+	brandPresets["drive.google.com"] = "/static/icons/brand/googledrive.svg"
+	brandPresets["calendar.google.com"] = "/static/icons/brand/googlecalendar.svg"
 	brandPresets["oracle.com"] = "/static/icons/brand/oracle.svg"
 	brandPresets["cloud.oracle.com"] = "/static/icons/brand/oracle.svg"
 	brandPresets["blender.org"] = "/static/icons/brand/blender.svg"

@@ -58,21 +58,21 @@ func getIcon(rawURL string) string {
 }
 
 func LazyFetchLogo(rawURL string, id int64) {
-	updateIconStatus(id, "fetching", "")
-	logo := DiscoverIconPipeline(rawURL)
+	updateIconStatus(id, "fetching", "", "")
+	logo, source := DiscoverIconPipeline(rawURL)
 	if logo != "" {
 		if err := UpdateToolIcon(id, logo); err != nil {
 			logger.LogInfo("LazyFetchLogo: UpdateToolIcon failed for id %d: %s", id, err)
 		}
-		updateIconStatus(id, "success", "")
+		updateIconStatus(id, "success", "", source)
 		return
 	}
-	updateIconStatus(id, "failed", "all strategies failed")
+	updateIconStatus(id, "failed", "all strategies failed", "")
 	logger.LogInfo("LazyFetchLogo: all strategies failed for %s", rawURL)
 }
 
-func updateIconStatus(id int64, status string, errMsg string) {
-	err := repository.UpdateIconStatus(id, status, errMsg)
+func updateIconStatus(id int64, status string, errMsg string, source string) {
+	err := repository.UpdateIconStatus(id, status, errMsg, source)
 	if err != nil {
 		logger.LogInfo("updateIconStatus: failed for id %d: %s", id, err)
 	}

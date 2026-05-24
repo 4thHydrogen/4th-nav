@@ -82,7 +82,9 @@ func ScoreCandidates(candidates []IconCandidate, pageURL string) IconCandidate {
 		// Source score
 		switch c.Source {
 		case "preset":
-			c.Score += 95
+			c.Score += 120
+		case "brandfetch":
+			c.Score += 105
 		case "html":
 			switch {
 			case c.IsSVG:
@@ -104,6 +106,8 @@ func ScoreCandidates(candidates []IconCandidate, pageURL string) IconCandidate {
 			c.Score += 60
 		case "google":
 			c.Score += 30
+		case "iconhorse":
+			c.Score += 45
 		}
 
 		// SVG bonus
@@ -373,38 +377,25 @@ func guessSizeFromURL(rawURL string) (int, int) {
 }
 
 // DiscoverIconPipeline is the main entry point for icon discovery.
-// It collects candidates from all sources and returns the best one.
-func DiscoverIconPipeline(rawURL string) string {
-	// Step 1: Brand preset
-	if preset := MatchBrandPreset(rawURL); preset != "" {
-		return preset
+// It collects candidates from all registered providers, scores them,
+// validates and caches the best one, then returns the final logo URL.
+func DiscoverIconPipeline(rawURL string) (string, string) {
+	setting := GetSetting()
+
+	// Collect candidates from all registered providers
+	candidates := CollectAll(rawURL, &setting)
+	if len(candidates) == 0 {
+		return "", ""
 	}
 
-	var allCandidates []IconCandidate
-
-	// Step 2: HTML parsing + manifest
-	htmlCandidates := collectFromHTML(rawURL)
-	allCandidates = append(allCandidates, htmlCandidates...)
-
-	// Step 3: Path probing
-	probeCandidates := probeCommonIconPathsEnhanced(rawURL)
-	allCandidates = append(allCandidates, probeCandidates...)
-
-	// Step 4: Google favicon fallback
-	if fallback := fetchGoogleFavicon(rawURL); fallback != "" {
-		allCandidates = append(allCandidates, IconCandidate{
-			URL:    fallback,
-			Source: "google",
-		})
+	// Resolve: score → sort → validate → cache → return best
+	logo, best, err := ResolveBestIcon(rawURL, candidates)
+	if err != nil {
+		logger.LogInfo("DiscoverIconPipeline: no valid icon for %s: %v", rawURL, err)
+		return "", ""
 	}
 
-	if len(allCandidates) == 0 {
-		return ""
-	}
-
-	// Score and select best
-	best := ScoreCandidates(allCandidates, rawURL)
 	logger.LogInfo("DiscoverIconPipeline: best candidate for %s is %s (score=%d, source=%s)",
 		rawURL, best.URL, best.Score, best.Source)
-	return best.URL
+	return logo, best.Source
 }

@@ -7,7 +7,7 @@ import (
 
 func GetSetting() (types.Setting, error) {
 	row := database.DB.QueryRow(`
-		SELECT id, favicon, title, govRecord, logo192, logo512, hideAdmin, hideGithub, hideToggleJumpTarget, jumpTargetBlank, backgroundUrl, enableBackground, enableSurfaceEffects, pexelsApiKey, proxy
+		SELECT id, favicon, title, govRecord, logo192, logo512, hideAdmin, hideGithub, hideToggleJumpTarget, jumpTargetBlank, backgroundUrl, enableBackground, enableSurfaceEffects, pexelsApiKey, proxy, icon_provider_mode, brandfetch_client_id, enable_brandfetch, enable_icon_horse
 		FROM nav_setting
 		ORDER BY id ASC
 		LIMIT 1;
@@ -16,6 +16,7 @@ func GetSetting() (types.Setting, error) {
 	var setting types.Setting
 	var hideAdmin, hideGithub, hideToggleJumpTarget, jumpTargetBlank any
 	var backgroundURL, enableBackground, enableSurfaceEffects, pexelsAPIKey, proxy any
+	var iconProviderMode, brandfetchClientID, enableBrandfetch, enableIconHorse any
 	err := row.Scan(
 		&setting.Id,
 		&setting.Favicon,
@@ -32,6 +33,10 @@ func GetSetting() (types.Setting, error) {
 		&enableSurfaceEffects,
 		&pexelsAPIKey,
 		&proxy,
+		&iconProviderMode,
+		&brandfetchClientID,
+		&enableBrandfetch,
+		&enableIconHorse,
 	)
 	if err != nil {
 		return types.Setting{}, err
@@ -46,6 +51,10 @@ func GetSetting() (types.Setting, error) {
 	setting.EnableSurfaceEffects = boolFromDB(enableSurfaceEffects, false)
 	setting.PexelsApiKey = stringFromDB(pexelsAPIKey, "")
 	setting.Proxy = stringFromDB(proxy, "")
+	setting.IconProviderMode = stringFromDB(iconProviderMode, "local-only")
+	setting.BrandfetchClientID = stringFromDB(brandfetchClientID, "")
+	setting.EnableBrandfetch = boolFromDB(enableBrandfetch, false)
+	setting.EnableIconHorse = boolFromDB(enableIconHorse, false)
 
 	return setting, nil
 }
@@ -53,7 +62,7 @@ func GetSetting() (types.Setting, error) {
 func UpdateSetting(data types.Setting) error {
 	_, err := database.DB.Exec(`
 		UPDATE nav_setting
-		SET favicon = ?, title = ?, govRecord = ?, logo192 = ?, logo512 = ?, hideAdmin = ?, hideGithub = ?, hideToggleJumpTarget = ?, jumpTargetBlank = ?, backgroundUrl = ?, enableBackground = ?, enableSurfaceEffects = ?, pexelsApiKey = ?, proxy = ?
+		SET favicon = ?, title = ?, govRecord = ?, logo192 = ?, logo512 = ?, hideAdmin = ?, hideGithub = ?, hideToggleJumpTarget = ?, jumpTargetBlank = ?, backgroundUrl = ?, enableBackground = ?, enableSurfaceEffects = ?, pexelsApiKey = ?, proxy = ?, icon_provider_mode = ?, brandfetch_client_id = ?, enable_brandfetch = ?, enable_icon_horse = ?
 		WHERE id = (SELECT id FROM nav_setting ORDER BY id ASC LIMIT 1);
 	`,
 		data.Favicon,
@@ -70,6 +79,10 @@ func UpdateSetting(data types.Setting) error {
 		data.EnableSurfaceEffects,
 		data.PexelsApiKey,
 		data.Proxy,
+		data.IconProviderMode,
+		data.BrandfetchClientID,
+		data.EnableBrandfetch,
+		data.EnableIconHorse,
 	)
 	return err
 }

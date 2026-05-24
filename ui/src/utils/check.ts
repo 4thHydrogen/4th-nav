@@ -9,6 +9,6 @@ export const isInlineSvg = (value: string): boolean => {
 export const getLogoUrl = (url: string) => {
   if (!url) return '';
   if (isInlineSvg(url)) return url;
-  if (url.startsWith('http')) return `/api/img?url=${url}`;
+  if (url.startsWith('http')) return `/api/img?url=${encodeURIComponent(url)}`;
   return url;
 } 

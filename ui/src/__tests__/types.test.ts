@@ -62,6 +62,10 @@ describe("TypeScript types", () => {
       enableSurfaceEffects: false,
       pexelsApiKey: "",
       proxy: "",
+      iconProviderMode: "local-only",
+      brandfetchClientId: "",
+      enableBrandfetch: false,
+      enableIconHorse: false,
     };
     expect(setting.enableBackground).toBe(true);
     expect(setting.backgroundUrl).toBe("bing");

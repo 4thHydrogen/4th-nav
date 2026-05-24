@@ -22,6 +22,10 @@ export interface Tool {
   gridY: number;
   folderViewMode: FolderViewMode;
   folderItemSize: number;
+  iconStatus?: string;
+  iconError?: string;
+  iconUpdatedAt?: number;
+  iconSource?: string;
 }
 
 export interface FolderRecord extends Tool {
@@ -51,6 +55,10 @@ export interface Setting {
   enableSurfaceEffects: boolean;
   pexelsApiKey: string;
   proxy: string;
+  iconProviderMode: string;
+  brandfetchClientId: string;
+  enableBrandfetch: boolean;
+  enableIconHorse: boolean;
 }
 
 export interface SiteConfig {
