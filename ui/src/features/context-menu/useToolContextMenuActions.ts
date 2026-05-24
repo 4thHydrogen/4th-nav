@@ -107,7 +107,7 @@ export function useToolContextMenuActions({
         folderItemSize: 28,
       });
 
-      if ("id" in folder && folder.id) {
+      if (folder.id) {
         await fetchMoveToolToFolder(tool.id, folder.id);
       }
     } finally {

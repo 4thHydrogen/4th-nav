@@ -11,7 +11,7 @@ import {
   pixelsToGrid,
   buildLayout,
 } from "../features/panel-grid/useGridLayout";
-import type { GridLayout } from "../features/panel-grid/useGridLayout";
+import type { GridLayout, LayoutSourceItem } from "../features/panel-grid/useGridLayout";
 import type { Tool, ToolSize } from "../types";
 
 // ---------------------------------------------------------------------------
@@ -617,6 +617,16 @@ function toolsFromLayout(layout: GridLayout[]): Tool[] {
   );
 }
 
+function toLayoutSource(tools: Tool[]): LayoutSourceItem[] {
+  return tools.map((tool) => ({
+    id: String(tool.id),
+    sort: tool.sort,
+    size: tool.size,
+    gridX: tool.gridX,
+    gridY: tool.gridY,
+  }));
+}
+
 describe("buildLayout — idempotency (regression for restart drift)", () => {
   it("running buildLayout twice on its own output produces the same layout", () => {
     const tools = [
@@ -626,8 +636,8 @@ describe("buildLayout — idempotency (regression for restart drift)", () => {
       makeTool(4, 8, 0, "1x1", 3),
     ];
     const cols = COLS.lg;
-    const first = buildLayout(tools, cols);
-    const second = buildLayout(toolsFromLayout(first), cols);
+    const first = buildLayout(toLayoutSource(tools), cols);
+    const second = buildLayout(toLayoutSource(toolsFromLayout(first)), cols);
     expect(second).toEqual(first);
   });
 
@@ -638,7 +648,7 @@ describe("buildLayout — idempotency (regression for restart drift)", () => {
       makeTool(3, 10, 5),
     ];
     const cols = COLS.lg;
-    const result = buildLayout(tools, cols);
+    const result = buildLayout(toLayoutSource(tools), cols);
     for (const tool of tools) {
       const placed = result.find((l) => l.i === String(tool.id))!;
       expect(placed.x).toBe(tool.gridX);
@@ -654,7 +664,7 @@ describe("buildLayout — idempotency (regression for restart drift)", () => {
       makeTool(4, -1, -1, "1x1", 3), // 新项
     ];
     const cols = COLS.lg;
-    const result = buildLayout(tools, cols);
+    const result = buildLayout(toLayoutSource(tools), cols);
 
     // 已有位置项保持原位
     expect(result.find((l) => l.i === "1")!.x).toBe(0);
@@ -678,8 +688,8 @@ describe("buildLayout — idempotency (regression for restart drift)", () => {
       makeTool(3, -1, -1, "1x1", 2),
     ];
     const cols = COLS.lg;
-    const a = buildLayout(tools, cols);
-    const b = buildLayout(tools, cols);
+    const a = buildLayout(toLayoutSource(tools), cols);
+    const b = buildLayout(toLayoutSource(tools), cols);
     expect(a).toEqual(b);
   });
 });

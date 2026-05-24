@@ -1,5 +1,12 @@
-import type { Tool } from "../../../types";
 import { pushOverlapping, overlaps, type GridLayout } from "./collision";
+
+export interface LayoutSourceItem {
+  id: string;
+  sort: number;
+  size: string;
+  gridX: number;
+  gridY: number;
+}
 
 const parseToolSize = (size: string): [number, number] => {
   const parts = size.split("x").map(Number);
@@ -9,8 +16,8 @@ const parseToolSize = (size: string): [number, number] => {
   return [1, 1];
 };
 
-export function autoLayout(tools: Tool[], cols: number): GridLayout[] {
-  const sorted = [...tools].sort((a, b) => a.sort - b.sort);
+export function autoLayout(items: LayoutSourceItem[], cols: number): GridLayout[] {
+  const sorted = [...items].sort((a, b) => a.sort - b.sort);
   const occupied = new Set<string>();
   const layouts: GridLayout[] = [];
 
@@ -28,10 +35,10 @@ export function autoLayout(tools: Tool[], cols: number): GridLayout[] {
     }
   };
 
-  for (const tool of sorted) {
-    const [w, h] = parseToolSize(tool.size);
+  for (const item of sorted) {
+    const [w, h] = parseToolSize(item.size);
     const pos = findPosition(w, h);
-    layouts.push({ i: String(tool.id), x: pos.x, y: pos.y, w, h });
+    layouts.push({ i: item.id, x: pos.x, y: pos.y, w, h });
     for (let dy = 0; dy < h; dy++) {
       for (let dx = 0; dx < w; dx++) {
         occupied.add(`${pos.x + dx},${pos.y + dy}`);
@@ -42,12 +49,12 @@ export function autoLayout(tools: Tool[], cols: number): GridLayout[] {
   return layouts;
 }
 
-export function buildLayout(tools: Tool[], cols: number): GridLayout[] {
-  const hasPositions = tools.some((tool) => tool.gridX >= 0);
-  if (!hasPositions) return autoLayout(tools, cols);
+export function buildLayout(items: LayoutSourceItem[], cols: number): GridLayout[] {
+  const hasPositions = items.some((item) => item.gridX >= 0);
+  if (!hasPositions) return autoLayout(items, cols);
 
-  const positionedTools = tools
-    .filter((tool) => tool.gridX >= 0)
+  const positionedItems = items
+    .filter((item) => item.gridX >= 0)
     .slice()
     .sort((a, b) => a.gridY - b.gridY || a.gridX - b.gridX);
 
@@ -62,17 +69,17 @@ export function buildLayout(tools: Tool[], cols: number): GridLayout[] {
     }
   };
 
-  for (const tool of positionedTools) {
-    const [w, h] = parseToolSize(tool.size);
-    let x = Math.max(tool.gridX, 0);
-    let y = Math.max(tool.gridY, 0);
+  for (const item of positionedItems) {
+    const [w, h] = parseToolSize(item.size);
+    let x = Math.max(item.gridX, 0);
+    let y = Math.max(item.gridY, 0);
 
     if (x + w > cols) x = 0;
 
-    const probe: GridLayout = { i: String(tool.id), x, y, w, h };
+    const probe: GridLayout = { i: item.id, x, y, w, h };
     pushOverlapping(placed, probe, cols);
 
-    while (placed.some((item) => overlaps(item, probe))) {
+    while (placed.some((existing) => overlaps(existing, probe))) {
       probe.y++;
     }
 
@@ -93,15 +100,15 @@ export function buildLayout(tools: Tool[], cols: number): GridLayout[] {
     }
   };
 
-  const newTools = tools
-    .filter((tool) => tool.gridX < 0)
+  const newItems = items
+    .filter((item) => item.gridX < 0)
     .slice()
     .sort((a, b) => a.sort - b.sort);
 
-  for (const tool of newTools) {
-    const [w, h] = parseToolSize(tool.size);
+  for (const item of newItems) {
+    const [w, h] = parseToolSize(item.size);
     const pos = findEmptyPos(w, h);
-    occupy({ i: String(tool.id), x: pos.x, y: pos.y, w, h });
+    occupy({ i: item.id, x: pos.x, y: pos.y, w, h });
   }
 
   return placed;

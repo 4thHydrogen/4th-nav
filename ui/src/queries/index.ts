@@ -108,7 +108,7 @@ export function useMergeToFolder() {
         folderItemSize: 28,
       });
 
-      if ("id" in folder && folder.id) {
+      if (folder.id) {
         await fetchMoveToolToFolder(vars.toolId1, folder.id);
         await fetchMoveToolToFolder(vars.toolId2, folder.id);
       }

@@ -1,18 +1,24 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 
-export function useHomeLayoutVars(density?: string) {
+export type GridLayoutConfig = {
+  rowHeight: number;
+  margin: [number, number];
+};
+
+const DENSITY_PARAMS: Record<
+  string,
+  { rowHeight: number; iconSize: number; iconGap: number; margin: number }
+> = {
+  compact: { rowHeight: 64, iconSize: 38, iconGap: 4, margin: 8 },
+  standard: { rowHeight: 80, iconSize: 48, iconGap: 6, margin: 12 },
+  relaxed: { rowHeight: 100, iconSize: 62, iconGap: 8, margin: 16 },
+};
+
+export function useHomeLayoutVars(density?: string): GridLayoutConfig {
   useEffect(() => {
     const el = document.querySelector(".desktop-page") as HTMLElement | null;
     if (!el) return;
-    const params: Record<
-      string,
-      { rowHeight: number; iconSize: number; iconGap: number; margin: number }
-    > = {
-      compact: { rowHeight: 64, iconSize: 38, iconGap: 4, margin: 8 },
-      standard: { rowHeight: 80, iconSize: 48, iconGap: 6, margin: 12 },
-      relaxed: { rowHeight: 100, iconSize: 62, iconGap: 8, margin: 16 },
-    };
-    const current = params[density || "standard"] || params.standard;
+    const current = DENSITY_PARAMS[density || "standard"] || DENSITY_PARAMS.standard;
     el.style.setProperty("--icon-size", `${current.iconSize}px`);
     el.style.setProperty("--icon-gap", `${current.iconGap}px`);
     el.style.setProperty("--row-height", `${current.rowHeight}px`);
@@ -53,4 +59,11 @@ export function useHomeLayoutVars(density?: string) {
     observer.observe(workspaceEl);
     return () => observer.disconnect();
   }, [density]);
+
+  const layoutConfig = useMemo<GridLayoutConfig>(() => {
+    const current = DENSITY_PARAMS[density || "standard"] || DENSITY_PARAMS.standard;
+    return { rowHeight: current.rowHeight, margin: [current.margin, current.margin] };
+  }, [density]);
+
+  return layoutConfig;
 }

@@ -4,6 +4,7 @@ import { Loading } from "../../shared/ui/Loading";
 import CategoryFilter from "./CategoryFilter";
 import MobileCategoryMenu from "./MobileCategoryMenu";
 import type { Tool } from "../../types";
+import type { GridLayoutConfig } from "../../pages/home/useHomeLayoutVars";
 
 interface HomeWorkspaceProps {
   isLoading: boolean;
@@ -17,6 +18,7 @@ interface HomeWorkspaceProps {
   gridTools: Tool[];
   noImageMode: boolean;
   listItemSize: number;
+  layoutConfig?: GridLayoutConfig;
   onContextMenu: (event: React.MouseEvent, tool: Tool) => void;
   onResetSearch: () => void;
   onMoveToFolder: (toolId: number, folderId: number) => void;
@@ -41,6 +43,7 @@ export function HomeWorkspace({
   gridTools,
   noImageMode,
   listItemSize,
+  layoutConfig,
   onContextMenu,
   onResetSearch,
   onMoveToFolder,
@@ -86,6 +89,7 @@ export function HomeWorkspace({
               allTools={allTools}
               noImageMode={noImageMode}
               listItemSize={listItemSize}
+              layoutConfig={layoutConfig}
               onToolClick={() => onResetSearch()}
               onToolContextMenu={onContextMenu}
               onMoveToFolder={onMoveToFolder}

@@ -14,7 +14,6 @@ import (
 func AddApiTokenHandler(c *gin.Context) {
 	var token types.AddTokenDto
 	if err := c.ShouldBindJSON(&token); err != nil {
-		utils.CheckErr(err)
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success":      false,
 			"errorMessage": err.Error(),
@@ -25,7 +24,6 @@ func AddApiTokenHandler(c *gin.Context) {
 	newID := utils.GenerateId()
 	signedJWT, err := utils.SignJWTForAPI(token.Name, newID)
 	if err != nil {
-		utils.CheckErr(err)
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success":      false,
 			"errorMessage": err.Error(),
@@ -33,12 +31,18 @@ func AddApiTokenHandler(c *gin.Context) {
 		return
 	}
 
-	service.AddApiTokenInDB(types.Token{
+	if err := service.AddApiTokenInDB(types.Token{
 		Name:     token.Name,
 		Value:    signedJWT,
 		Id:       newID,
 		Disabled: 0,
-	})
+	}); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success":      false,
+			"errorMessage": err.Error(),
+		})
+		return
+	}
 
 	c.JSON(200, gin.H{
 		"success": true,

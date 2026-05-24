@@ -84,8 +84,8 @@
     background:
       linear-gradient(
         0deg,
-        color-mix(in srgb, var(--folder-tint, transparent) 18%, transparent),
-        color-mix(in srgb, var(--folder-tint, transparent) 18%, transparent)
+        color-mix(in srgb, var(--folder-tint, transparent) var(--material-folder-tint-percent, 7%), transparent),
+        color-mix(in srgb, var(--folder-tint, transparent) var(--material-folder-tint-percent, 7%), transparent)
       ),
       var(--surface-folder-bg, rgba(255, 255, 255, 0.08));
   }

@@ -29,9 +29,11 @@ export const fetchUpdateTool = async (payload: UpdateToolDto) => {
   return data?.data || {};
 };
 
-export const fetchAddTool = async (payload: AddToolDto): Promise<Tool | Record<string, never>> => {
+type AddToolResult = { id: number };
+
+export const fetchAddTool = async (payload: AddToolDto): Promise<AddToolResult> => {
   const { data } = await http.post(`/api/admin/tool`, normalizeToolPayload(payload));
-  return data?.data ? normalizeTool(data.data as Tool) : {};
+  return data?.data;
 };
 
 export const fetchUpdateToolsSort = async (updates: SortUpdateDto[]) => {

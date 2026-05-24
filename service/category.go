@@ -8,14 +8,13 @@ import (
 	"github.com/4thHydrogen/4th-nav/utils"
 )
 
-func UpdateCategory(data types.UpdateCategoryDto) {
-	err := repository.UpdateCategory(data)
-	utils.CheckErr(err)
+func UpdateCategory(data types.UpdateCategoryDto) error {
+	return repository.UpdateCategory(data)
 }
 
-func AddCategory(data types.AddCategoryDto) {
+func AddCategory(data types.AddCategoryDto) error {
 	if data.Name == "" || strings.TrimSpace(data.Name) == "" {
-		return
+		return nil
 	}
 
 	existingCategories := GetAllCategories()
@@ -24,11 +23,10 @@ func AddCategory(data types.AddCategoryDto) {
 		names = append(names, category.Name)
 	}
 	if utils.In(data.Name, names) {
-		return
+		return nil
 	}
 
-	err := repository.CreateCategory(data)
-	utils.CheckErr(err)
+	return repository.CreateCategory(data)
 }
 
 func DeleteCategory(id int) error {

@@ -2,7 +2,6 @@ package service
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 	"sync"
 
@@ -12,68 +11,21 @@ import (
 	"github.com/4thHydrogen/4th-nav/utils"
 )
 
-func normalizeViewMode(v string) string {
-	if v == "card" {
-		return "card"
-	}
-	return "icon"
-}
+// Note: utils is still used by GetAllTool, GetToolLogoUrlById (read-only functions not changed in this pass)
 
-func normalizeFolderViewMode(v string) string {
-	if v == "list" {
-		return "list"
-	}
-	return "grid"
-}
-
-func normalizeFolderItemSize(v int) int {
-	if v < 20 {
-		return 20
-	}
-	if v > 48 {
-		return 48
-	}
-	return v
-}
-
-func normalizeToolType(v string) string {
-	if v == "folder" {
-		return "folder"
-	}
-	return "icon"
-}
-
-func normalizeToolSize(v string) string {
-	parts := strings.Split(v, "x")
-	if len(parts) != 2 {
-		return "1x1"
-	}
-	w, err1 := strconv.Atoi(parts[0])
-	h, err2 := strconv.Atoi(parts[1])
-	if err1 != nil || err2 != nil || w < 1 || h < 1 || w > 6 || h > 6 {
-		return "1x1"
-	}
-	return fmt.Sprintf("%dx%d", w, h)
-}
-
-func normalizeGrid(v int) int {
-	if v < 0 {
-		return -1
-	}
-	return v
-}
-
-func ImportTools(data []types.Tool) {
+func ImportTools(data []types.Tool) error {
 	var categories []string
 	for _, v := range data {
 		if v.Category != "" && strings.TrimSpace(v.Category) != "" && !utils.In(v.Category, categories) {
 			categories = append(categories, v.Category)
 		}
-		err := repository.ImportTool(v)
-		utils.CheckErr(err)
+		if err := repository.ImportTool(v); err != nil {
+			return err
+		}
 	}
 	for _, category := range categories {
 		dto := types.AddCategoryDto{Name: category}
+		// TODO: handle AddCategory error
 		AddCategory(dto)
 	}
 	go func(data []types.Tool) {
@@ -90,12 +42,15 @@ func ImportTools(data []types.Tool) {
 		}
 		wg.Wait()
 	}(data)
+	return nil
 }
 
-func UpdateTool(data types.UpdateToolDto) {
+func UpdateTool(data types.UpdateToolDto) error {
 	if data.GridX < 0 || data.GridY < 0 {
 		tool, err := repository.GetToolByID(int64(data.Id))
-		utils.CheckErr(err)
+		if err != nil {
+			return err
+		}
 		if data.GridX < 0 {
 			data.GridX = tool.GridX
 		}
@@ -103,9 +58,11 @@ func UpdateTool(data types.UpdateToolDto) {
 			data.GridY = tool.GridY
 		}
 	}
-	err := repository.UpdateTool(data)
-	utils.CheckErr(err)
+	if err := repository.UpdateTool(data); err != nil {
+		return err
+	}
 	UpdateImg(data.Logo)
+	return nil
 }
 
 func AddTool(data types.AddToolDto) (int64, error) {
@@ -134,10 +91,12 @@ func GetToolLogoUrlById(id int) string {
 	return logo
 }
 
-func UpdateToolIcon(id int64, logo string) {
-	err := repository.UpdateToolLogoByID(id, logo)
-	utils.CheckErr(err)
+func UpdateToolIcon(id int64, logo string) error {
+	if err := repository.UpdateToolLogoByID(id, logo); err != nil {
+		return err
+	}
 	UpdateImg(logo)
+	return nil
 }
 
 func DeleteTool(id int) error {
@@ -149,12 +108,12 @@ func UpdateToolsSort(updates []types.UpdateToolsSortDto) error {
 }
 
 func UpdateToolViewMode(id int, viewMode string) error {
-	viewMode = normalizeViewMode(viewMode)
+	viewMode = types.NormalizeViewMode(viewMode)
 	return repository.UpdateToolViewMode(id, viewMode)
 }
 
 func UpdateFolderSettings(id int, folderViewMode string, folderItemSize int) error {
-	return repository.UpdateFolderSettings(id, normalizeFolderViewMode(folderViewMode), normalizeFolderItemSize(folderItemSize))
+	return repository.UpdateFolderSettings(id, types.NormalizeFolderViewMode(folderViewMode), types.NormalizeFolderItemSize(folderItemSize))
 }
 
 func MoveToolToFolder(toolId int, parentId *int) error {

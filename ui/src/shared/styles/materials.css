@@ -1,6 +1,7 @@
 :root {
   --material-folder-highlight: linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0));
   --material-folder-tint-strength: 0.07;
+  --material-folder-tint-percent: 7%;
 }
 
 .material-folder {

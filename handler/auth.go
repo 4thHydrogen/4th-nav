@@ -13,7 +13,6 @@ import (
 func LoginHandler(c *gin.Context) {
 	var data types.LoginDto
 	if err := c.ShouldBindJSON(&data); err != nil {
-		utils.CheckErr(err)
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success":      false,
 			"errorMessage": err.Error(),
@@ -45,8 +44,7 @@ func LoginHandler(c *gin.Context) {
 			})
 		}
 	}
-	token, err := utils.SignJWT(user)
-	utils.CheckErr(err)
+	token, _ := utils.SignJWT(user)
 
 	c.JSON(200, gin.H{
 		"success": true,

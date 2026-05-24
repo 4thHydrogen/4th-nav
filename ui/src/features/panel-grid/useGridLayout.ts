@@ -6,26 +6,29 @@ import {
   compactLayout,
   moveItem,
   resizeLayoutItem,
+  type LayoutSourceItem,
 } from "../../features/grid-layout/model/layout";
 import { gridToPixels, pixelsToGrid } from "../../features/grid-layout/model/geometry";
 import type { GridLayout } from "../../features/grid-layout/model/collision";
 
 export type { GridLayout };
+export type { LayoutSourceItem };
 export { buildLayout, compactLayout, moveItem, resizeLayoutItem, gridToPixels, pixelsToGrid };
+
+function toLayoutSourceItems(tools: Tool[]): LayoutSourceItem[] {
+  return tools.map((tool) => ({
+    id: String(tool.id),
+    sort: tool.sort,
+    size: tool.size,
+    gridX: tool.gridX,
+    gridY: tool.gridY,
+  }));
+}
 
 export const BREAKPOINTS = { lg: 1100, md: 768, sm: 500, xs: 0 };
 export const COLS = { lg: 12, md: 8, sm: 5, xs: 3 };
 export const ROW_HEIGHT = 80;
 export const MARGIN: readonly [number, number] = [12, 12];
-
-function readGridVars(): { rowHeight: number; margin: [number, number] } {
-  const el = document.querySelector(".desktop-page");
-  if (!el) return { rowHeight: ROW_HEIGHT, margin: [...MARGIN] as [number, number] };
-  const style = getComputedStyle(el);
-  const rh = parseFloat(style.getPropertyValue("--row-height")) || ROW_HEIGHT;
-  const gm = parseFloat(style.getPropertyValue("--grid-margin")) || MARGIN[0];
-  return { rowHeight: rh, margin: [gm, gm] };
-}
 
 export function getBreakpoint(width: number): keyof typeof COLS {
   if (width >= BREAKPOINTS.lg) return "lg";
@@ -54,11 +57,15 @@ export function useContainerWidth() {
   return { wrapperRef, gridRef, width };
 }
 
-export function useGridLayout(tools: Tool[]) {
+export function useGridLayout(
+  tools: Tool[],
+  config?: { rowHeight: number; margin: [number, number] }
+) {
   const { wrapperRef, gridRef, width } = useContainerWidth();
   const bp = getBreakpoint(width);
   const cols = COLS[bp];
-  const { rowHeight, margin } = useMemo(readGridVars, [tools, width]);
+  const rowHeight = config?.rowHeight ?? ROW_HEIGHT;
+  const margin: [number, number] = config?.margin ?? [...MARGIN] as [number, number];
 
   const prevToolsRef = useRef<Tool[]>([]);
   const currentLayoutRef = useRef<GridLayout[]>([]);
@@ -105,7 +112,7 @@ export function useGridLayout(tools: Tool[]) {
     }
 
     prevToolsRef.current = tools;
-    return buildLayout(tools, cols);
+    return buildLayout(toLayoutSourceItems(tools), cols);
   }, [tools, cols, width]);
 
   const [layout, setLayout] = useState<GridLayout[]>([]);

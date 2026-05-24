@@ -1,9 +1,11 @@
 import { useCallback, useMemo } from "react";
 import { DndContext, closestCenter } from "@dnd-kit/core";
 import type { Tool } from "../../types";
+import type { GridLayoutConfig } from "../../pages/home/useHomeLayoutVars";
 import { useFloatingPanel } from "../../shared/ui/overlay/useFloatingPanel";
 import { gridToPixels, type GridLayout, useGridLayout } from "./useGridLayout";
 import { useGridDrag } from "./useGridDrag";
+import { usePanelGridModel } from "./usePanelGridModel";
 import { PanelGridCanvas, type PanelGridItemStyle } from "./PanelGridCanvas";
 import { ToolDragOverlay } from "./ToolDragOverlay";
 import "./panel-grid.css";
@@ -13,6 +15,7 @@ interface PanelGridProps {
   allTools: Tool[];
   noImageMode: boolean;
   listItemSize: number;
+  layoutConfig?: GridLayoutConfig;
   onToolClick: (tool: Tool) => void;
   onToolContextMenu: (e: React.MouseEvent, tool: Tool) => void;
   onMoveToFolder: (toolId: number, folderId: number) => void;
@@ -30,6 +33,7 @@ export default function PanelGrid({
   allTools,
   noImageMode,
   listItemSize,
+  layoutConfig,
   onToolClick,
   onToolContextMenu,
   onMoveToFolder,
@@ -48,39 +52,20 @@ export default function PanelGrid({
     cellWidth,
     rowHeight,
     margin,
-  } = useGridLayout(tools);
+  } = useGridLayout(tools, layoutConfig);
 
   const folderPanel = useFloatingPanel<number>();
 
-  const toolsMap = useMemo(() => {
-    const map = new Map<string, Tool>();
-    tools.forEach((tool) => map.set(String(tool.id), tool));
-    return map;
-  }, [tools]);
+  const { toolsMap, folderIds, childrenMap, layoutMap } = usePanelGridModel(tools, allTools, layout);
 
-  const folderIds = useMemo(
-    () => new Set(tools.filter((tool) => tool.type === "folder").map((tool) => String(tool.id))),
-    [tools]
-  );
-
-  const childrenMap = useMemo(() => {
-    const map: Record<number, Tool[]> = {};
-    allTools.forEach((tool) => {
-      if (tool.parentId != null) {
-        if (!map[tool.parentId]) {
-          map[tool.parentId] = [];
-        }
-        map[tool.parentId].push(tool);
-      }
+  /** PanelGridCanvas and ToolDragOverlay still expect Record<number, Tool[]> */
+  const childrenRecord = useMemo(() => {
+    const record: Record<number, Tool[]> = {};
+    childrenMap.forEach((children, id) => {
+      record[id] = children;
     });
-    return map;
-  }, [allTools]);
-
-  const layoutMap = useMemo(() => {
-    const map = new Map<string, GridLayout>();
-    layout.forEach((item) => map.set(item.i, item));
-    return map;
-  }, [layout]);
+    return record;
+  }, [childrenMap]);
 
   const {
     sensors,
@@ -136,7 +121,7 @@ export default function PanelGrid({
   const expandedFolder =
     expandedFolderId != null ? toolsMap.get(String(expandedFolderId)) ?? null : null;
   const expandedChildren =
-    expandedFolderId != null ? childrenMap[expandedFolderId] ?? [] : [];
+    expandedFolderId != null ? childrenMap.get(expandedFolderId) ?? [] : [];
   const folderAnchorRect =
     folderPanel.state.phase !== "closed" ? (folderPanel.state.anchorRect as DOMRect) : null;
 
@@ -167,7 +152,7 @@ export default function PanelGrid({
           activeId={activeId}
           dropTargetId={dropTargetId}
           itemStyles={itemStyles}
-          childrenMap={childrenMap}
+          childrenMap={childrenRecord}
           listItemSize={listItemSize}
           onToolClick={onToolClick}
           onToolContextMenu={onToolContextMenu}
@@ -190,7 +175,7 @@ export default function PanelGrid({
         cellWidth={cellWidth}
         rowHeight={rowHeight}
         margin={margin}
-        childrenMap={childrenMap}
+        childrenMap={childrenRecord}
         listItemSize={listItemSize}
       />
     </DndContext>

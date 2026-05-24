@@ -6,7 +6,6 @@ import (
 
 	"github.com/4thHydrogen/4th-nav/service"
 	"github.com/4thHydrogen/4th-nav/types"
-	"github.com/4thHydrogen/4th-nav/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -14,7 +13,6 @@ import (
 func AddCategoryHandler(c *gin.Context) {
 	var data types.AddCategoryDto
 	if err := c.ShouldBindJSON(&data); err != nil {
-		utils.CheckErr(err)
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success":      false,
 			"errorMessage": err.Error(),
@@ -22,7 +20,13 @@ func AddCategoryHandler(c *gin.Context) {
 		return
 	}
 
-	service.AddCategory(data)
+	if err := service.AddCategory(data); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success":      false,
+			"errorMessage": err.Error(),
+		})
+		return
+	}
 	c.JSON(200, gin.H{
 		"success": true,
 		"message": "新增分类成功",
@@ -56,7 +60,6 @@ func DeleteCategoryHandler(c *gin.Context) {
 func UpdateCategoryHandler(c *gin.Context) {
 	var data types.UpdateCategoryDto
 	if err := c.ShouldBindJSON(&data); err != nil {
-		utils.CheckErr(err)
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success":      false,
 			"errorMessage": err.Error(),
@@ -64,7 +67,13 @@ func UpdateCategoryHandler(c *gin.Context) {
 		return
 	}
 
-	service.UpdateCategory(data)
+	if err := service.UpdateCategory(data); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success":      false,
+			"errorMessage": err.Error(),
+		})
+		return
+	}
 	c.JSON(200, gin.H{
 		"success": true,
 		"message": "更新分类成功",

@@ -24,30 +24,27 @@ func GetUser(name string) types.User {
 	return user
 }
 
-func AddApiTokenInDB(data types.Token) {
-	err := repository.InsertAPIToken(data)
-	utils.CheckErr(err)
+func AddApiTokenInDB(data types.Token) error {
+	return repository.InsertAPIToken(data)
 }
 
 func DisableApiToken(id int) error {
 	return repository.DisableAPIToken(id)
 }
 
-func UpdateUser(data types.UpdateUserDto) {
+func UpdateUser(data types.UpdateUserDto) error {
 	password := data.Password
 	if !utils.IsBcryptHash(password) {
 		hashed, err := utils.HashPassword(password)
 		if err != nil {
-			utils.CheckErr(err)
-			return
+			return err
 		}
 		password = hashed
 	}
 
-	err := repository.UpdateUser(types.UpdateUserDto{
+	return repository.UpdateUser(types.UpdateUserDto{
 		Id:       data.Id,
 		Name:     data.Name,
 		Password: password,
 	})
-	utils.CheckErr(err)
 }

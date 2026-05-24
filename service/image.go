@@ -61,7 +61,9 @@ func LazyFetchLogo(rawURL string, id int64) {
 	updateIconStatus(id, "fetching", "")
 	logo := DiscoverIconPipeline(rawURL)
 	if logo != "" {
-		UpdateToolIcon(id, logo)
+		if err := UpdateToolIcon(id, logo); err != nil {
+			logger.LogInfo("LazyFetchLogo: UpdateToolIcon failed for id %d: %s", id, err)
+		}
 		updateIconStatus(id, "success", "")
 		return
 	}
@@ -262,11 +264,10 @@ func GetImgFromDB(url1 string) types.Img {
 	return result
 }
 
-func UpdateImg(url1 string) {
+func UpdateImg(url1 string) error {
 	base64ImgValue := utils.GetImgBase64FromUrl(url1)
 	if base64ImgValue == "" {
-		return
+		return nil
 	}
-	err := repository.SaveImage(url1, base64ImgValue)
-	utils.CheckErr(err)
+	return repository.SaveImage(url1, base64ImgValue)
 }

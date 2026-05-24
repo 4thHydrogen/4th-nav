@@ -13,3 +13,11 @@
   -webkit-backdrop-filter: blur(var(--surface-panel-blur)) saturate(var(--surface-panel-saturate));
   box-shadow: var(--surface-panel-shadow);
 }
+
+.surface-folder {
+  background: var(--surface-folder-bg, rgba(255, 255, 255, 0.08));
+  border: 1px solid var(--surface-folder-border, rgba(255, 255, 255, 0.06));
+  backdrop-filter: blur(var(--surface-folder-blur, 18px)) saturate(var(--surface-folder-saturate, 1.2));
+  -webkit-backdrop-filter: blur(var(--surface-folder-blur, 18px)) saturate(var(--surface-folder-saturate, 1.2));
+  box-shadow: var(--surface-folder-shadow, none);
+}

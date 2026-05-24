@@ -7,7 +7,6 @@ import (
 	"github.com/4thHydrogen/4th-nav/logger"
 	"github.com/4thHydrogen/4th-nav/service"
 	"github.com/4thHydrogen/4th-nav/types"
-	"github.com/4thHydrogen/4th-nav/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -24,7 +23,6 @@ func ExportToolsHandler(c *gin.Context) {
 func ImportToolsHandler(c *gin.Context) {
 	var tools []types.Tool
 	if err := c.ShouldBindJSON(&tools); err != nil {
-		utils.CheckErr(err)
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success":      false,
 			"errorMessage": err.Error(),
@@ -32,7 +30,14 @@ func ImportToolsHandler(c *gin.Context) {
 		return
 	}
 
-	service.ImportTools(tools)
+	if err := service.ImportTools(tools); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success":      false,
+			"errorMessage": err.Error(),
+		})
+		return
+	}
+
 	c.JSON(200, gin.H{
 		"success": true,
 		"message": "导入工具成功",
@@ -42,7 +47,6 @@ func ImportToolsHandler(c *gin.Context) {
 func AddToolHandler(c *gin.Context) {
 	var data types.AddToolDto
 	if err := c.ShouldBindJSON(&data); err != nil {
-		utils.CheckErr(err)
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success":      false,
 			"errorMessage": err.Error(),
@@ -53,7 +57,6 @@ func AddToolHandler(c *gin.Context) {
 	logger.LogInfo("%s logo: %s", data.Name, data.Logo)
 	id, err := service.AddTool(data)
 	if err != nil {
-		utils.CheckErr(err)
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success":      false,
 			"errorMessage": err.Error(),
@@ -101,7 +104,6 @@ func DeleteToolHandler(c *gin.Context) {
 func UpdateToolHandler(c *gin.Context) {
 	var data types.UpdateToolDto
 	if err := c.ShouldBindJSON(&data); err != nil {
-		utils.CheckErr(err)
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success":      false,
 			"errorMessage": err.Error(),
@@ -109,7 +111,13 @@ func UpdateToolHandler(c *gin.Context) {
 		return
 	}
 
-	service.UpdateTool(data)
+	if err := service.UpdateTool(data); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success":      false,
+			"errorMessage": err.Error(),
+		})
+		return
+	}
 	if data.Logo == "" {
 		logger.LogInfo("%s logo: %s", data.Name, data.Logo)
 		go service.LazyFetchLogo(data.Url, int64(data.Id))
@@ -276,7 +284,6 @@ func UpdateLayoutHandler(c *gin.Context) {
 func UpdateToolsSortHandler(c *gin.Context) {
 	var updates []types.UpdateToolsSortDto
 	if err := c.ShouldBindJSON(&updates); err != nil {
-		utils.CheckErr(err)
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success":      false,
 			"errorMessage": err.Error(),
@@ -285,7 +292,6 @@ func UpdateToolsSortHandler(c *gin.Context) {
 	}
 
 	if err := service.UpdateToolsSort(updates); err != nil {
-		utils.CheckErr(err)
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"success":      false,
 			"errorMessage": err.Error(),
@@ -376,7 +382,6 @@ func IconsStatusHandler(c *gin.Context) {
 func UpdateUserHandler(c *gin.Context) {
 	var data types.UpdateUserDto
 	if err := c.ShouldBindJSON(&data); err != nil {
-		utils.CheckErr(err)
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success":      false,
 			"errorMessage": err.Error(),
@@ -384,7 +389,13 @@ func UpdateUserHandler(c *gin.Context) {
 		return
 	}
 
-	service.UpdateUser(data)
+	if err := service.UpdateUser(data); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success":      false,
+			"errorMessage": err.Error(),
+		})
+		return
+	}
 	c.JSON(200, gin.H{
 		"success": true,
 		"message": "更新用户信息成功",
