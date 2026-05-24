@@ -272,6 +272,7 @@ export function useGridDrag({
       layoutMap,
       onMergeToFolder,
       onMoveToFolder,
+      onLayoutChange,
       itemsMap,
       setLayout,
     ]

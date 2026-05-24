@@ -57,21 +57,13 @@ export default function PanelGrid({
     iconSize,
   } = useGridLayout(panelItems, layoutConfig);
 
-  const isClampMode = useMemo(() => {
-    const maxOriginalGridX = panelItems.reduce(
-      (maxValue, item) => Math.max(maxValue, item.gridX >= 0 ? item.gridX : -1),
-      -1
-    );
-    return maxOriginalGridX >= 0 && maxOriginalGridX >= cols;
-  }, [panelItems, cols]);
-
   const { persist } = usePersistGridLayout();
 
   const handleLayoutChange = useCallback(
     (layout: GridLayout[]) => {
-      if (!isClampMode) persist(layout);
+      persist(layout);
     },
-    [isClampMode, persist]
+    [persist]
   );
 
   const layoutMap = useMemo(() => {
