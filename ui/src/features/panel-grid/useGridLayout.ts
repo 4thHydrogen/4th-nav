@@ -25,15 +25,22 @@ function toLayoutSourceItems(items: PanelItem[]): LayoutSourceItem[] {
 }
 
 export const BREAKPOINTS = { lg: 1100, md: 768, sm: 500, xs: 0 };
-export const COLS = { lg: 12, md: 8, sm: 5, xs: 3 };
-export const ROW_HEIGHT = 80;
-export const MARGIN: readonly [number, number] = [12, 12];
+const RESPONSIVE_DEFAULTS: Record<string, number> = { lg: 12, md: 8, sm: 5, xs: 3 };
 
-export function getBreakpoint(width: number): keyof typeof COLS {
+export function getBreakpoint(width: number): keyof typeof BREAKPOINTS {
   if (width >= BREAKPOINTS.lg) return "lg";
   if (width >= BREAKPOINTS.md) return "md";
   if (width >= BREAKPOINTS.sm) return "sm";
   return "xs";
+}
+
+function getCols(width: number, configured: number | null): number {
+  const bp = getBreakpoint(width);
+  if (configured != null && configured > 0) {
+    if (bp === "lg") return configured;
+    return Math.min(configured, RESPONSIVE_DEFAULTS[bp]);
+  }
+  return RESPONSIVE_DEFAULTS[bp];
 }
 
 export function useContainerWidth() {
@@ -58,13 +65,17 @@ export function useContainerWidth() {
 
 export function useGridLayout(
   items: PanelItem[],
-  config?: { rowHeight: number; margin: [number, number] }
+  config?: { columnsPerRow: number | null; gap: number; iconScale: number }
 ) {
   const { wrapperRef, gridRef, width } = useContainerWidth();
-  const bp = getBreakpoint(width);
-  const cols = COLS[bp];
-  const rowHeight = config?.rowHeight ?? ROW_HEIGHT;
-  const margin: [number, number] = config?.margin ?? [...MARGIN] as [number, number];
+  const gap = config?.gap ?? 12;
+  const iconScale = config?.iconScale ?? 0.62;
+  const cols = getCols(width, config?.columnsPerRow ?? null);
+  const cellSize = cols > 0 ? (width - (cols - 1) * gap) / cols : 0;
+  const rowHeight = cellSize;
+  const cellWidth = cellSize;
+  const iconSize = cellSize * iconScale;
+  const margin: [number, number] = [gap, gap];
 
   const prevItemsRef = useRef<PanelItem[]>([]);
   const currentLayoutRef = useRef<GridLayout[]>([]);
@@ -127,7 +138,6 @@ export function useGridLayout(
     setLayout(initialLayout);
   }, [initialLayout, items]);
 
-  const cellWidth = cols > 0 ? (width - (cols - 1) * margin[0]) / cols : 0;
   const totalHeight = useMemo(() => {
     if (layout.length === 0) return 200;
     const maxY = Math.max(...layout.map((item) => item.y + item.h));
@@ -146,5 +156,6 @@ export function useGridLayout(
     isReady: width > 0,
     rowHeight,
     margin,
+    iconSize,
   };
 }

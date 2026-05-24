@@ -1,9 +1,6 @@
 import { describe, it, expect } from "vitest";
 import {
   BREAKPOINTS,
-  COLS,
-  ROW_HEIGHT,
-  MARGIN,
   getBreakpoint,
   compactLayout,
   moveItem,
@@ -12,6 +9,11 @@ import {
   buildLayout,
 } from "../features/panel-grid/useGridLayout";
 import type { GridLayout, LayoutSourceItem } from "../features/panel-grid/useGridLayout";
+
+// Legacy constants kept for test compatibility
+const COLS = { lg: 12, md: 8, sm: 5, xs: 3 };
+const ROW_HEIGHT = 80;
+const MARGIN: readonly [number, number] = [12, 12];
 import type { Tool, ToolSize } from "../types";
 
 // ---------------------------------------------------------------------------

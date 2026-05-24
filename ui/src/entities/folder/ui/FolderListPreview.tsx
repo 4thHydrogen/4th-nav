@@ -8,7 +8,7 @@ interface FolderListPreviewProps {
   itemSize: number;
   maxRows: number;
   onOpenChild: (item: LinkItem) => void;
-  onContextMenu: (e: React.MouseEvent, item: LinkItem) => void;
+  onChildContextMenu: (e: React.MouseEvent, item: LinkItem) => void;
 }
 
 export function FolderListPreview({
@@ -16,7 +16,7 @@ export function FolderListPreview({
   itemSize,
   maxRows,
   onOpenChild,
-  onContextMenu,
+  onChildContextMenu,
 }: FolderListPreviewProps) {
   const visibleCount = useMemo(() => {
     const iconSize = 48;
@@ -40,7 +40,7 @@ export function FolderListPreview({
           item={item}
           itemSize={itemSize}
           onOpenChild={onOpenChild}
-          onContextMenu={onContextMenu}
+          onChildContextMenu={onChildContextMenu}
         />
       ))}
       {overflow > 0 && (
@@ -54,12 +54,12 @@ function FolderListPreviewItem({
   item,
   itemSize,
   onOpenChild,
-  onContextMenu,
+  onChildContextMenu,
 }: {
   item: LinkItem;
   itemSize: number;
   onOpenChild: (item: LinkItem) => void;
-  onContextMenu: (e: React.MouseEvent, item: LinkItem) => void;
+  onChildContextMenu: (e: React.MouseEvent, item: LinkItem) => void;
 }) {
   return (
     <a
@@ -81,7 +81,7 @@ function FolderListPreviewItem({
       }}
       onContextMenu={(e) => {
         e.stopPropagation();
-        onContextMenu(e, item);
+        onChildContextMenu(e, item);
       }}
       style={{ height: itemSize }}
     >

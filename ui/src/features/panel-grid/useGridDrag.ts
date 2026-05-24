@@ -10,8 +10,6 @@ import {
 import type { PanelItem } from "../../entities/panel/types";
 import { isFolderItem } from "../../entities/panel/types";
 import {
-  MARGIN,
-  ROW_HEIGHT,
   moveItem,
   pixelsToGrid,
   type GridLayout,
@@ -136,8 +134,8 @@ export function useGridDrag({
   onMoveToFolder,
   onMergeToFolder,
   onLayoutChange,
-  rowHeight = ROW_HEIGHT,
-  margin = [...MARGIN] as [number, number],
+  rowHeight,
+  margin,
 }: UseGridDragParams): GridDragResult {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [altHeld, setAltHeld] = useState(false);

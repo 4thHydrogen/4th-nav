@@ -12,10 +12,11 @@ interface WidgetFolderProps {
   listItemSize: number;
   onOpen: () => void;
   onOpenChild: (item: LinkItem) => void;
-  onContextMenu: (e: React.MouseEvent, item: LinkItem) => void;
+  onContextMenu: (e: React.MouseEvent) => void;
+  onChildContextMenu: (e: React.MouseEvent, item: LinkItem) => void;
 }
 
-const WidgetFolder = ({ folder, listItemSize, onOpen, onOpenChild, onContextMenu }: WidgetFolderProps) => {
+const WidgetFolder = ({ folder, listItemSize, onOpen, onOpenChild, onContextMenu, onChildContextMenu }: WidgetFolderProps) => {
   const [w, h] = parseSize(folder.size);
   const isEmpty = folder.children.length === 0;
   const mouseDownPos = useRef<{ x: number; y: number } | null>(null);
@@ -48,7 +49,7 @@ const WidgetFolder = ({ folder, listItemSize, onOpen, onOpenChild, onContextMenu
           onOpen();
         }}
         onAuxClick={(e) => { if (e.button === 1) e.preventDefault(); }}
-        onContextMenu={(e) => e.stopPropagation()}
+        onContextMenu={(e) => { e.stopPropagation(); onContextMenu(e); }}
       >
         {isEmpty ? (
           <div className="widget-folder-empty">
@@ -60,7 +61,7 @@ const WidgetFolder = ({ folder, listItemSize, onOpen, onOpenChild, onContextMenu
             itemSize={listItemSize}
             maxRows={h}
             onOpenChild={onOpenChild}
-            onContextMenu={onContextMenu}
+            onChildContextMenu={onChildContextMenu}
           />
         ) : (
           <FolderGridPreview
@@ -68,7 +69,7 @@ const WidgetFolder = ({ folder, listItemSize, onOpen, onOpenChild, onContextMenu
             cols={w}
             rows={h}
             onOpenChild={onOpenChild}
-            onContextMenu={onContextMenu}
+            onChildContextMenu={onChildContextMenu}
           />
         )}
 

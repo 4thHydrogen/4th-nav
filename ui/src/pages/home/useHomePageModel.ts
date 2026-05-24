@@ -48,7 +48,7 @@ export function useHomePageModel() {
   );
 
   const { theme, handleThemeSwitch } = useHomeTheme();
-  const layoutConfig = useHomeLayoutVars(data?.siteConfig?.density);
+  const layoutConfig = useHomeLayoutVars(data?.siteConfig);
 
   const { bgRefreshKey, handleRefreshBg, showRefresh } = useHomeBackground(
     data?.setting?.backgroundUrl,

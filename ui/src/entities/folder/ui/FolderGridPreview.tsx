@@ -8,7 +8,7 @@ interface FolderGridPreviewProps {
   cols: number;
   rows: number;
   onOpenChild: (item: LinkItem) => void;
-  onContextMenu: (e: React.MouseEvent, item: LinkItem) => void;
+  onChildContextMenu: (e: React.MouseEvent, item: LinkItem) => void;
 }
 
 export function FolderGridPreview({
@@ -16,7 +16,7 @@ export function FolderGridPreview({
   cols,
   rows,
   onOpenChild,
-  onContextMenu,
+  onChildContextMenu,
 }: FolderGridPreviewProps) {
   const slots = useMemo(
     () => buildFolderPreviewSlots(children, cols, rows),
@@ -39,7 +39,7 @@ export function FolderGridPreview({
           key={slot.item?.id ?? `slot-${i}`}
           slot={slot}
           onOpenChild={onOpenChild}
-          onContextMenu={onContextMenu}
+          onChildContextMenu={onChildContextMenu}
         />
       ))}
     </div>

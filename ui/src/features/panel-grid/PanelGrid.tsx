@@ -54,6 +54,7 @@ export default function PanelGrid({
     cellWidth,
     rowHeight,
     margin,
+    iconSize,
   } = useGridLayout(panelItems, layoutConfig);
 
   const isClampMode = useMemo(() => {
@@ -177,6 +178,7 @@ export default function PanelGrid({
           totalHeight={totalHeight}
           cellWidth={cellWidth}
           rowHeight={rowHeight}
+          iconSize={iconSize}
           margin={margin}
           items={panelItems}
           activeId={activeId}
@@ -204,6 +206,7 @@ export default function PanelGrid({
         itemStyle={activeId ? itemStyles.get(activeId) : undefined}
         cellWidth={cellWidth}
         rowHeight={rowHeight}
+        iconSize={iconSize}
         margin={margin}
         listItemSize={listItemSize}
       />

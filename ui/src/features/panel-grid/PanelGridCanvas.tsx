@@ -23,6 +23,7 @@ interface PanelGridCanvasProps {
   totalHeight: number;
   cellWidth: number;
   rowHeight: number;
+  iconSize: number;
   margin: readonly [number, number];
   items: PanelItem[];
   activeId: string | null;
@@ -110,6 +111,7 @@ export function PanelGridCanvas({
   totalHeight,
   cellWidth,
   rowHeight,
+  iconSize,
   margin,
   items,
   activeId,
@@ -134,6 +136,8 @@ export function PanelGridCanvas({
         height: totalHeight,
         "--cell-width": `${cellWidth}px`,
         "--row-height": `${rowHeight}px`,
+        "--cell-size": `${cellWidth}px`,
+        "--icon-size": `${iconSize}px`,
         "--cell-gap-x": `${margin[0]}px`,
         "--cell-gap-y": `${margin[1]}px`,
       } as React.CSSProperties}
@@ -220,7 +224,8 @@ function GridItemHost({
           listItemSize={listItemSize}
           onOpen={() => onFolderOpen(item)}
           onOpenChild={handleChildOpen}
-          onContextMenu={handleChildContextMenu}
+          onContextMenu={(e) => onItemContextMenu(e, item)}
+          onChildContextMenu={handleChildContextMenu}
         />
       ) : (
         <WidgetTool

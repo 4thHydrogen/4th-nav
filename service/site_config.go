@@ -14,7 +14,7 @@ func GetSiteConfig() types.SiteConfig {
 			Id:                 1,
 			NoImageMode:        false,
 			CompactMode:        false,
-			ColumnsPerRow:      3,
+			ColumnsPerRow:      12,
 			Density:            "standard",
 			FolderListItemSize: 28,
 		}

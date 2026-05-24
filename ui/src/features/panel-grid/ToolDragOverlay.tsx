@@ -10,6 +10,7 @@ interface ToolDragOverlayProps {
   itemStyle?: { width: number; height: number };
   cellWidth: number;
   rowHeight: number;
+  iconSize: number;
   margin: readonly [number, number];
   listItemSize: number;
 }
@@ -25,6 +26,7 @@ export function ToolDragOverlay({
 }: ToolDragOverlayProps) {
   const handleChildContextMenu = (e: React.MouseEvent, item: LinkItem) => {};
   const handleChildOpen = (item: LinkItem) => {};
+  const handleFolderContextMenu = (e: React.MouseEvent) => {};
 
   return (
     <DragOverlay dropAnimation={null}>
@@ -46,7 +48,8 @@ export function ToolDragOverlay({
               listItemSize={listItemSize}
               onOpen={() => {}}
               onOpenChild={handleChildOpen}
-              onContextMenu={handleChildContextMenu}
+              onContextMenu={handleFolderContextMenu}
+              onChildContextMenu={handleChildContextMenu}
             />
           ) : (
             <WidgetTool item={activeItem} onContextMenu={() => {}} onClick={() => {}} />

@@ -5,22 +5,7 @@
   height: 100%;
   grid-template-columns: repeat(var(--grid-w, 1), 1fr);
   grid-template-rows: repeat(var(--grid-h, 1), 1fr);
-  justify-items: center;
-  align-items: start;
-}
-
-.widget-folder-preview > .widget-tool {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.widget-folder-preview > .widget-tool .widget-tool-icon {
-  width: 100%;
-  height: 100%;
-  max-width: var(--icon-size, 48px);
-  max-height: var(--icon-size, 48px);
+  place-items: center;
 }
 
 .widget-folder-child {
@@ -81,8 +66,9 @@
 }
 
 .widget-folder-overflow-grid {
-  width: 100%;
-  height: 100%;
+  width: var(--icon-size, 48px);
+  height: var(--icon-size, 48px);
+  aspect-ratio: 1 / 1;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   grid-template-rows: repeat(2, 1fr);
@@ -97,6 +83,8 @@
   justify-content: center;
   width: 100%;
   height: 100%;
+  min-width: 0;
+  min-height: 0;
   background: var(--widget-icon-bg);
   border-radius: var(--folder-overflow-radius);
   box-sizing: border-box;

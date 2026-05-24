@@ -7,10 +7,10 @@ import { getJumpTarget } from "../../../utils/setting";
 interface FolderPreviewSlotProps {
   slot: PreviewSlot;
   onOpenChild: (item: LinkItem) => void;
-  onContextMenu: (e: React.MouseEvent, item: LinkItem) => void;
+  onChildContextMenu: (e: React.MouseEvent, item: LinkItem) => void;
 }
 
-export function FolderPreviewSlot({ slot, onOpenChild, onContextMenu }: FolderPreviewSlotProps) {
+export function FolderPreviewSlot({ slot, onOpenChild, onChildContextMenu }: FolderPreviewSlotProps) {
   if (slot.type === "summary") {
     return (
       <div className="widget-folder-overflow">
@@ -69,7 +69,7 @@ export function FolderPreviewSlot({ slot, onOpenChild, onContextMenu }: FolderPr
       }}
       onContextMenu={(e) => {
         e.stopPropagation();
-        onContextMenu(e, item);
+        onChildContextMenu(e, item);
       }}
     >
       <span className="widget-folder-child-icon">

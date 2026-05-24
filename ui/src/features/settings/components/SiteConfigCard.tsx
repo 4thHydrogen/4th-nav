@@ -2,11 +2,35 @@ import { Button, Card, Form, Select, Slider, Spin, Switch } from "antd";
 import type { FormInstance } from "antd";
 import type { SiteConfig } from "../../../types";
 
+const COLUMNS_OPTIONS = [
+  { label: "6 列", value: 6 },
+  { label: "8 列", value: 8 },
+  { label: "10 列", value: 10 },
+  { label: "12 列（默认）", value: 12 },
+  { label: "14 列", value: 14 },
+  { label: "16 列", value: 16 },
+];
+
+const MIN_COLUMNS = 6;
+const MAX_COLUMNS = 16;
+
 interface SiteConfigCardProps {
   form: FormInstance;
   loading: boolean;
   siteConfig: SiteConfig | null | undefined;
   onSubmit: (values: any) => Promise<void>;
+}
+
+function ColumnsPerRowHint() {
+  const value = Form.useWatch("columnsPerRow");
+  if (value == null) return null;
+  if (value < MIN_COLUMNS) {
+    return `建议设置为 ${MIN_COLUMNS} 列以上，当前值 ${value} 过小`;
+  }
+  if (value > MAX_COLUMNS) {
+    return `建议设置为 ${MAX_COLUMNS} 列以内，当前值 ${value} 过大`;
+  }
+  return null;
 }
 
 export function SiteConfigCard({
@@ -39,19 +63,12 @@ export function SiteConfigCard({
             <Switch defaultChecked={Boolean(siteConfig?.compactMode)} />
           </Form.Item>
           <Form.Item
-            label="每行项目数"
+            label="桌面网格列数"
             name="columnsPerRow"
-            tooltip="设置桌面端每行显示的工具卡片数量"
+            tooltip="控制桌面主面板横向划分为多少个基础网格单元。普通网页项目占 1 个单元，2×2 文件夹占 2 列 × 2 行。"
+            help={<ColumnsPerRowHint />}
           >
-            <Select
-              options={[
-                { label: "2 列", value: 2 },
-                { label: "3 列（默认）", value: 3 },
-                { label: "4 列", value: 4 },
-                { label: "5 列", value: 5 },
-                { label: "6 列", value: 6 },
-              ]}
-            />
+            <Select options={COLUMNS_OPTIONS} />
           </Form.Item>
           <Form.Item
             label="图标密度"
