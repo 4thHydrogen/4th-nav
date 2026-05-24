@@ -1,10 +1,17 @@
 import { useEffect, useCallback, useState } from "react";
 import { createPortal } from "react-dom";
-import "./index.css";
-import type { Tool, ToolViewMode, ToolSize } from "../../types";
-import { fetchAddTool, fetchUpdateTool } from "../../shared/api/tool";
 import { fetchMoveToolToFolder, fetchDeleteFolder } from "../../shared/api/folder";
+import { fetchAddTool, fetchUpdateTool } from "../../shared/api/tool";
+import type { Tool, ToolSize, ToolViewMode } from "../../types";
 import { useUpdateToolSize } from "../../queries";
+import "./index.css";
+
+const toUpdateDto = (tool: Tool) => ({
+  ...tool,
+  category: tool.category || "",
+  description: tool.description || "",
+  folderTint: tool.folderTint || "",
+});
 
 interface ContextMenuState {
   visible: boolean;
@@ -22,6 +29,13 @@ interface ToolContextMenuProps {
   allTools?: Tool[];
   onRefresh?: () => void;
 }
+
+const FOLDER_SIZES: ToolSize[] = ["1x1", "2x2", "3x2", "2x3", "3x3"];
+
+const parseSizeDims = (size: string): [number, number] => {
+  const parts = size.split("x").map(Number);
+  return [parts[0] || 1, parts[1] || 1];
+};
 
 const ToolContextMenu = ({
   state,
@@ -44,8 +58,8 @@ const ToolContextMenu = ({
   }, [onClose]);
 
   const handleKeyDown = useCallback(
-    (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
+    (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
         setShowFolderPicker(false);
         setShowSizePicker(false);
         onClose();
@@ -69,30 +83,24 @@ const ToolContextMenu = ({
   const isFolder = tool.type === "folder";
   const nextViewMode: ToolViewMode = tool.viewMode === "card" ? "icon" : "card";
   const canDock = !isFolder;
-
-  // 文件夹不能移入其他文件夹（禁止嵌套）
-  const folders = isFolder
-    ? []
-    : allTools.filter((t) => t.type === "folder" && t.id !== tool.id);
+  const folders = isFolder ? [] : allTools.filter((item) => item.type === "folder" && item.id !== tool.id);
 
   const handleMoveToFolder = async (folderId: number) => {
     try {
       await fetchMoveToolToFolder(tool.id, folderId);
       onRefresh?.();
-    } catch {
-      // ignore
+    } finally {
+      onClose();
     }
-    onClose();
   };
 
   const handleRemoveFromFolder = async () => {
     try {
       await fetchMoveToolToFolder(tool.id, null);
       onRefresh?.();
-    } catch {
-      // ignore
+    } finally {
+      onClose();
     }
-    onClose();
   };
 
   const handleRename = async () => {
@@ -100,37 +108,28 @@ const ToolContextMenu = ({
     if (!name?.trim()) return;
     try {
       await fetchUpdateTool({
-        ...tool,
+        ...toUpdateDto(tool),
         id: tool.id,
         name: name.trim(),
       });
       onRefresh?.();
-    } catch {
-      // ignore
+    } finally {
+      onClose();
     }
-    onClose();
   };
 
   const handleDeleteFolder = async (mode: "move-children-to-root" | "delete-with-children") => {
     try {
       await fetchDeleteFolder(tool.id, mode);
       onRefresh?.();
-    } catch {
-      // ignore
+    } finally {
+      onClose();
     }
-    onClose();
   };
 
   const handleSetSize = (size: ToolSize) => {
     updateToolSize.mutate({ id: tool.id, size });
     onClose();
-  };
-
-  const FOLDER_SIZES: ToolSize[] = ["1x1", "2x2", "3x2", "2x3", "3x3"];
-
-  const parseSizeDims = (s: string): [number, number] => {
-    const parts = s.split("x").map(Number);
-    return [parts[0] || 1, parts[1] || 1];
   };
 
   const renderSizeGrid = (cols: number, rows: number, isActive: boolean) => (
@@ -143,9 +142,9 @@ const ToolContextMenu = ({
         height: rows * 10 + (rows - 1) * 2,
       }}
     >
-      {Array.from({ length: cols * rows }).map((_, i) => (
+      {Array.from({ length: cols * rows }).map((_, index) => (
         <div
-          key={i}
+          key={index}
           style={{
             width: 10,
             height: 10,
@@ -168,37 +167,31 @@ const ToolContextMenu = ({
         name: name.trim(),
         url: "",
         logo: "",
-        catelog: tool.catelog || "",
-        desc: "",
+        category: tool.category || "",
+        description: "",
         sort: 1,
         hide: false,
         viewMode: "icon",
         type: "folder",
         parentId: null,
         size: "1x1",
-        bgColor: "",
+        folderTint: "",
         gridX: -1,
         gridY: -1,
         folderViewMode: "grid",
         folderItemSize: 28,
       });
-      if (folder?.id) {
+      if ("id" in folder && folder.id) {
         await fetchMoveToolToFolder(tool.id, folder.id);
       }
       onRefresh?.();
-    } catch {
-      // ignore
+    } finally {
+      onClose();
     }
-    onClose();
-  };
-
-  const menuStyle: React.CSSProperties = {
-    left: x,
-    top: y,
   };
 
   return createPortal(
-    <div className="tool-context-menu" style={menuStyle} onClick={(e) => e.stopPropagation()}>
+    <div className="tool-context-menu" style={{ left: x, top: y }} onClick={(event) => event.stopPropagation()}>
       <div className="tool-context-menu-title">{tool.name}</div>
 
       {isFolder ? (
@@ -212,22 +205,22 @@ const ToolContextMenu = ({
             onMouseLeave={() => setShowSizePicker(false)}
           >
             <button className="tool-context-menu-item tool-context-menu-item-flyout-trigger">
-              大小 ({tool.size || "1×1"}) ▸
+              大小 ({tool.size || "1x1"}) ▸
             </button>
             {showSizePicker && (
               <div className="tool-context-menu-submenu tool-context-menu-submenu-flyout size-picker-grid">
-                {FOLDER_SIZES.map((s) => {
-                  const [cols, rows] = parseSizeDims(s);
-                  const isActive = tool.size === s;
+                {FOLDER_SIZES.map((size) => {
+                  const [cols, rows] = parseSizeDims(size);
+                  const isActive = tool.size === size;
                   return (
                     <button
-                      key={s}
+                      key={size}
                       className={`size-picker-option ${isActive ? "active" : ""}`}
-                      onClick={() => handleSetSize(s)}
-                      title={`${cols}×${rows}`}
+                      onClick={() => handleSetSize(size)}
+                      title={`${cols}x${rows}`}
                     >
                       {renderSizeGrid(cols, rows, isActive)}
-                      <span className="size-picker-label">{cols}×{rows}</span>
+                      <span className="size-picker-label">{cols}x{rows}</span>
                     </button>
                   );
                 })}
@@ -288,17 +281,11 @@ const ToolContextMenu = ({
             </button>
           )}
           {tool.parentId != null && (
-            <button
-              className="tool-context-menu-item"
-              onClick={handleRemoveFromFolder}
-            >
+            <button className="tool-context-menu-item" onClick={handleRemoveFromFolder}>
               从文件夹移出
             </button>
           )}
-          <button
-            className="tool-context-menu-item"
-            onClick={handleCreateFolder}
-          >
+          <button className="tool-context-menu-item" onClick={handleCreateFolder}>
             创建文件夹并移入
           </button>
           {folders.length > 0 && (
@@ -311,13 +298,13 @@ const ToolContextMenu = ({
           )}
           {showFolderPicker && (
             <div className="tool-context-menu-submenu">
-              {folders.map((f) => (
+              {folders.map((folder) => (
                 <button
-                  key={f.id}
+                  key={folder.id}
                   className="tool-context-menu-item"
-                  onClick={() => handleMoveToFolder(f.id)}
+                  onClick={() => handleMoveToFolder(folder.id)}
                 >
-                  {f.name}
+                  {folder.name}
                 </button>
               ))}
             </div>

@@ -23,7 +23,7 @@ func GetSetting() types.Setting {
 			JumpTargetBlank:      true,
 			BackgroundUrl:        "",
 			EnableBackground:     false,
-			EnableGlassmorphism:  false,
+			EnableSurfaceEffects: false,
 		}
 	}
 	return setting

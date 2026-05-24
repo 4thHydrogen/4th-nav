@@ -33,8 +33,8 @@ const FolderItem = ({
       <div
         className="folder-preview"
         style={
-          folder.bgColor
-            ? { backgroundColor: folder.bgColor }
+          folder.folderTint
+            ? { backgroundColor: folder.folderTint }
             : undefined
         }
       >

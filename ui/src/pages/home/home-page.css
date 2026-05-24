@@ -6,31 +6,31 @@
   right: 0;
 }
 
-.record-wraper>a {
+.record-wraper > a {
   text-decoration: none;
   color: #bbb;
 }
 
-/* ---- Content Fade In ---- */
 @keyframes contentFadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
 
-/* ====== Desktop page layout ====== */
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
 .desktop-page {
   --desktop-surface: rgba(255, 255, 255, 0.72);
   --desktop-surface-strong: rgba(255, 255, 255, 0.86);
   --desktop-border: rgba(15, 23, 42, 0.08);
-  --desktop-shadow: 0 24px 70px rgba(15, 23, 42, 0.10);
-
-  /* Dock safe area */
+  --desktop-shadow: 0 24px 70px rgba(15, 23, 42, 0.1);
   --dock-safe-area: 96px;
   --record-safe-area: 24px;
   --home-bottom-safe-area: calc(var(--dock-safe-area) + var(--record-safe-area));
-
-  /* Widget 系统变量 — 亮色默认值 */
   --widget-bg: rgba(255, 255, 255, 0.72);
   --widget-bg-hover: rgba(255, 255, 255, 0.86);
   --widget-text: rgba(30, 30, 30, 0.85);
@@ -57,7 +57,6 @@
   --folder-inner-gap: 6px;
   --grid-item-pad-y: 8px;
   --grid-item-pad-x: 4px;
-
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -98,8 +97,10 @@
 .desktop-search-shell .search-wraper {
   width: 100%;
   background: var(--surface-widget-bg, rgba(255, 255, 255, 0.12));
-  backdrop-filter: blur(var(--surface-widget-blur, 18px)) saturate(var(--surface-widget-saturate, 1.2));
-  -webkit-backdrop-filter: blur(var(--surface-widget-blur, 18px)) saturate(var(--surface-widget-saturate, 1.2));
+  backdrop-filter: blur(var(--surface-widget-blur, 18px))
+    saturate(var(--surface-widget-saturate, 1.2));
+  -webkit-backdrop-filter: blur(var(--surface-widget-blur, 18px))
+    saturate(var(--surface-widget-saturate, 1.2));
   border: 1px solid var(--surface-widget-border, rgba(255, 255, 255, 0.16));
   box-shadow: var(--surface-widget-shadow, none);
   color: var(--text-primary);
@@ -176,7 +177,6 @@ body.dark-mode .desktop-page {
   --desktop-surface-strong: rgba(40, 42, 48, 0.92);
   --desktop-border: rgba(255, 255, 255, 0.08);
   --desktop-shadow: 0 24px 70px rgba(0, 0, 0, 0.32);
-
   --widget-bg: rgba(255, 255, 255, 0.06);
   --widget-bg-hover: rgba(255, 255, 255, 0.1);
   --widget-text: rgba(255, 255, 255, 0.85);
@@ -200,12 +200,11 @@ body.dark-mode .desktop-search-shell .search-wraper {
 }
 
 body.has-background .desktop-page,
-body.glassmorphism .desktop-page {
+body.surface-effects .desktop-page {
   --desktop-surface: rgba(255, 255, 255, 0.08);
   --desktop-surface-strong: rgba(255, 255, 255, 0.14);
   --desktop-border: rgba(255, 255, 255, 0.12);
   --desktop-shadow: 0 24px 70px rgba(0, 0, 0, 0.22);
-
   --widget-bg: rgba(255, 255, 255, 0.06);
   --widget-bg-hover: rgba(255, 255, 255, 0.1);
   --widget-text: rgba(255, 255, 255, 0.85);
@@ -225,12 +224,12 @@ body.glassmorphism .desktop-page {
 }
 
 body.has-background .desktop-search-shell .search-wraper,
-body.glassmorphism .desktop-search-shell .search-wraper {
+body.surface-effects .desktop-search-shell .search-wraper {
   color: rgba(255, 255, 255, 0.94);
 }
 
 body.has-background .desktop-search-shell input::placeholder,
-body.glassmorphism .desktop-search-shell input::placeholder {
+body.surface-effects .desktop-search-shell input::placeholder {
   color: rgba(255, 255, 255, 0.55);
 }
 
@@ -290,8 +289,6 @@ body.glassmorphism .desktop-search-shell input::placeholder {
     gap: 12px;
   }
 }
-
-/* ====== Search empty state ====== */
 
 .search-empty-state {
   display: flex;

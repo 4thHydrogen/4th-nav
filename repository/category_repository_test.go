@@ -20,7 +20,7 @@ func setupCategoryRepositoryTestDB(t *testing.T) *sql.DB {
 	}
 
 	stmts := []string{
-		`CREATE TABLE nav_catelog (
+		`CREATE TABLE nav_category (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			name TEXT,
 			sort INTEGER,
@@ -28,7 +28,7 @@ func setupCategoryRepositoryTestDB(t *testing.T) *sql.DB {
 		);`,
 		`CREATE TABLE nav_table (
 			id INTEGER PRIMARY KEY,
-			catelog TEXT
+			category TEXT
 		);`,
 	}
 	for _, stmt := range stmts {
@@ -47,8 +47,8 @@ func setupCategoryRepositoryTestDB(t *testing.T) *sql.DB {
 func TestCategoryRepositoryLifecycle(t *testing.T) {
 	db := setupCategoryRepositoryTestDB(t)
 	if _, err := db.Exec(`
-		INSERT INTO nav_catelog (id, name, sort, hide) VALUES (1, 'old', 1, 0);
-		INSERT INTO nav_table (id, catelog) VALUES (10, 'old'), (11, 'old');
+		INSERT INTO nav_category (id, name, sort, hide) VALUES (1, 'old', 1, 0);
+		INSERT INTO nav_table (id, category) VALUES (10, 'old'), (11, 'old');
 	`); err != nil {
 		t.Fatalf("seed categories: %v", err)
 	}
@@ -70,7 +70,7 @@ func TestCategoryRepositoryLifecycle(t *testing.T) {
 	}
 
 	var toolCategory string
-	if err := db.QueryRow(`SELECT catelog FROM nav_table WHERE id = 10`).Scan(&toolCategory); err != nil {
+	if err := db.QueryRow(`SELECT category FROM nav_table WHERE id = 10`).Scan(&toolCategory); err != nil {
 		t.Fatalf("load tool category: %v", err)
 	}
 	if toolCategory != "renamed" {
@@ -82,7 +82,7 @@ func TestCategoryRepositoryLifecycle(t *testing.T) {
 	}
 
 	var count int
-	if err := db.QueryRow(`SELECT COUNT(*) FROM nav_catelog WHERE id = 1`).Scan(&count); err != nil {
+	if err := db.QueryRow(`SELECT COUNT(*) FROM nav_category WHERE id = 1`).Scan(&count); err != nil {
 		t.Fatalf("count categories: %v", err)
 	}
 	if count != 0 {

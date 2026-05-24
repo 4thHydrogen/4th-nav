@@ -2,7 +2,7 @@ import { useCallback, useRef, useState } from "react";
 import { Plus } from "lucide-react";
 import type { DockItem } from "../../types";
 import { fetchRemoveDockItem, fetchUpdateDockSort } from "../../shared/api/dock";
-import LogoIcon from "../../shared/components/LogoIcon";
+import ToolIcon from "../../shared/ui/ToolIcon";
 import "./index.css";
 
 interface DockBarProps {
@@ -95,7 +95,7 @@ export default function DockBar({ items, onChange }: DockBarProps) {
           onContextMenu={(e) => handleContextMenu(e, item)}
         >
           <span className="dock-tooltip">{item.name}</span>
-          <LogoIcon logo={item.logo} name={item.name} toolUrl={item.url} size={36} radius={8} />
+          <ToolIcon logo={item.logo} name={item.name} toolUrl={item.url} size={36} radius={8} />
         </div>
       ))}
     </div>

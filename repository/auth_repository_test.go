@@ -62,6 +62,22 @@ func TestGetActiveAPITokens(t *testing.T) {
 	if len(tokens) != 1 || tokens[0].Name != "active" {
 		t.Fatalf("unexpected tokens: %+v", tokens)
 	}
+
+	exists, err := ExistsActiveAPIToken("a")
+	if err != nil {
+		t.Fatalf("exists active token: %v", err)
+	}
+	if !exists {
+		t.Fatalf("expected active token to exist")
+	}
+
+	missing, err := ExistsActiveAPIToken("missing")
+	if err != nil {
+		t.Fatalf("missing active token: %v", err)
+	}
+	if missing {
+		t.Fatalf("expected missing token to be false")
+	}
 }
 
 func TestGetUserByName(t *testing.T) {

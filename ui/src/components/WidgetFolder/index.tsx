@@ -22,14 +22,14 @@ const WidgetFolder = ({ folder, childrenTools, listItemSize, onOpen, onOpenChild
   const isEmpty = childrenTools.length === 0;
   const mouseDownPos = useRef<{ x: number; y: number } | null>(null);
 
-  const bgColor = folder.bgColor || undefined;
+  const folderTint = folder.folderTint || undefined;
   const isListMode = folder.folderViewMode === "list";
 
   return (
     <div className="widget-folder-outer" style={{ "--grid-w": w, "--grid-h": h } as React.CSSProperties}>
       <div
-        className="widget-folder"
-        style={{ "--folder-tint": bgColor || "transparent" } as React.CSSProperties}
+        className="widget-folder material-folder"
+        style={{ "--folder-tint": folderTint || "transparent" } as React.CSSProperties}
         onMouseDown={(e) => {
           if (e.button === 1) {
             e.preventDefault();

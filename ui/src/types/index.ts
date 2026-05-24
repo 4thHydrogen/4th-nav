@@ -1,7 +1,6 @@
-// Entity types — mirror Go backend types/types.go
-
 export type ToolViewMode = "icon" | "card";
-export type ToolType = "icon" | "folder";
+export type ToolKind = "icon" | "folder";
+export type ToolType = ToolKind;
 export type ToolSize = `${number}x${number}`;
 export type FolderViewMode = "grid" | "list";
 
@@ -10,19 +9,23 @@ export interface Tool {
   name: string;
   url: string;
   logo: string;
-  catelog: string;
-  desc: string;
+  category: string;
+  description: string;
   sort: number;
   hide: boolean;
   viewMode: ToolViewMode;
-  type: ToolType;
+  type: ToolKind;
   parentId: number | null;
   size: ToolSize;
-  bgColor: string;
+  folderTint: string;
   gridX: number;
   gridY: number;
   folderViewMode: FolderViewMode;
   folderItemSize: number;
+}
+
+export interface FolderRecord extends Tool {
+  type: "folder";
 }
 
 export interface Category {
@@ -31,9 +34,6 @@ export interface Category {
   sort: number;
   hide: boolean;
 }
-
-/** @deprecated Use Category instead */
-export type Catelog = Category;
 
 export interface Setting {
   id: number;
@@ -48,7 +48,7 @@ export interface Setting {
   jumpTargetBlank: boolean;
   backgroundUrl: string;
   enableBackground: boolean;
-  enableGlassmorphism: boolean;
+  enableSurfaceEffects: boolean;
   pexelsApiKey: string;
   proxy: string;
 }
@@ -58,7 +58,6 @@ export interface SiteConfig {
   noImageMode: boolean;
   compactMode: boolean;
   columnsPerRow: number;
-  /** @deprecated Use density instead */
   iconSize?: number;
   density?: "compact" | "standard" | "relaxed";
   folderListItemSize: number;
@@ -87,40 +86,11 @@ export interface User {
   password: string;
 }
 
-// API response envelope
-
 export interface ApiResponse<T> {
   success: boolean;
   data?: T;
   message?: string;
   errorMessage?: string;
-}
-
-// Composite API data
-
-export interface PublicApiData {
-  tools: Tool[];
-  catelogs: Category[];
-  setting: Setting;
-  siteConfig: SiteConfig;
-}
-
-export interface AdminApiData {
-  tools: Tool[];
-  catelogs: Category[];
-  setting: Setting;
-  siteConfig: SiteConfig;
-  user: Pick<User, "name" | "id">;
-  tokens: Token[];
-}
-
-// Transformed data from FetchList()
-export interface ContentData {
-  tools: Tool[];
-  catelogs: string[];
-  setting: Setting;
-  siteConfig: SiteConfig;
-  dockItems: DockItem[];
 }
 
 export interface DockItem {
@@ -130,25 +100,49 @@ export interface DockItem {
   name: string;
   url: string;
   logo: string;
-  catelog: string;
-  desc: string;
+  category: string;
+  description: string;
 }
 
-// DTO types
+export interface PublicApiData {
+  tools: Tool[];
+  categories: Category[];
+  setting: Setting;
+  siteConfig: SiteConfig;
+  dockItems?: DockItem[];
+}
+
+export interface AdminApiData {
+  tools: Tool[];
+  categories: Category[];
+  setting: Setting;
+  siteConfig: SiteConfig;
+  user: Pick<User, "name" | "id">;
+  tokens: Token[];
+}
+
+export interface ContentData {
+  tools: Tool[];
+  categories: string[];
+  categoryRecords: Category[];
+  setting: Setting;
+  siteConfig: SiteConfig;
+  dockItems: DockItem[];
+}
 
 export interface AddToolDto {
   name: string;
   url: string;
   logo: string;
-  catelog: string;
-  desc: string;
+  category: string;
+  description: string;
   sort: number;
   hide: boolean;
   viewMode: ToolViewMode;
-  type: ToolType;
+  type: ToolKind;
   parentId: number | null;
   size: ToolSize;
-  bgColor: string;
+  folderTint: string;
   gridX: number;
   gridY: number;
   folderViewMode: FolderViewMode;
@@ -165,15 +159,9 @@ export interface AddCategoryDto {
   hide: boolean;
 }
 
-/** @deprecated Use AddCategoryDto instead */
-export type AddCatelogDto = AddCategoryDto;
-
 export interface UpdateCategoryDto extends AddCategoryDto {
   id: number;
 }
-
-/** @deprecated Use UpdateCategoryDto instead */
-export type UpdateCatelogDto = UpdateCategoryDto;
 
 export interface UpdateUserDto {
   id: number;
@@ -198,14 +186,12 @@ export interface LayoutItemDto {
   h: number;
 }
 
-// Component prop types
-
 export interface CardProps {
   title: string;
   url: string;
   des: string;
   logo: string;
-  catelog: string;
+  category?: string;
   index: number;
   isSearching: boolean;
   noImageMode: boolean;

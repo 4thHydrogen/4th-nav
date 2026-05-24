@@ -16,7 +16,7 @@ const Login = React.lazy(() => import('./pages/Login'));
 
 // 懒加载管理后台的子页面
 const Tools = React.lazy(() => import('./pages/admin/tabs/Tools').then(module => ({ default: module.Tools })));
-const Catelog = React.lazy(() => import('./pages/admin/tabs/Category').then(module => ({ default: module.Catelog })));
+const Category = React.lazy(() => import('./pages/admin/tabs/Category').then(module => ({ default: module.Category })));
 const ApiToken = React.lazy(() => import('./pages/admin/tabs/ApiToken').then(module => ({ default: module.ApiToken })));
 const Setting = React.lazy(() => import('./pages/admin/tabs/Setting').then(module => ({ default: module.Setting })));
 const SearchEngine = React.lazy(() => import('./pages/admin/tabs/Search'));
@@ -78,7 +78,7 @@ function App() {
             <Route path="/admin" element={<AdminPage />}>
               <Route index element={<Tools />} />
               <Route path="tools" element={<Tools />} />
-              <Route path="categories" element={<Catelog />} />
+              <Route path="categories" element={<Category />} />
               <Route path="search-engines" element={<SearchEngine />} />
               <Route path="api-token" element={<ApiToken />} />
               <Route path="settings" element={<Setting />} />

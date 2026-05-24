@@ -26,6 +26,15 @@ func GetActiveAPITokens() ([]types.Token, error) {
 	return results, nil
 }
 
+func ExistsActiveAPIToken(token string) (bool, error) {
+	var count int
+	err := database.DB.QueryRow(`SELECT COUNT(*) FROM nav_api_token WHERE value = ? AND disabled = 0;`, token).Scan(&count)
+	if err != nil {
+		return false, err
+	}
+	return count > 0, nil
+}
+
 func GetUserByName(name string) (types.User, error) {
 	var user types.User
 	err := database.DB.QueryRow(`SELECT id, name, password FROM nav_user WHERE name = ?;`, name).Scan(&user.Id, &user.Name, &user.Password)

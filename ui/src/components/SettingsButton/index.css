@@ -9,14 +9,15 @@
   align-items: center;
   justify-content: center;
   color: var(--widget-text-muted);
-  background: var(--widget-bg, rgba(255, 255, 255, 0.72));
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--widget-border, rgba(15, 23, 42, 0.08));
+  background: var(--surface-widget-bg, rgba(255, 255, 255, 0.12));
+  backdrop-filter: blur(var(--surface-widget-blur, 18px)) saturate(var(--surface-widget-saturate, 1.2));
+  -webkit-backdrop-filter: blur(var(--surface-widget-blur, 18px)) saturate(var(--surface-widget-saturate, 1.2));
+  border: 1px solid var(--surface-widget-border, rgba(255, 255, 255, 0.16));
   cursor: pointer;
   transition: all 0.2s ease;
   text-decoration: none;
   z-index: 300;
+  box-shadow: var(--surface-widget-shadow, none);
 }
 
 .settings-button:hover {
@@ -24,16 +25,6 @@
   color: var(--widget-text);
   transform: rotate(30deg);
 }
-
-/* ====== Glassmorphism ====== */
-body.glassmorphism .settings-button {
-  background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur)) saturate(1.2);
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.2);
-  border-color: var(--glass-border);
-  box-shadow: var(--glass-shadow);
-}
-
 @media (max-width: 768px) {
   .settings-button {
     display: none;

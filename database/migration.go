@@ -13,6 +13,10 @@ func migration_2024_12_13() error {
 		return nil
 	}
 
+	if !tableExists("nav_catelog") {
+		return nil
+	}
+
 	// 1. 首先更新现有的 NULL 值为 0
 	sql_update_null_sort := `
         UPDATE nav_catelog 
@@ -66,9 +70,5 @@ func migration_2024_12_13() error {
 	if err != nil {
 		return err
 	}
-
-	return markMigrationApplied(migration{
-		id:   "2024_12_13_nav_catelog_rebuild",
-		name: "rebuild nav_catelog with non-null sort and hide columns",
-	})
+	return nil
 }

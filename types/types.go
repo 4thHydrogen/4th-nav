@@ -14,7 +14,7 @@ type Setting struct {
 	JumpTargetBlank      bool   `json:"jumpTargetBlank"`
 	BackgroundUrl        string `json:"backgroundUrl"`
 	EnableBackground     bool   `json:"enableBackground"`
-	EnableGlassmorphism  bool   `json:"enableGlassmorphism"`
+	EnableSurfaceEffects bool   `json:"enableSurfaceEffects"`
 	PexelsApiKey         string `json:"pexelsApiKey"`
 	Proxy                string `json:"proxy"`
 }
@@ -38,23 +38,23 @@ type Img struct {
 }
 
 type Tool struct {
-	Id       int     `json:"id"`
-	Name     string  `json:"name"`
-	Url      string  `json:"url"`
-	Logo     string  `json:"logo"`
-	Catelog  string  `json:"catelog"`
-	Desc     string  `json:"desc"`
-	Sort     int     `json:"sort"`
-	Hide     bool    `json:"hide"`
-	ViewMode string  `json:"viewMode"`
-	Type     string  `json:"type"`
-	ParentId *int    `json:"parentId"`
-	Size     string  `json:"size"`
-	BgColor  string  `json:"bgColor"`
-	GridX          int     `json:"gridX"`
-	GridY          int     `json:"gridY"`
-	FolderViewMode string  `json:"folderViewMode"`
-	FolderItemSize int     `json:"folderItemSize"`
+	Id             int    `json:"id"`
+	Name           string `json:"name"`
+	Url            string `json:"url"`
+	Logo           string `json:"logo"`
+	Category       string `json:"category"`
+	Description    string `json:"description"`
+	Sort           int    `json:"sort"`
+	Hide           bool   `json:"hide"`
+	ViewMode       string `json:"viewMode"`
+	Type           string `json:"type"`
+	ParentId       *int   `json:"parentId"`
+	Size           string `json:"size"`
+	FolderTint     string `json:"folderTint"`
+	GridX          int    `json:"gridX"`
+	GridY          int    `json:"gridY"`
+	FolderViewMode string `json:"folderViewMode"`
+	FolderItemSize int    `json:"folderItemSize"`
 }
 
 type Category struct {

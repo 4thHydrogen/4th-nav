@@ -1,0 +1,20 @@
+:root {
+  --width-small: 500px;
+  --width-medium: 700px;
+  --width-large: 1060px;
+
+  --z-background: -10;
+  --z-base: 0;
+  --z-grid: 10;
+  --z-sticky: 100;
+  --z-dock: 200;
+  --z-folder-overlay: 700;
+  --z-folder-window: 800;
+  --z-dropdown: 900;
+  --z-floating-menu: 1000;
+  --z-context-menu: 1100;
+  --z-popover: 1200;
+  --z-modal: 1300;
+  --z-toast: 1400;
+  --z-tooltip: 1500;
+}

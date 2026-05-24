@@ -1,12 +1,15 @@
 import { useCallback } from "react";
 import { message } from "antd";
-import {
-  fetchAddTool,
-  fetchDeleteTool,
-  fetchUpdateTool,
-} from "../../shared/api/tool";
-import type { AddToolDto, UpdateToolDto, Tool } from "../../types";
+import { fetchAddTool, fetchDeleteTool, fetchUpdateTool } from "../../shared/api/tool";
+import type { AddToolDto, UpdateToolDto } from "../../types";
 import type { DataType } from "../../pages/admin/tabs/Tools/DraggableRow";
+
+const normalizeRecord = (record: DataType) => ({
+  ...record,
+  category: record.category || "",
+  description: record.description || "",
+  folderTint: record.folderTint || "",
+});
 
 export function useToolMutations(reload: () => void) {
   const handleDelete = useCallback(
@@ -26,8 +29,8 @@ export function useToolMutations(reload: () => void) {
   const handleUpdate = useCallback(
     async (record: DataType) => {
       try {
-        await fetchUpdateTool(record as unknown as UpdateToolDto);
-        message.success("更新成功! Logo 将在 3 秒后刷新并加载！", 3);
+        await fetchUpdateTool(normalizeRecord(record) as unknown as UpdateToolDto);
+        message.success("更新成功! Logo 会在 3 秒后刷新并加载!", 3);
         setTimeout(() => reload(), 3000);
       } catch {
         message.warning("更新失败!");
@@ -41,9 +44,9 @@ export function useToolMutations(reload: () => void) {
   const handleCreate = useCallback(
     async (record: DataType) => {
       try {
-        const payload = { gridX: -1, gridY: -1, ...record } as unknown as AddToolDto;
+        const payload = { gridX: -1, gridY: -1, ...normalizeRecord(record) } as unknown as AddToolDto;
         await fetchAddTool(payload);
-        message.success("添加成功! Logo 将在 3 秒后刷新并加载！", 3);
+        message.success("添加成功! Logo 会在 3 秒后刷新并加载!", 3);
         setTimeout(() => reload(), 3000);
       } catch {
         message.warning("添加失败!");
@@ -59,13 +62,12 @@ export function useToolMutations(reload: () => void) {
       const payload = {
         gridX: -1,
         gridY: -1,
-        ...record,
+        ...normalizeRecord(record),
         type: "folder" as const,
         url: "",
         logo: "",
         parentId: null,
         size: record.size || "1x1",
-        bgColor: record.bgColor || "",
       };
       try {
         await fetchAddTool(payload as unknown as AddToolDto);

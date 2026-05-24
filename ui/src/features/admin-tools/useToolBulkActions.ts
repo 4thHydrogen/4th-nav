@@ -4,6 +4,13 @@ import { fetchDeleteTool, fetchUpdateTool } from "../../shared/api/tool";
 import type { UpdateToolDto } from "../../types";
 import type { DataType } from "../../pages/admin/tabs/Tools/DraggableRow";
 
+const normalizeRecord = (record: DataType) => ({
+  ...record,
+  category: record.category || "",
+  description: record.description || "",
+  folderTint: record.folderTint || "",
+});
+
 export function useToolBulkActions(
   reload: () => void,
   selectedRows: DataType[]
@@ -27,7 +34,7 @@ export function useToolBulkActions(
     try {
       for (const each of selectedRows) {
         try {
-          await fetchUpdateTool({ ...each, logo: "" } as unknown as UpdateToolDto);
+          await fetchUpdateTool({ ...normalizeRecord(each), logo: "" } as unknown as UpdateToolDto);
         } catch {}
       }
       message.success("重置成功!");
@@ -42,7 +49,7 @@ export function useToolBulkActions(
     try {
       for (const each of selectedRows) {
         try {
-          await fetchUpdateTool(each as unknown as UpdateToolDto);
+          await fetchUpdateTool(normalizeRecord(each) as unknown as UpdateToolDto);
         } catch {}
       }
       message.success("缓存成功!");

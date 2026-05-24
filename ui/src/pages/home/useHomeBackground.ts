@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import { parsePexelsUrl, clearPexelsCache } from "../../utils/pexels";
+import { clearPexelsCache, parsePexelsUrl } from "../../utils/pexels";
 
 export function useHomeBackground(backgroundUrl?: string, enableBackground?: boolean) {
   const isPexels = useMemo(() => {
@@ -12,7 +12,7 @@ export function useHomeBackground(backgroundUrl?: string, enableBackground?: boo
   const handleRefreshBg = useCallback(() => {
     const { query } = parsePexelsUrl(backgroundUrl ?? "");
     clearPexelsCache(query);
-    setBgRefreshKey((k) => k + 1);
+    setBgRefreshKey((value) => value + 1);
   }, [backgroundUrl]);
 
   const showRefresh = isPexels && !!enableBackground;

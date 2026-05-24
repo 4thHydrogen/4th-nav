@@ -10,7 +10,7 @@ import (
 
 func GetDockItems() ([]types.DockItem, error) {
 	rows, err := database.DB.Query(`
-		SELECT di.id, di.sort, t.id, t.name, t.url, t.logo, t.catelog, t.desc
+		SELECT di.id, di.sort, t.id, t.name, t.url, t.logo, t.category, t.description
 		FROM dock_items di
 		JOIN nav_table t ON di.tool_id = t.id
 		ORDER BY di.sort ASC;
@@ -23,7 +23,7 @@ func GetDockItems() ([]types.DockItem, error) {
 	items := make([]types.DockItem, 0)
 	for rows.Next() {
 		var item types.DockItem
-		if err := rows.Scan(&item.ID, &item.Sort, &item.ToolID, &item.Name, &item.Url, &item.Logo, &item.Catelog, &item.Desc); err != nil {
+		if err := rows.Scan(&item.ID, &item.Sort, &item.ToolID, &item.Name, &item.Url, &item.Logo, &item.Category, &item.Description); err != nil {
 			return nil, err
 		}
 		items = append(items, item)

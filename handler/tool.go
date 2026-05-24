@@ -233,7 +233,7 @@ func UpdateToolsSortHandler(c *gin.Context) {
 
 	c.JSON(200, gin.H{
 		"success": true,
-		"message": "鏇存柊鎺掑簭鎴愬姛",
+		"message": "更新排序成功",
 	})
 }
 

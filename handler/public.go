@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/4thHydrogen/4th-nav/database"
 	"github.com/4thHydrogen/4th-nav/service"
 	"github.com/4thHydrogen/4th-nav/types"
 	"github.com/4thHydrogen/4th-nav/utils"
@@ -15,12 +14,10 @@ import (
 
 func GetAllHandler(c *gin.Context) {
 	tools := service.GetAllTool()
-	catelogs := service.GetAllCategories()
+	categories := service.GetAllCategories()
 	if !utils.IsLogin(c) {
-		tools = utils.FilterHideTools(tools, catelogs)
-	}
-	if !utils.IsLogin(c) {
-		catelogs = utils.FilterHideCates(catelogs)
+		tools = utils.FilterHideTools(tools, categories)
+		categories = utils.FilterHideCates(categories)
 	}
 	setting := service.GetSetting()
 	siteConfig := service.GetSiteConfig()
@@ -28,11 +25,11 @@ func GetAllHandler(c *gin.Context) {
 	if err != nil || dockItems == nil {
 		dockItems = []types.DockItem{}
 	}
-	c.JSON(200, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"data": gin.H{
 			"tools":      tools,
-			"catelogs":   catelogs,
+			"categories": categories,
 			"setting":    setting,
 			"siteConfig": siteConfig,
 			"dockItems":  dockItems,
@@ -45,13 +42,12 @@ func GetLogoImgHandler(c *gin.Context) {
 	if imgURL == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success":      false,
-			"errorMessage": "URL参数不能为空",
+			"errorMessage": "URL 参数不能为空",
 		})
 		return
 	}
-	img := service.GetImgFromDB(imgURL)
 
-	// Cache miss: try to fetch and cache the image
+	img := service.GetImgFromDB(imgURL)
 	if img.Value == "" {
 		cached, err := service.FetchAndCacheImage(imgURL)
 		if err != nil {
@@ -61,6 +57,7 @@ func GetLogoImgHandler(c *gin.Context) {
 			})
 			return
 		}
+
 		contentType := cached.ContentType
 		if contentType == "" {
 			contentType = guessImgContentType(imgURL)
@@ -77,6 +74,7 @@ func GetLogoImgHandler(c *gin.Context) {
 		})
 		return
 	}
+
 	contentType := guessImgContentType(imgURL)
 	c.Data(http.StatusOK, contentType, imgBuffer)
 }
@@ -119,7 +117,7 @@ func ManifastHanlder(c *gin.Context) {
 	if title == "" {
 		title = "4th Nav"
 	}
-	c.JSON(200, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"short_name":       title,
 		"name":             title,
 		"icons":            icons,
@@ -132,16 +130,8 @@ func ManifastHanlder(c *gin.Context) {
 }
 
 func GetEnabledSearchEnginesHandler(c *gin.Context) {
-	engines, err := database.GetEnabledSearchEngines()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"success":      false,
-			"errorMessage": err.Error(),
-		})
-		return
-	}
-	c.JSON(200, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"success": true,
-		"data":    engines,
+		"data":    service.GetEnabledSearchEngines(),
 	})
 }

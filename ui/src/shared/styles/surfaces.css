@@ -1,0 +1,15 @@
+.surface-widget {
+  background: var(--surface-widget-bg);
+  border: 1px solid var(--surface-widget-border);
+  backdrop-filter: blur(var(--surface-widget-blur)) saturate(var(--surface-widget-saturate));
+  -webkit-backdrop-filter: blur(var(--surface-widget-blur)) saturate(var(--surface-widget-saturate));
+  box-shadow: var(--surface-widget-shadow);
+}
+
+.surface-panel {
+  background: var(--surface-panel-bg);
+  border: 1px solid var(--surface-panel-border);
+  backdrop-filter: blur(var(--surface-panel-blur)) saturate(var(--surface-panel-saturate));
+  -webkit-backdrop-filter: blur(var(--surface-panel-blur)) saturate(var(--surface-panel-saturate));
+  box-shadow: var(--surface-panel-shadow);
+}

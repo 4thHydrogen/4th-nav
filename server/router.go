@@ -67,12 +67,7 @@ func RegisterAdminRoutes(admin *gin.RouterGroup) {
 	admin.DELETE("/icons/cache", handler.IconsClearCacheHandler)
 	admin.GET("/icons/status", handler.IconsStatusHandler)
 
-	// Category routes (legacy /catelog paths for backward compatibility)
-	admin.POST("/catelog", handler.AddCategoryHandler)
-	admin.DELETE("/catelog/:id", handler.DeleteCategoryHandler)
-	admin.PUT("/catelog/:id", handler.UpdateCategoryHandler)
-
-	// Category routes (new canonical paths)
+	// Category routes
 	admin.POST("/category", handler.AddCategoryHandler)
 	admin.DELETE("/category/:id", handler.DeleteCategoryHandler)
 	admin.PUT("/category/:id", handler.UpdateCategoryHandler)

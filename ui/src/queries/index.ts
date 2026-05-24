@@ -1,19 +1,19 @@
 import {
-  useQuery,
-  useMutation,
-  useQueryClient,
   QueryClient,
+  useMutation,
+  useQuery,
+  useQueryClient,
 } from "@tanstack/react-query";
-import {
-  fetchUpdateToolViewMode,
-  fetchAddTool,
-  fetchUpdateTool,
-} from "../shared/api/tool";
+import type { ContentData, FolderViewMode, LayoutItemDto, ToolSize, ToolViewMode } from "../types";
 import { FetchList } from "../shared/api/content";
 import { fetchAddDockItem } from "../shared/api/dock";
 import { fetchMoveToolToFolder, fetchUpdateFolderSettings } from "../shared/api/folder";
-import { fetchUpdateLayout } from "../shared/api/tool";
-import type { ContentData, ToolViewMode, LayoutItemDto, FolderViewMode, ToolSize } from "../types";
+import {
+  fetchAddTool,
+  fetchUpdateLayout,
+  fetchUpdateTool,
+  fetchUpdateToolViewMode,
+} from "../shared/api/tool";
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -35,9 +35,7 @@ const contentKey = ["content"] as const;
 export function useContentQuery() {
   return useQuery({
     queryKey: contentKey,
-    queryFn: async () => {
-      return await FetchList();
-    },
+    queryFn: async () => FetchList(),
   });
 }
 
@@ -57,8 +55,8 @@ export function useUpdateViewMode() {
       if (prev) {
         qc.setQueryData<ContentData>(contentKey, {
           ...prev,
-          tools: prev.tools.map((t) =>
-            t.id === id ? { ...t, viewMode } : t
+          tools: prev.tools.map((tool) =>
+            tool.id === id ? { ...tool, viewMode } : tool
           ),
         });
       }
@@ -90,26 +88,27 @@ export function useMoveToFolder() {
 export function useMergeToFolder() {
   const refresh = useRefreshContent();
   return useMutation({
-    mutationFn: async (vars: { toolId1: number; toolId2: number; catelog: string; gridX: number; gridY: number }) => {
+    mutationFn: async (vars: { toolId1: number; toolId2: number; category: string; gridX: number; gridY: number }) => {
       const folder = await fetchAddTool({
         name: "新建文件夹",
         url: "",
         logo: "",
-        catelog: vars.catelog,
-        desc: "",
+        category: vars.category,
+        description: "",
         sort: 1,
         hide: false,
         viewMode: "icon",
         type: "folder",
         parentId: null,
         size: "1x1",
-        bgColor: "",
+        folderTint: "",
         gridX: vars.gridX,
         gridY: vars.gridY,
         folderViewMode: "grid",
         folderItemSize: 28,
       });
-      if (folder?.id) {
+
+      if ("id" in folder && folder.id) {
         await fetchMoveToolToFolder(vars.toolId1, folder.id);
         await fetchMoveToolToFolder(vars.toolId2, folder.id);
       }
@@ -135,8 +134,8 @@ export function useUpdateFolderSettings() {
       if (prev) {
         qc.setQueryData<ContentData>(contentKey, {
           ...prev,
-          tools: prev.tools.map((t) =>
-            t.id === id ? { ...t, folderViewMode } : t
+          tools: prev.tools.map((tool) =>
+            tool.id === id ? { ...tool, folderViewMode } : tool
           ),
         });
       }
@@ -153,9 +152,15 @@ export function useUpdateToolSize() {
   return useMutation({
     mutationFn: (vars: { id: number; size: ToolSize }) => {
       const prev = qc.getQueryData<ContentData>(contentKey);
-      const tool = prev?.tools.find((t) => t.id === vars.id);
+      const tool = prev?.tools.find((item) => item.id === vars.id);
       if (!tool) return Promise.resolve();
-      return fetchUpdateTool({ ...tool, size: vars.size });
+      return fetchUpdateTool({
+        ...tool,
+        size: vars.size,
+        category: tool.category || "",
+        description: tool.description || "",
+        folderTint: tool.folderTint || "",
+      });
     },
     onMutate: async ({ id, size }) => {
       await qc.cancelQueries({ queryKey: contentKey });
@@ -163,8 +168,8 @@ export function useUpdateToolSize() {
       if (prev) {
         qc.setQueryData<ContentData>(contentKey, {
           ...prev,
-          tools: prev.tools.map((t) =>
-            t.id === id ? { ...t, size } : t
+          tools: prev.tools.map((tool) =>
+            tool.id === id ? { ...tool, size } : tool
           ),
         });
       }

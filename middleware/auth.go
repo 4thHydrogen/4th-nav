@@ -4,10 +4,10 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/4thHydrogen/4th-nav/service"
+	"github.com/4thHydrogen/4th-nav/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
-	"github.com/4thHydrogen/4th-nav/database"
-	"github.com/4thHydrogen/4th-nav/utils"
 )
 
 func extractToken(authHeader string) string {
@@ -29,7 +29,7 @@ func JWTMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		if database.HasApiToken(rawToken) {
+		if service.HasApiToken(rawToken) {
 			c.Set("username", "apiToken")
 			c.Set("uid", 1)
 			c.Next()
@@ -45,17 +45,18 @@ func JWTMiddleware() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
+
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 			c.Set("username", claims["name"])
 			c.Set("uid", claims["id"])
 			c.Next()
-		} else {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"success":      false,
-				"errorMessage": "未登录",
-			})
-			c.Abort()
 			return
 		}
+
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"success":      false,
+			"errorMessage": "未登录",
+		})
+		c.Abort()
 	}
 }

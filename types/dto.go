@@ -31,43 +31,48 @@ type AddCategoryDto struct {
 	Hide bool   `json:"hide"`
 }
 type UpdateToolDto struct {
-	Id       int    `json:"id"`
-	Name     string `json:"name"`
-	Url      string `json:"url"`
-	Logo     string `json:"logo"`
-	Catelog  string `json:"catelog"`
-	Desc     string `json:"desc"`
-	Sort     int    `json:"sort"`
-	Hide     bool   `json:"hide"`
-	ViewMode string `json:"viewMode"`
-	Type     string `json:"type"`
-	ParentId *int   `json:"parentId"`
-	Size     string `json:"size"`
-	BgColor  string `json:"bgColor"`
+	Id             int    `json:"id"`
+	Name           string `json:"name"`
+	Url            string `json:"url"`
+	Logo           string `json:"logo"`
+	Category       string `json:"category"`
+	Description    string `json:"description"`
+	Sort           int    `json:"sort"`
+	Hide           bool   `json:"hide"`
+	ViewMode       string `json:"viewMode"`
+	Type           string `json:"type"`
+	ParentId       *int   `json:"parentId"`
+	Size           string `json:"size"`
+	FolderTint     string `json:"folderTint"`
 	GridX          int    `json:"gridX"`
 	GridY          int    `json:"gridY"`
 	FolderViewMode string `json:"folderViewMode"`
 	FolderItemSize int    `json:"folderItemSize"`
 }
 type AddToolDto struct {
-	Name     string `json:"name"`
-	Url      string `json:"url"`
-	Logo     string `json:"logo"`
-	Catelog  string `json:"catelog"`
-	Desc     string `json:"desc"`
-	Sort     int    `json:"sort"`
-	Hide     bool   `json:"hide"`
-	ViewMode string `json:"viewMode"`
-	Type     string `json:"type"`
-	ParentId *int   `json:"parentId"`
-	Size     string `json:"size"`
-	BgColor  string `json:"bgColor"`
+	Name           string `json:"name"`
+	Url            string `json:"url"`
+	Logo           string `json:"logo"`
+	Category       string `json:"category"`
+	Description    string `json:"description"`
+	Sort           int    `json:"sort"`
+	Hide           bool   `json:"hide"`
+	ViewMode       string `json:"viewMode"`
+	Type           string `json:"type"`
+	ParentId       *int   `json:"parentId"`
+	Size           string `json:"size"`
+	FolderTint     string `json:"folderTint"`
 	GridX          int    `json:"gridX"`
 	GridY          int    `json:"gridY"`
 	FolderViewMode string `json:"folderViewMode"`
 	FolderItemSize int    `json:"folderItemSize"`
 }
 type UpdateToolsSortDto struct {
+	Id   int `json:"id"`
+	Sort int `json:"sort"`
+}
+
+type UpdateSearchEngineSortItem struct {
 	Id   int `json:"id"`
 	Sort int `json:"sort"`
 }
@@ -94,12 +99,12 @@ type UpdateDockSortDto struct {
 }
 
 type DockItem struct {
-	ID      int    `json:"id"`
-	Sort    int    `json:"sort"`
-	ToolID  int    `json:"toolId"`
-	Name    string `json:"name"`
-	Url     string `json:"url"`
-	Logo    string `json:"logo"`
-	Catelog string `json:"catelog"`
-	Desc    string `json:"desc"`
+	ID          int    `json:"id"`
+	Sort        int    `json:"sort"`
+	ToolID      int    `json:"toolId"`
+	Name        string `json:"name"`
+	Url         string `json:"url"`
+	Logo        string `json:"logo"`
+	Category    string `json:"category"`
+	Description string `json:"description"`
 }

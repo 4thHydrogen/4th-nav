@@ -104,7 +104,7 @@ func FilterHideTools(tools []types.Tool, cates []types.Category) []types.Tool {
 	}
 	// 过滤工具
 	for _, tool := range tools {
-		if !tool.Hide && !In(tool.Catelog, hideCates) {
+		if !tool.Hide && !In(tool.Category, hideCates) {
 			result = append(result, tool)
 		}
 	}

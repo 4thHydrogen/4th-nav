@@ -50,7 +50,7 @@ const hooksMock = vi.hoisted(() => ({
   useBackgroundEffect: vi.fn(),
 }));
 
-vi.mock("../components/Content/hooks", () => hooksMock);
+vi.mock("../pages/home/hooks", () => hooksMock);
 
 vi.mock("../components/Background", () => ({
   default: () => <div data-testid="background" />,
@@ -112,15 +112,15 @@ const buildTool = (overrides: Partial<Tool> = {}): Tool => ({
   name: "Docs",
   url: "https://example.com",
   logo: "",
-  catelog: "Common",
-  desc: "",
+  category: "Common",
+  description: "",
   sort: 0,
   hide: false,
   viewMode: "icon",
   type: "icon",
   parentId: null,
   size: "1x1",
-  bgColor: "",
+  folderTint: "",
   gridX: -1,
   gridY: -1,
   folderViewMode: "grid",
@@ -130,7 +130,11 @@ const buildTool = (overrides: Partial<Tool> = {}): Tool => ({
 
 const buildData = (): ContentData => ({
   tools: [buildTool()],
-  catelogs: ["Common", "Dev"],
+  categories: ["Common", "Dev"],
+  categoryRecords: [
+    { id: 1, name: "Common", sort: 0, hide: false },
+    { id: 2, name: "Dev", sort: 1, hide: false },
+  ],
   setting: {
     id: 1,
     favicon: "",
@@ -144,7 +148,7 @@ const buildData = (): ContentData => ({
     jumpTargetBlank: true,
     backgroundUrl: "",
     enableBackground: false,
-    enableGlassmorphism: false,
+    enableSurfaceEffects: false,
     pexelsApiKey: "",
     proxy: "",
   },
@@ -182,8 +186,8 @@ describe("Content desktop workspace rendering", () => {
   });
 
   it("renders the desktop workspace shell", async () => {
-    const Content = (await import("../components/Content")).default;
-    const { container } = render(<Content />);
+    const HomePage = (await import("../pages/home/HomePage")).default;
+    const { container } = render(<HomePage />);
 
     expect(screen.getByRole("main")).toHaveClass("desktop-page");
     expect(container.querySelector(".desktop-hero")).not.toBeNull();
@@ -202,8 +206,8 @@ describe("Content desktop workspace rendering", () => {
       restoreTag: vi.fn(),
     });
 
-    const Content = (await import("../components/Content")).default;
-    const { container } = render(<Content />);
+    const HomePage = (await import("../pages/home/HomePage")).default;
+    const { container } = render(<HomePage />);
 
     expect(container.querySelector(".desktop-tool-grid-flat")).not.toBeNull();
     expect(screen.getByText("GitHub")).toBeInTheDocument();

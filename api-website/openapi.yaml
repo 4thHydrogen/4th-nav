@@ -21,9 +21,28 @@ components:
           type: string
         logo:
           type: string
-        desc:
+        category:
           type: string
-        catelogId:
+        description:
+          type: string
+        folderTint:
+          type: string
+        viewMode:
+          type: string
+        type:
+          type: string
+        parentId:
+          type: integer
+          nullable: true
+        size:
+          type: string
+        gridX:
+          type: integer
+        gridY:
+          type: integer
+        folderViewMode:
+          type: string
+        folderItemSize:
           type: integer
 
     AddToolDto:
@@ -38,10 +57,12 @@ components:
           type: string
         logo:
           type: string
-        desc:
+        category:
           type: string
-        catelogId:
-          type: integer
+        description:
+          type: string
+        folderTint:
+          type: string
 
     UpdateToolDto:
       type: object
@@ -56,22 +77,26 @@ components:
           type: string
         logo:
           type: string
-        desc:
+        category:
           type: string
-        catelogId:
-          type: integer
+        description:
+          type: string
+        folderTint:
+          type: string
 
-    Catelog:
+    Category:
       type: object
       properties:
         id:
           type: integer
         name:
           type: string
-        desc:
-          type: string
+        sort:
+          type: integer
+        hide:
+          type: boolean
 
-    UpdateCatelogDto:
+    UpdateCategoryDto:
       type: object
       required:
         - id
@@ -80,8 +105,10 @@ components:
           type: integer
         name:
           type: string
-        desc:
-          type: string
+        sort:
+          type: integer
+        hide:
+          type: boolean
 
     Setting:
       type: object
@@ -221,10 +248,10 @@ paths:
                             type: array
                             items:
                               $ref: "#/components/schemas/Tool"
-                          catelogs:
+                          categories:
                             type: array
                             items:
-                              $ref: "#/components/schemas/Catelog"
+                              $ref: "#/components/schemas/Category"
                           setting:
                             $ref: "#/components/schemas/Setting"
 
@@ -250,10 +277,10 @@ paths:
                             type: array
                             items:
                               $ref: "#/components/schemas/Tool"
-                          catelogs:
+                          categories:
                             type: array
                             items:
-                              $ref: "#/components/schemas/Catelog"
+                              $ref: "#/components/schemas/Category"
                           setting:
                             $ref: "#/components/schemas/Setting"
                           user:
@@ -428,7 +455,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/StandardResponse"
 
-  /api/admin/catelog:
+  /api/admin/category:
     post:
       summary: 添加新分类
       security:
@@ -444,8 +471,10 @@ paths:
               properties:
                 name:
                   type: string
-                desc:
-                  type: string
+                sort:
+                  type: integer
+                hide:
+                  type: boolean
       responses:
         "200":
           description: 添加分类成功
@@ -454,7 +483,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/StandardResponse"
 
-  /api/admin/catelog/{id}:
+  /api/admin/category/{id}:
     delete:
       summary: 删除分类
       security:
@@ -488,7 +517,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpdateCatelogDto"
+              $ref: "#/components/schemas/UpdateCategoryDto"
       responses:
         "200":
           description: 更新分类成功

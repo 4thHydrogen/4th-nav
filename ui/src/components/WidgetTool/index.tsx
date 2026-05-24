@@ -1,9 +1,8 @@
-import { useMemo, useState, useEffect, useRef } from "react";
-import "./index.css";
-import { getLogoUrl, isInlineSvg } from "../../utils/check";
-import { sanitizeSvg } from "../../utils/sanitize";
-import { getJumpTarget } from "../../utils/setting";
+import { useMemo, useRef } from "react";
+import ToolIcon from "../../shared/ui/ToolIcon";
 import type { Tool } from "../../types";
+import { getJumpTarget } from "../../utils/setting";
+import "./index.css";
 
 interface WidgetToolProps {
   tool: Tool;
@@ -14,7 +13,7 @@ interface WidgetToolProps {
   layout?: "grid" | "list";
 }
 
-const parseSize = (size: string): [number, number] => {
+export const parseSize = (size: string): [number, number] => {
   const parts = size.split("x").map(Number);
   if (parts.length === 2 && parts[0] > 0 && parts[1] > 0) {
     return [parts[0], parts[1]];
@@ -27,43 +26,19 @@ const WidgetTool = ({ tool, onContextMenu, onClick, compact = false, hideLabel =
   const isLarge = !compact && (w > 1 || h > 1);
   const mouseDownPos = useRef<{ x: number; y: number } | null>(null);
 
-  const [imageLoaded, setImageLoaded] = useState(false);
-  const [imageError, setImageError] = useState(false);
-
-  useEffect(() => {
-    setImageLoaded(false);
-    setImageError(false);
-  }, [tool.logo]);
-
-  const iconEl = useMemo(() => {
-    if (imageError) {
-      return (
-        <div className="widget-tool-fallback">
-          {tool.name.charAt(0).toUpperCase()}
-        </div>
-      );
-    }
-    if (isInlineSvg(tool.logo)) {
-      return (
-        <span
-          className="widget-tool-svg"
-          dangerouslySetInnerHTML={{ __html: sanitizeSvg(tool.logo) }}
-        />
-      );
-    }
-    const imgSrc = tool.url === "admin" ? tool.logo : getLogoUrl(tool.logo);
-    return (
-      <img
-        src={imgSrc}
-        alt={tool.name}
-        loading="lazy"
-        draggable={false}
-        onLoad={() => setImageLoaded(true)}
-        onError={() => setImageError(true)}
-        style={{ opacity: imageLoaded ? 1 : 0.3, transition: "opacity 0.3s ease" }}
+  const iconEl = useMemo(
+    () => (
+      <ToolIcon
+        logo={tool.logo}
+        name={tool.name}
+        toolUrl={tool.url}
+        className="widget-tool-svg"
+        fill
+        dimWhileLoading
       />
-    );
-  }, [tool.logo, tool.url, tool.name, imageLoaded, imageError]);
+    ),
+    [tool.logo, tool.name, tool.url]
+  );
 
   const modeClass = compact
     ? layout === "list" ? "widget-tool-compact-list" : "widget-tool-compact"
@@ -121,9 +96,9 @@ const WidgetTool = ({ tool, onContextMenu, onClick, compact = false, hideLabel =
           {tool.name}
         </div>
       )}
-      {isLarge && tool.desc && (
-        <div className="widget-tool-desc" title={tool.desc}>
-          {tool.desc}
+      {isLarge && tool.description && (
+        <div className="widget-tool-desc" title={tool.description}>
+          {tool.description}
         </div>
       )}
     </a>
@@ -131,4 +106,3 @@ const WidgetTool = ({ tool, onContextMenu, onClick, compact = false, hideLabel =
 };
 
 export default WidgetTool;
-export { parseSize };

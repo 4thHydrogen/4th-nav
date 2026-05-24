@@ -99,6 +99,7 @@ export function SiteSettingsCard({
           <Form.Item label="隐藏跳转方式卡片" name="hideToggleJumpTarget" tooltip="开启后将在前台隐藏跳转方式卡片">
             <Switch defaultChecked={Boolean(setting?.hideToggleJumpTarget)} />
           </Form.Item>
+
           <Divider orientation="left" style={{ margin: "16px 0 12px" }}>
             壁纸配置
           </Divider>
@@ -141,9 +142,14 @@ export function SiteSettingsCard({
           <Form.Item label="启用背景图片" name="enableBackground" tooltip="开启后页面将显示背景图片">
             <Switch defaultChecked={Boolean(setting?.enableBackground)} />
           </Form.Item>
-          <Form.Item label="启用毛玻璃效果" name="enableGlassmorphism" tooltip="开启后卡片和导航栏将呈现毛玻璃半透明效果">
-            <Switch defaultChecked={Boolean(setting?.enableGlassmorphism)} />
+          <Form.Item
+            label="启用表面材质效果"
+            name="enableSurfaceEffects"
+            tooltip="开启后卡片和导航栏将使用统一的半透明表面材质效果"
+          >
+            <Switch defaultChecked={Boolean(setting?.enableSurfaceEffects)} />
           </Form.Item>
+
           <Divider orientation="left" style={{ margin: "16px 0 12px" }}>
             图标管理
           </Divider>
@@ -170,6 +176,7 @@ export function SiteSettingsCard({
               )}
             </Space>
           </Form.Item>
+
           <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
             <Button type="primary" htmlType="submit">
               提交

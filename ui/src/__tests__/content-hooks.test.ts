@@ -1,29 +1,29 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 
 describe("useSearch", () => {
   it("exports useSearch hook", async () => {
-    const mod = await import("../components/Content/hooks");
+    const mod = await import("../pages/home/hooks");
     expect(typeof mod.useSearch).toBe("function");
   });
 });
 
 describe("useCategoryObserver", () => {
   it("exports useCategoryObserver hook", async () => {
-    const mod = await import("../components/Content/hooks");
+    const mod = await import("../pages/home/hooks");
     expect(typeof mod.useCategoryObserver).toBe("function");
   });
 });
 
 describe("useKeyboardNavigation", () => {
   it("exports useKeyboardNavigation hook", async () => {
-    const mod = await import("../components/Content/hooks");
+    const mod = await import("../pages/home/hooks");
     expect(typeof mod.useKeyboardNavigation).toBe("function");
   });
 });
 
 describe("useBackgroundEffect", () => {
   it("exports useBackgroundEffect hook", async () => {
-    const mod = await import("../components/Content/hooks");
+    const mod = await import("../pages/home/hooks");
     expect(typeof mod.useBackgroundEffect).toBe("function");
   });
 });

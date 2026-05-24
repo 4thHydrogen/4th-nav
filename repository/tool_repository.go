@@ -72,13 +72,13 @@ func scanToolRow(scanner interface {
 	var toolType interface{}
 	var parentID interface{}
 	var size interface{}
-	var bgColor interface{}
+	var folderTint interface{}
 	var gridX interface{}
 	var gridY interface{}
 	var folderViewMode interface{}
 	var folderItemSize interface{}
 
-	err := scanner.Scan(&tool.Id, &tool.Name, &tool.Url, &tool.Logo, &tool.Catelog, &tool.Desc, &sort, &hide, &viewMode, &toolType, &parentID, &size, &bgColor, &gridX, &gridY, &folderViewMode, &folderItemSize)
+	err := scanner.Scan(&tool.Id, &tool.Name, &tool.Url, &tool.Logo, &tool.Category, &tool.Description, &sort, &hide, &viewMode, &toolType, &parentID, &size, &folderTint, &gridX, &gridY, &folderViewMode, &folderItemSize)
 	if err != nil {
 		return types.Tool{}, err
 	}
@@ -108,8 +108,8 @@ func scanToolRow(scanner interface {
 	} else {
 		tool.Size = normalizeToolSize(size.(string))
 	}
-	if bgColor != nil {
-		tool.BgColor = bgColor.(string)
+	if folderTint != nil {
+		tool.FolderTint = folderTint.(string)
 	}
 	if gridX == nil {
 		tool.GridX = -1
@@ -137,7 +137,7 @@ func scanToolRow(scanner interface {
 
 func GetAllTools() ([]types.Tool, error) {
 	rows, err := database.DB.Query(`
-		SELECT id,name,url,logo,catelog,` + "`desc`" + `,sort,hide,view_mode,type,parent_id,size,bg_color,grid_x,grid_y,folder_view_mode,folder_item_size
+		SELECT id,name,url,logo,category,description,sort,hide,view_mode,type,parent_id,size,folder_tint,grid_x,grid_y,folder_view_mode,folder_item_size
 		FROM nav_table
 		ORDER BY sort;
 	`)
@@ -161,7 +161,7 @@ func GetAllTools() ([]types.Tool, error) {
 
 func GetToolByID(id int64) (types.Tool, error) {
 	row := database.DB.QueryRow(`
-		SELECT id,name,url,logo,catelog,`+"`desc`"+`,sort,hide,view_mode,type,parent_id,size,bg_color,grid_x,grid_y,folder_view_mode,folder_item_size
+		SELECT id,name,url,logo,category,description,sort,hide,view_mode,type,parent_id,size,folder_tint,grid_x,grid_y,folder_view_mode,folder_item_size
 		FROM nav_table
 		WHERE id = ?;
 	`, id)
@@ -281,7 +281,7 @@ func CreateTool(data types.AddToolDto) (int64, error) {
 	}
 
 	stmt, err := tx.Prepare(`
-		INSERT INTO nav_table (name, url, logo, catelog, ` + "`desc`" + `, sort, hide, view_mode, type, parent_id, size, bg_color, grid_x, grid_y, folder_view_mode, folder_item_size)
+		INSERT INTO nav_table (name, url, logo, category, description, sort, hide, view_mode, type, parent_id, size, folder_tint, grid_x, grid_y, folder_view_mode, folder_item_size)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 	`)
 	if err != nil {
@@ -294,15 +294,15 @@ func CreateTool(data types.AddToolDto) (int64, error) {
 		data.Name,
 		data.Url,
 		data.Logo,
-		data.Catelog,
-		data.Desc,
+		data.Category,
+		data.Description,
 		data.Sort,
 		data.Hide,
 		normalizeViewMode(data.ViewMode),
 		normalizeToolType(data.Type),
 		data.ParentId,
 		normalizeToolSize(data.Size),
-		data.BgColor,
+		data.FolderTint,
 		normalizeGrid(data.GridX),
 		normalizeGrid(data.GridY),
 		normalizeFolderViewMode(data.FolderViewMode),
@@ -328,22 +328,22 @@ func CreateTool(data types.AddToolDto) (int64, error) {
 
 func ImportTool(data types.Tool) error {
 	_, err := database.DB.Exec(`
-		INSERT INTO nav_table (id, name, catelog, url, logo, `+"`desc`"+`, sort, hide, view_mode, type, parent_id, size, bg_color, grid_x, grid_y, folder_view_mode, folder_item_size)
+		INSERT INTO nav_table (id, name, category, url, logo, description, sort, hide, view_mode, type, parent_id, size, folder_tint, grid_x, grid_y, folder_view_mode, folder_item_size)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 	`,
 		data.Id,
 		data.Name,
-		data.Catelog,
+		data.Category,
 		data.Url,
 		data.Logo,
-		data.Desc,
+		data.Description,
 		data.Sort,
 		data.Hide,
 		normalizeViewMode(data.ViewMode),
 		normalizeToolType(data.Type),
 		data.ParentId,
 		normalizeToolSize(data.Size),
-		data.BgColor,
+		data.FolderTint,
 		normalizeGrid(data.GridX),
 		normalizeGrid(data.GridY),
 		normalizeFolderViewMode(data.FolderViewMode),
@@ -355,21 +355,21 @@ func ImportTool(data types.Tool) error {
 func UpdateTool(data types.UpdateToolDto) error {
 	_, err := database.DB.Exec(`
 		UPDATE nav_table
-		SET name = ?, url = ?, logo = ?, catelog = ?, `+"`desc`"+` = ?, sort = ?, hide = ?, view_mode = ?, type = ?, parent_id = ?, size = ?, bg_color = ?, grid_x = ?, grid_y = ?, folder_view_mode = ?, folder_item_size = ?
+		SET name = ?, url = ?, logo = ?, category = ?, description = ?, sort = ?, hide = ?, view_mode = ?, type = ?, parent_id = ?, size = ?, folder_tint = ?, grid_x = ?, grid_y = ?, folder_view_mode = ?, folder_item_size = ?
 		WHERE id = ?;
 	`,
 		data.Name,
 		data.Url,
 		data.Logo,
-		data.Catelog,
-		data.Desc,
+		data.Category,
+		data.Description,
 		data.Sort,
 		data.Hide,
 		normalizeViewMode(data.ViewMode),
 		normalizeToolType(data.Type),
 		data.ParentId,
 		normalizeToolSize(data.Size),
-		data.BgColor,
+		data.FolderTint,
 		normalizeGrid(data.GridX),
 		normalizeGrid(data.GridY),
 		normalizeFolderViewMode(data.FolderViewMode),

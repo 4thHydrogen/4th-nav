@@ -25,8 +25,8 @@ func setupDockRepositoryTestDB(t *testing.T) *sql.DB {
 			name TEXT,
 			url TEXT,
 			logo TEXT,
-			catelog TEXT,
-			"desc" TEXT
+			category TEXT,
+			description TEXT
 		);`,
 		`CREATE TABLE dock_items (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -51,7 +51,7 @@ func setupDockRepositoryTestDB(t *testing.T) *sql.DB {
 func TestGetDockItems(t *testing.T) {
 	db := setupDockRepositoryTestDB(t)
 	if _, err := db.Exec(`
-		INSERT INTO nav_table (id, name, url, logo, catelog, "desc") VALUES
+		INSERT INTO nav_table (id, name, url, logo, category, description) VALUES
 			(1, 'Tool 1', 'https://1.example', 'logo-1', 'dev', 'desc-1'),
 			(2, 'Tool 2', 'https://2.example', 'logo-2', 'ops', 'desc-2');
 	`); err != nil {

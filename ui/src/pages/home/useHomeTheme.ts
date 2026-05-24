@@ -10,9 +10,7 @@ export function useHomeTheme() {
   }, [theme]);
 
   const handleThemeSwitch = useCallback(() => {
-    setTheme((prev) =>
-      prev === "light" ? "dark" : prev === "dark" ? "auto" : "light"
-    );
+    setTheme((prev) => (prev === "light" ? "dark" : prev === "dark" ? "auto" : "light"));
   }, []);
 
   return { theme, handleThemeSwitch };

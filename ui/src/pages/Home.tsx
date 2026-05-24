@@ -1,11 +1,11 @@
 import React from 'react';
-import Content from '../components/Content';
+import HomePage from './home/HomePage';
 
 const Home: React.FC = () => {
   return (
     <div className="App">
       <div className="main">
-        <Content />
+        <HomePage />
       </div>
     </div>
   );

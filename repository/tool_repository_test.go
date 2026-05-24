@@ -111,15 +111,15 @@ func TestGetAllToolsNormalizesStoredValues(t *testing.T) {
 		name TEXT,
 		url TEXT,
 		logo TEXT,
-		catelog TEXT,
-		"desc" TEXT,
+		category TEXT,
+		description TEXT,
 		sort INTEGER,
 		hide BOOLEAN,
 		view_mode TEXT,
 		type TEXT,
 		parent_id INTEGER,
 		size TEXT,
-		bg_color TEXT,
+		folder_tint TEXT,
 		grid_x INTEGER,
 		grid_y INTEGER,
 		folder_view_mode TEXT,
@@ -135,7 +135,7 @@ func TestGetAllToolsNormalizesStoredValues(t *testing.T) {
 	})
 
 	_, err = db.Exec(`INSERT INTO nav_table (
-		id, name, url, logo, catelog, "desc", sort, hide, view_mode, type, parent_id, size, bg_color, grid_x, grid_y, folder_view_mode, folder_item_size
+		id, name, url, logo, category, description, sort, hide, view_mode, type, parent_id, size, folder_tint, grid_x, grid_y, folder_view_mode, folder_item_size
 	) VALUES
 		(1, 'Tool A', 'https://a.example', 'logo-a', 'dev', 'desc-a', NULL, NULL, '', '', NULL, '', NULL, NULL, NULL, '', NULL),
 		(2, 'Folder B', 'https://b.example', 'logo-b', 'ops', 'desc-b', 7, 1, 'card', 'folder', 1, '2x2', '#fff', 3, 4, 'list', 36)
@@ -155,7 +155,7 @@ func TestGetAllToolsNormalizesStoredValues(t *testing.T) {
 	if tools[0].Sort != 0 || tools[0].Hide || tools[0].ViewMode != "icon" || tools[0].Type != "icon" {
 		t.Fatalf("tool 0 normalization mismatch: %+v", tools[0])
 	}
-	if tools[0].Size != "1x1" || tools[0].BgColor != "" || tools[0].GridX != -1 || tools[0].GridY != -1 {
+	if tools[0].Size != "1x1" || tools[0].FolderTint != "" || tools[0].GridX != -1 || tools[0].GridY != -1 {
 		t.Fatalf("tool 0 default fields mismatch: %+v", tools[0])
 	}
 	if tools[0].FolderViewMode != "grid" || tools[0].FolderItemSize != 28 {
@@ -168,7 +168,7 @@ func TestGetAllToolsNormalizesStoredValues(t *testing.T) {
 	if tools[1].ParentId == nil || *tools[1].ParentId != 1 {
 		t.Fatalf("tool 1 parent mismatch: %+v", tools[1].ParentId)
 	}
-	if tools[1].Size != "2x2" || tools[1].BgColor != "#fff" || tools[1].GridX != 3 || tools[1].GridY != 4 {
+	if tools[1].Size != "2x2" || tools[1].FolderTint != "#fff" || tools[1].GridX != 3 || tools[1].GridY != 4 {
 		t.Fatalf("tool 1 layout mismatch: %+v", tools[1])
 	}
 	if tools[1].FolderViewMode != "list" || tools[1].FolderItemSize != 36 {
@@ -188,15 +188,15 @@ func TestGetToolByID(t *testing.T) {
 		name TEXT,
 		url TEXT,
 		logo TEXT,
-		catelog TEXT,
-		"desc" TEXT,
+		category TEXT,
+		description TEXT,
 		sort INTEGER,
 		hide BOOLEAN,
 		view_mode TEXT,
 		type TEXT,
 		parent_id INTEGER,
 		size TEXT,
-		bg_color TEXT,
+		folder_tint TEXT,
 		grid_x INTEGER,
 		grid_y INTEGER,
 		folder_view_mode TEXT,
@@ -212,7 +212,7 @@ func TestGetToolByID(t *testing.T) {
 	})
 
 	_, err = db.Exec(`INSERT INTO nav_table (
-		id, name, url, logo, catelog, "desc", sort, hide, view_mode, type, parent_id, size, bg_color, grid_x, grid_y, folder_view_mode, folder_item_size
+		id, name, url, logo, category, description, sort, hide, view_mode, type, parent_id, size, folder_tint, grid_x, grid_y, folder_view_mode, folder_item_size
 	) VALUES (8, 'Tool 8', 'https://8.example', 'logo-8', 'dev', 'desc-8', 3, 0, 'card', 'icon', NULL, '1x1', '', 0, 1, 'grid', 28)`)
 	if err != nil {
 		t.Fatalf("seed tool: %v", err)
@@ -259,15 +259,15 @@ func TestCreateToolNormalizesPersistedFields(t *testing.T) {
 		name TEXT,
 		url TEXT,
 		logo TEXT,
-		catelog TEXT,
-		"desc" TEXT,
+		category TEXT,
+		description TEXT,
 		sort INTEGER,
 		hide BOOLEAN,
 		view_mode TEXT,
 		type TEXT,
 		parent_id INTEGER,
 		size TEXT,
-		bg_color TEXT,
+		folder_tint TEXT,
 		grid_x INTEGER,
 		grid_y INTEGER,
 		folder_view_mode TEXT,
@@ -286,14 +286,14 @@ func TestCreateToolNormalizesPersistedFields(t *testing.T) {
 		Name:           "Tool A",
 		Url:            "https://example.com",
 		Logo:           "logo-a",
-		Catelog:        "dev",
-		Desc:           "desc-a",
+		Category:       "dev",
+		Description:    "desc-a",
 		Sort:           7,
 		Hide:           true,
 		ViewMode:       "unknown",
 		Type:           "weird",
 		Size:           "9x9",
-		BgColor:        "#123",
+		FolderTint:     "#123",
 		GridX:          -9,
 		GridY:          3,
 		FolderViewMode: "unknown",
@@ -331,15 +331,15 @@ func TestImportToolPreservesProvidedIDAndNormalizesFields(t *testing.T) {
 		name TEXT,
 		url TEXT,
 		logo TEXT,
-		catelog TEXT,
-		"desc" TEXT,
+		category TEXT,
+		description TEXT,
 		sort INTEGER,
 		hide BOOLEAN,
 		view_mode TEXT,
 		type TEXT,
 		parent_id INTEGER,
 		size TEXT,
-		bg_color TEXT,
+		folder_tint TEXT,
 		grid_x INTEGER,
 		grid_y INTEGER,
 		folder_view_mode TEXT,
@@ -359,8 +359,8 @@ func TestImportToolPreservesProvidedIDAndNormalizesFields(t *testing.T) {
 		Name:           "Imported",
 		Url:            "https://imported.example",
 		Logo:           "logo-imported",
-		Catelog:        "ops",
-		Desc:           "imported-desc",
+		Category:       "ops",
+		Description:    "imported-desc",
 		Sort:           6,
 		Hide:           true,
 		ViewMode:       "bad",
@@ -401,15 +401,15 @@ func TestUpdateToolPersistsChanges(t *testing.T) {
 		name TEXT,
 		url TEXT,
 		logo TEXT,
-		catelog TEXT,
-		"desc" TEXT,
+		category TEXT,
+		description TEXT,
 		sort INTEGER,
 		hide BOOLEAN,
 		view_mode TEXT,
 		type TEXT,
 		parent_id INTEGER,
 		size TEXT,
-		bg_color TEXT,
+		folder_tint TEXT,
 		grid_x INTEGER,
 		grid_y INTEGER,
 		folder_view_mode TEXT,
@@ -425,7 +425,7 @@ func TestUpdateToolPersistsChanges(t *testing.T) {
 	})
 
 	if _, err := db.Exec(`INSERT INTO nav_table (
-		id, name, url, logo, catelog, "desc", sort, hide, view_mode, type, parent_id, size, bg_color, grid_x, grid_y, folder_view_mode, folder_item_size
+		id, name, url, logo, category, description, sort, hide, view_mode, type, parent_id, size, folder_tint, grid_x, grid_y, folder_view_mode, folder_item_size
 	) VALUES (5, 'Old', 'https://old.example', 'old-logo', 'ops', 'old-desc', 1, 0, 'icon', 'icon', NULL, '1x1', '', 4, 6, 'grid', 28)`); err != nil {
 		t.Fatalf("seed tool: %v", err)
 	}
@@ -436,15 +436,15 @@ func TestUpdateToolPersistsChanges(t *testing.T) {
 		Name:           "New",
 		Url:            "https://new.example",
 		Logo:           "new-logo",
-		Catelog:        "dev",
-		Desc:           "new-desc",
+		Category:       "dev",
+		Description:    "new-desc",
 		Sort:           9,
 		Hide:           true,
 		ViewMode:       "card",
 		Type:           "folder",
 		ParentId:       &parentID,
 		Size:           "2x3",
-		BgColor:        "#fff",
+		FolderTint:     "#fff",
 		GridX:          8,
 		GridY:          10,
 		FolderViewMode: "list",
@@ -465,7 +465,7 @@ func TestUpdateToolPersistsChanges(t *testing.T) {
 	if !tool.Hide || tool.ViewMode != "card" || tool.Type != "folder" {
 		t.Fatalf("unexpected state fields: %+v", tool)
 	}
-	if tool.ParentId == nil || *tool.ParentId != 11 || tool.Size != "2x3" || tool.BgColor != "#fff" {
+	if tool.ParentId == nil || *tool.ParentId != 11 || tool.Size != "2x3" || tool.FolderTint != "#fff" {
 		t.Fatalf("unexpected hierarchy fields: %+v", tool)
 	}
 	if tool.GridX != 8 || tool.GridY != 10 || tool.FolderViewMode != "list" || tool.FolderItemSize != 20 {

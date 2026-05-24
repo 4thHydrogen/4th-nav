@@ -64,18 +64,17 @@ func normalizeGrid(v int) int {
 }
 
 func ImportTools(data []types.Tool) {
-	var catelogs []string
+	var categories []string
 	for _, v := range data {
-		if v.Catelog != "" && strings.TrimSpace(v.Catelog) != "" && !utils.In(v.Catelog, catelogs) {
-			catelogs = append(catelogs, v.Catelog)
+		if v.Category != "" && strings.TrimSpace(v.Category) != "" && !utils.In(v.Category, categories) {
+			categories = append(categories, v.Category)
 		}
 		err := repository.ImportTool(v)
 		utils.CheckErr(err)
 	}
-	for _, catelog := range catelogs {
-		var addCatelogDto types.AddCategoryDto
-		addCatelogDto.Name = catelog
-		AddCategory(addCatelogDto)
+	for _, category := range categories {
+		dto := types.AddCategoryDto{Name: category}
+		AddCategory(dto)
 	}
 	go func(data []types.Tool) {
 		sem := make(chan struct{}, 4)

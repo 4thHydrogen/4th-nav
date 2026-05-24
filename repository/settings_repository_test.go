@@ -33,7 +33,7 @@ func setupSettingsRepositoryTestDB(t *testing.T) *sql.DB {
 			jumpTargetBlank BOOLEAN,
 			backgroundUrl TEXT,
 			enableBackground BOOLEAN,
-			enableGlassmorphism BOOLEAN,
+			enableSurfaceEffects BOOLEAN,
 			pexelsApiKey TEXT,
 			proxy TEXT
 		);`,
@@ -64,7 +64,7 @@ func TestGetAndUpdateSetting(t *testing.T) {
 	db := setupSettingsRepositoryTestDB(t)
 	if _, err := db.Exec(`
 		INSERT INTO nav_setting (
-			id, favicon, title, govRecord, logo192, logo512, hideAdmin, hideGithub, hideToggleJumpTarget, jumpTargetBlank, backgroundUrl, enableBackground, enableGlassmorphism, pexelsApiKey, proxy
+			id, favicon, title, govRecord, logo192, logo512, hideAdmin, hideGithub, hideToggleJumpTarget, jumpTargetBlank, backgroundUrl, enableBackground, enableSurfaceEffects, pexelsApiKey, proxy
 		) VALUES (1, 'favicon.ico', 'Van Nav', '', 'logo192.png', 'logo512.png', 0, 1, 0, 1, '', 0, 1, 'key', 'proxy');
 	`); err != nil {
 		t.Fatalf("seed setting: %v", err)
@@ -74,7 +74,7 @@ func TestGetAndUpdateSetting(t *testing.T) {
 	if err != nil {
 		t.Fatalf("get setting: %v", err)
 	}
-	if setting.HideGithub != true || setting.EnableGlassmorphism != true || setting.PexelsApiKey != "key" {
+	if setting.HideGithub != true || setting.EnableSurfaceEffects != true || setting.PexelsApiKey != "key" {
 		t.Fatalf("unexpected setting normalization: %+v", setting)
 	}
 
@@ -90,7 +90,7 @@ func TestGetAndUpdateSetting(t *testing.T) {
 		JumpTargetBlank:      false,
 		BackgroundUrl:        "bg",
 		EnableBackground:     true,
-		EnableGlassmorphism:  false,
+		EnableSurfaceEffects: false,
 		PexelsApiKey:         "new-key",
 		Proxy:                "new-proxy",
 	})

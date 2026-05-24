@@ -1,7 +1,7 @@
 import pinyin from 'pinyin-match';
-import type { Catelog } from "../types";
+import type { Category } from "../types";
 
-export const getOptions = (rawList: Catelog[]) => {
+export const getOptions = (rawList: Category[]) => {
   return rawList.map((item) => {
     return {
       label: item.name,
@@ -10,7 +10,7 @@ export const getOptions = (rawList: Catelog[]) => {
     }
   })
 }
-export const getFilter = (rawList: Catelog[]) => {
+export const getFilter = (rawList: Category[]) => {
   return rawList.map((item) => {
     return {
       text: item.name,

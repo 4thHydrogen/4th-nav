@@ -1,6 +1,6 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 import type { DataType } from "../pages/admin/tabs/Tools/DraggableRow";
-import type { Catelog } from "../types";
+import type { Category } from "../types";
 
 describe("DataType interface", () => {
   it("accepts objects with id, name, sort and extra fields", () => {
@@ -9,8 +9,8 @@ describe("DataType interface", () => {
       name: "Test Tool",
       sort: 0,
       url: "https://example.com",
-      catelog: "dev",
-      desc: "A test",
+      category: "dev",
+      description: "A test",
     };
     expect(row.id).toBe(1);
     expect(row.name).toBe("Test Tool");
@@ -23,18 +23,18 @@ describe("DataType interface", () => {
       sort: 1,
       extra: "field",
     };
-    expect(row["extra"]).toBe("field");
+    expect(row.extra).toBe("field");
   });
 });
 
 describe("ToolFormModal types", () => {
-  it("getOptions transforms Catelog[] to select options", async () => {
+  it("getOptions transforms Category[] to select options", async () => {
     const { getOptions } = await import("../utils/admin");
-    const catelogs: Catelog[] = [
+    const categories: Category[] = [
       { id: 1, name: "开发", sort: 0, hide: false },
       { id: 2, name: "设计", sort: 1, hide: false },
     ];
-    const options = getOptions(catelogs);
+    const options = getOptions(categories);
     expect(options).toHaveLength(2);
     expect(options[0]).toEqual({ label: "开发", value: "开发", key: 1 });
     expect(options[1]).toEqual({ label: "设计", value: "设计", key: 2 });
@@ -60,15 +60,15 @@ describe("Tools component structure", () => {
 });
 
 describe("CRUD handler type compatibility", () => {
-  it("DataType row can be cast to UpdateToolDto shape", () => {
+  it("DataType row can be cast to update payload shape", () => {
     const row: DataType = {
       id: 1,
       name: "Tool",
       sort: 0,
       url: "https://example.com",
       logo: "",
-      catelog: "dev",
-      desc: "desc",
+      category: "dev",
+      description: "desc",
       hide: false,
     };
     const dto = row as unknown as {
@@ -76,8 +76,8 @@ describe("CRUD handler type compatibility", () => {
       name: string;
       url: string;
       logo: string;
-      catelog: string;
-      desc: string;
+      category: string;
+      description: string;
       sort: number;
       hide: boolean;
     };

@@ -1,0 +1,18 @@
+:root {
+  --material-folder-highlight: linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0));
+  --material-folder-tint-strength: 0.07;
+}
+
+.material-folder {
+  position: relative;
+  overflow: hidden;
+}
+
+.material-folder::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: var(--material-folder-highlight);
+  mix-blend-mode: screen;
+}

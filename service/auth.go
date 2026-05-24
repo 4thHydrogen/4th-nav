@@ -12,6 +12,12 @@ func GetApiTokens() []types.Token {
 	return results
 }
 
+func HasApiToken(token string) bool {
+	exists, err := repository.ExistsActiveAPIToken(token)
+	utils.CheckErr(err)
+	return exists
+}
+
 func GetUser(name string) types.User {
 	user, err := repository.GetUserByName(name)
 	utils.CheckErr(err)

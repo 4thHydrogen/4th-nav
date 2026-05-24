@@ -6,7 +6,7 @@ import (
 )
 
 func GetAllCategories() ([]types.Category, error) {
-	rows, err := database.DB.Query(`SELECT id, name, sort, hide FROM nav_catelog ORDER BY sort;`)
+	rows, err := database.DB.Query(`SELECT id, name, sort, hide FROM nav_category ORDER BY sort;`)
 	if err != nil {
 		return nil, err
 	}
@@ -25,7 +25,7 @@ func GetAllCategories() ([]types.Category, error) {
 
 func CreateCategory(data types.AddCategoryDto) error {
 	_, err := database.DB.Exec(
-		`INSERT INTO nav_catelog (name, sort, hide) VALUES (?, ?, ?);`,
+		`INSERT INTO nav_category (name, sort, hide) VALUES (?, ?, ?);`,
 		data.Name, data.Sort, data.Hide,
 	)
 	return err
@@ -43,19 +43,19 @@ func UpdateCategory(data types.UpdateCategoryDto) error {
 	}()
 
 	var oldName string
-	if err = tx.QueryRow(`SELECT name FROM nav_catelog WHERE id = ?;`, data.Id).Scan(&oldName); err != nil {
+	if err = tx.QueryRow(`SELECT name FROM nav_category WHERE id = ?;`, data.Id).Scan(&oldName); err != nil {
 		return err
 	}
 
 	if _, err = tx.Exec(
-		`UPDATE nav_catelog SET name = ?, sort = ?, hide = ? WHERE id = ?;`,
+		`UPDATE nav_category SET name = ?, sort = ?, hide = ? WHERE id = ?;`,
 		data.Name, data.Sort, data.Hide, data.Id,
 	); err != nil {
 		return err
 	}
 
 	if oldName != data.Name {
-		if _, err = tx.Exec(`UPDATE nav_table SET catelog = ? WHERE catelog = ?;`, data.Name, oldName); err != nil {
+		if _, err = tx.Exec(`UPDATE nav_table SET category = ? WHERE category = ?;`, data.Name, oldName); err != nil {
 			return err
 		}
 	}
@@ -64,6 +64,6 @@ func UpdateCategory(data types.UpdateCategoryDto) error {
 }
 
 func DeleteCategory(id int) error {
-	_, err := database.DB.Exec(`DELETE FROM nav_catelog WHERE id = ?;`, id)
+	_, err := database.DB.Exec(`DELETE FROM nav_category WHERE id = ?;`, id)
 	return err
 }

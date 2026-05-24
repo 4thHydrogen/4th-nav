@@ -27,18 +27,6 @@
   color: rgba(255, 255, 255, 0.5);
 }
 
-.glassmorphism .time-date-widget {
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-}
-
-.glassmorphism .time-text {
-  color: rgba(255, 255, 255, 0.95);
-}
-
-.glassmorphism .date-text {
-  color: rgba(255, 255, 255, 0.6);
-}
-
 .has-background .time-date-widget {
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
 }

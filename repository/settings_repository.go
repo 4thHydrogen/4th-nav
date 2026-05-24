@@ -7,7 +7,7 @@ import (
 
 func GetSetting() (types.Setting, error) {
 	row := database.DB.QueryRow(`
-		SELECT id, favicon, title, govRecord, logo192, logo512, hideAdmin, hideGithub, hideToggleJumpTarget, jumpTargetBlank, backgroundUrl, enableBackground, enableGlassmorphism, pexelsApiKey, proxy
+		SELECT id, favicon, title, govRecord, logo192, logo512, hideAdmin, hideGithub, hideToggleJumpTarget, jumpTargetBlank, backgroundUrl, enableBackground, enableSurfaceEffects, pexelsApiKey, proxy
 		FROM nav_setting
 		ORDER BY id ASC
 		LIMIT 1;
@@ -15,7 +15,7 @@ func GetSetting() (types.Setting, error) {
 
 	var setting types.Setting
 	var hideAdmin, hideGithub, hideToggleJumpTarget, jumpTargetBlank any
-	var backgroundURL, enableBackground, enableGlassmorphism, pexelsAPIKey, proxy any
+	var backgroundURL, enableBackground, enableSurfaceEffects, pexelsAPIKey, proxy any
 	err := row.Scan(
 		&setting.Id,
 		&setting.Favicon,
@@ -29,7 +29,7 @@ func GetSetting() (types.Setting, error) {
 		&jumpTargetBlank,
 		&backgroundURL,
 		&enableBackground,
-		&enableGlassmorphism,
+		&enableSurfaceEffects,
 		&pexelsAPIKey,
 		&proxy,
 	)
@@ -43,7 +43,7 @@ func GetSetting() (types.Setting, error) {
 	setting.JumpTargetBlank = boolFromDB(jumpTargetBlank, true)
 	setting.BackgroundUrl = stringFromDB(backgroundURL, "")
 	setting.EnableBackground = boolFromDB(enableBackground, false)
-	setting.EnableGlassmorphism = boolFromDB(enableGlassmorphism, false)
+	setting.EnableSurfaceEffects = boolFromDB(enableSurfaceEffects, false)
 	setting.PexelsApiKey = stringFromDB(pexelsAPIKey, "")
 	setting.Proxy = stringFromDB(proxy, "")
 
@@ -53,7 +53,7 @@ func GetSetting() (types.Setting, error) {
 func UpdateSetting(data types.Setting) error {
 	_, err := database.DB.Exec(`
 		UPDATE nav_setting
-		SET favicon = ?, title = ?, govRecord = ?, logo192 = ?, logo512 = ?, hideAdmin = ?, hideGithub = ?, hideToggleJumpTarget = ?, jumpTargetBlank = ?, backgroundUrl = ?, enableBackground = ?, enableGlassmorphism = ?, pexelsApiKey = ?, proxy = ?
+		SET favicon = ?, title = ?, govRecord = ?, logo192 = ?, logo512 = ?, hideAdmin = ?, hideGithub = ?, hideToggleJumpTarget = ?, jumpTargetBlank = ?, backgroundUrl = ?, enableBackground = ?, enableSurfaceEffects = ?, pexelsApiKey = ?, proxy = ?
 		WHERE id = (SELECT id FROM nav_setting ORDER BY id ASC LIMIT 1);
 	`,
 		data.Favicon,
@@ -67,7 +67,7 @@ func UpdateSetting(data types.Setting) error {
 		data.JumpTargetBlank,
 		data.BackgroundUrl,
 		data.EnableBackground,
-		data.EnableGlassmorphism,
+		data.EnableSurfaceEffects,
 		data.PexelsApiKey,
 		data.Proxy,
 	)

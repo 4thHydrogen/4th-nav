@@ -14,6 +14,11 @@ var migrations = []migration{
 		name: "rebuild nav_catelog with non-null sort and hide columns",
 		run:  migration_2024_12_13,
 	},
+	{
+		id:   "2026_05_24_canonical_schema",
+		name: "rename legacy category, tool, and surface columns to canonical names",
+		run:  migration_2026_05_24,
+	},
 }
 
 func ensureSchemaMigrationsTable() error {

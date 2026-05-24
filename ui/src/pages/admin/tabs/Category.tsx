@@ -60,7 +60,7 @@ export const Category: React.FC<CategoryProps> = () => {
 
   return (
     <Card
-      title={`当前共 ${store?.catelogs?.length ?? 0} 条`}
+      title={`当前共 ${store?.categories?.length ?? 0} 条`}
       extra={
         <Space>
           <Button type="primary" onClick={() => setAddOpen(true)}>
@@ -71,7 +71,7 @@ export const Category: React.FC<CategoryProps> = () => {
       }
     >
       <Spin spinning={loading}>
-        <Table<CategoryType> dataSource={store?.catelogs || []} rowKey="id" size="small">
+        <Table<CategoryType> dataSource={store?.categories || []} rowKey="id" size="small">
           <Table.Column<CategoryType> title="ID" dataIndex="id" width={80} />
           <Table.Column<CategoryType> title="名称" dataIndex="name" width={180} />
           <Table.Column<CategoryType>
@@ -207,7 +207,5 @@ export const Category: React.FC<CategoryProps> = () => {
     </Card>
   );
 };
-
-export const Catelog = Category;
 
 export default Category;

@@ -9,9 +9,12 @@ export const useData = () => {
 
   const fetchData = async () => {
     setLoading(true);
-    const data = await fetchAdminData();
-    setState(data);
-    setLoading(false);
+    try {
+      const data = await fetchAdminData();
+      setState(data);
+    } finally {
+      setLoading(false);
+    }
   }
 
   useOnce(() => {

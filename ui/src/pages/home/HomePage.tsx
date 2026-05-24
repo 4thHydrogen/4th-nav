@@ -1,46 +1,42 @@
-import "./index.css";
-import SearchBar from "../SearchBar";
-import { Loading } from "../Loading";
 import { Helmet } from "react-helmet";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import FloatingActions from "../FloatingActions";
-import { initServerJumpTargetConfig } from "../../utils/setting";
-import Background from "../Background";
-import ToolContextMenu from "../ToolContextMenu";
-import ToolItem from "../ToolItem";
-import TimeDateWidget from "../TimeDateWidget";
-import DockBar from "../DockBar";
-import WidgetGrid from "../WidgetGrid";
-import CategoryFilter from "../CategoryFilter";
-import MobileCategoryMenu from "../MobileCategoryMenu";
-import SettingsButton from "../SettingsButton";
-import type { SearchEngine, Tool } from "../../types";
+import CategoryFilter from "../../components/CategoryFilter";
+import FloatingActions from "../../components/FloatingActions";
+import { Loading } from "../../components/Loading";
+import MobileCategoryMenu from "../../components/MobileCategoryMenu";
+import SearchBar from "../../components/SearchBar";
+import SettingsButton from "../../components/SettingsButton";
+import TimeDateWidget from "../../components/TimeDateWidget";
+import ToolItem from "../../components/ToolItem";
+import { ALL_TOOLS_CATEGORY } from "../../entities/tool/model";
+import HomeBackground from "../../features/background/HomeBackground";
+import ToolMenu from "../../features/context-menu/ToolMenu";
+import Dock from "../../features/dock/Dock";
+import PanelGrid from "../../features/panel-grid/PanelGrid";
 import {
+  useAddToDock,
   useContentQuery,
+  useMergeToFolder,
+  useMoveToFolder,
   useRefreshContent,
   useUpdateViewMode,
-  useAddToDock,
-  useMoveToFolder,
-  useMergeToFolder,
 } from "../../queries";
 import { useUIStore } from "../../stores/ui";
-import {
-  useSearch,
-  useKeyboardNavigation,
-  useBackgroundEffect,
-} from "./hooks";
-import { useHomeTheme } from "./useHomeTheme";
-import { useHomeLayoutVars } from "./useHomeLayoutVars";
+import type { SearchEngine, Tool } from "../../types";
+import { initServerJumpTargetConfig } from "../../utils/setting";
+import { useBackgroundEffect, useKeyboardNavigation, useSearch } from "./hooks";
+import "./home-page.css";
 import { useHomeBackground } from "./useHomeBackground";
+import { useHomeLayoutVars } from "./useHomeLayoutVars";
+import { useHomeTheme } from "./useHomeTheme";
 
-const Content = () => {
+export default function HomePage() {
   const { data, isLoading } = useContentQuery();
   const refreshContent = useRefreshContent();
   const updateViewMode = useUpdateViewMode();
   const addToDock = useAddToDock();
   const moveToFolder = useMoveToFolder();
   const mergeToFolder = useMergeToFolder();
-
   const {
     contextMenu,
     openContextMenu,
@@ -52,32 +48,27 @@ const Content = () => {
     setSearchValue,
   } = useUIStore();
 
-  const {
-    searchString,
-    filteredData,
-    handleSetSearch,
-    resetSearch,
-    restoreTag,
-  } = useSearch(data);
-
+  const { searchString, filteredData, handleSetSearch, resetSearch, restoreTag } = useSearch(
+    data ?? null
+  );
   const [selectedEngine, setSelectedEngine] = useState<SearchEngine | null>(null);
 
   useKeyboardNavigation(searchString, filteredData, resetSearch, selectedEngine);
   useBackgroundEffect(
-    data?.setting?.enableGlassmorphism === true,
+    data?.setting?.enableSurfaceEffects === true,
     data?.setting?.enableBackground === true
   );
 
   const { theme, handleThemeSwitch } = useHomeTheme();
   useHomeLayoutVars(data?.siteConfig?.density);
-  const { isPexels, bgRefreshKey, handleRefreshBg, showRefresh } = useHomeBackground(
+  const { bgRefreshKey, handleRefreshBg, showRefresh } = useHomeBackground(
     data?.setting?.backgroundUrl,
     data?.setting?.enableBackground
   );
 
   useEffect(() => {
-    if (data?.catelogs) restoreTag(data.catelogs);
-  }, [data?.catelogs, restoreTag]);
+    if (data?.categories) restoreTag(data.categories);
+  }, [data?.categories, restoreTag]);
 
   useEffect(() => {
     if (data?.setting) initServerJumpTargetConfig(data.setting);
@@ -92,28 +83,21 @@ const Content = () => {
   const noImageMode = data?.siteConfig?.noImageMode || false;
   const allTools = data?.tools ?? [];
 
-  const categories = useMemo(() => {
-    if (!data?.catelogs) return [];
-    return data.catelogs.filter((c: string) => c !== "全部工具");
-  }, [data?.catelogs]);
-
-  const gridTools = useMemo(() => {
-    const rootTools = allTools.filter((t: Tool) => t.parentId == null);
-    if (selectedCategories.size === 0) return rootTools;
-    return rootTools.filter((t: Tool) => selectedCategories.has(t.catelog));
-  }, [allTools, selectedCategories]);
-
-  const handleToolClick = useCallback(
-    (_tool: Tool) => {
-      resetSearch();
-    },
-    [resetSearch]
+  const categories = useMemo(
+    () => (data?.categories ?? []).filter((category) => category !== ALL_TOOLS_CATEGORY),
+    [data?.categories]
   );
 
+  const gridTools = useMemo(() => {
+    const rootTools = allTools.filter((tool) => tool.parentId == null);
+    if (selectedCategories.size === 0) return rootTools;
+    return rootTools.filter((tool) => selectedCategories.has(tool.category));
+  }, [allTools, selectedCategories]);
+
   const handleContextMenu = useCallback(
-    (e: React.MouseEvent, tool: Tool) => {
-      e.preventDefault();
-      openContextMenu(e.clientX, e.clientY, tool);
+    (event: React.MouseEvent, tool: Tool) => {
+      event.preventDefault();
+      openContextMenu(event.clientX, event.clientY, tool);
     },
     [openContextMenu]
   );
@@ -126,22 +110,8 @@ const Content = () => {
   );
 
   const isInDock = useCallback(
-    (toolId: number) => data?.dockItems?.some((d) => d.toolId === toolId) ?? false,
+    (toolId: number) => data?.dockItems?.some((item) => item.toolId === toolId) ?? false,
     [data?.dockItems]
-  );
-
-  const handleAddToDock = useCallback(
-    (tool: Tool) => {
-      addToDock.mutate(tool.id);
-    },
-    [addToDock]
-  );
-
-  const handleMoveToFolderCb = useCallback(
-    (toolId: number, folderId: number) => {
-      moveToFolder.mutate({ toolId, folderId });
-    },
-    [moveToFolder]
   );
 
   const handleMoveOutOfFolderCb = useCallback(
@@ -151,32 +121,9 @@ const Content = () => {
     [moveToFolder]
   );
 
-  const handleMergeToFolderCb = useCallback(
-    (toolId1: number, toolId2: number, pos1: { x: number; y: number }, pos2: { x: number; y: number }) => {
-      const t1 = data?.tools?.find((t) => t.id === toolId1);
-      const t2 = data?.tools?.find((t) => t.id === toolId2);
-      if (!t1 || !t2) return;
-      const earlier =
-        pos1.y < pos2.y || (pos1.y === pos2.y && pos1.x < pos2.x) ? pos1 : pos2;
-      mergeToFolder.mutate({
-        toolId1,
-        toolId2,
-        catelog: t1.catelog || t2.catelog || "",
-        gridX: earlier.x,
-        gridY: earlier.y,
-      });
-    },
-    [data?.tools, mergeToFolder]
-  );
-
   return (
     <>
-      <Background
-        url={data?.setting?.backgroundUrl ?? ""}
-        enabled={data?.setting?.enableBackground === true}
-        pexelsApiKey={data?.setting?.pexelsApiKey ?? ""}
-        refreshKey={bgRefreshKey}
-      />
+      <HomeBackground setting={data?.setting} refreshKey={bgRefreshKey} />
       <Helmet>
         <meta charSet="utf-8" />
         <link rel="icon" href={data?.setting?.favicon ?? "favicon.ico"} />
@@ -190,9 +137,9 @@ const Content = () => {
             <div className="desktop-search-shell">
               <SearchBar
                 searchString={searchValue}
-                setSearchText={(t) => {
-                  setSearchValue(t);
-                  handleSetSearch(t);
+                setSearchText={(value) => {
+                  setSearchValue(value);
+                  handleSetSearch(value);
                 }}
                 onSelectedEngineChange={setSelectedEngine}
               />
@@ -227,61 +174,85 @@ const Content = () => {
             ) : isSearching ? (
               filteredData.length === 0 ? (
                 <div className="search-empty-state">
-                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.3 }}>
+                  <svg
+                    width="48"
+                    height="48"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    style={{ opacity: 0.3 }}
+                  >
                     <circle cx="11" cy="11" r="8" />
                     <line x1="21" y1="21" x2="16.65" y2="16.65" />
                   </svg>
                   <div className="search-empty-text">未找到匹配的工具</div>
-                  <div className="search-empty-hint">尝试不同的关键词</div>
+                  <div className="search-empty-hint">试试别的关键词</div>
                 </div>
               ) : (
-              <div className="desktop-tool-grid desktop-tool-grid-flat">
-                {filteredData.map((item, index) => {
-                  const parentFolder = item.parentId != null
-                    ? allTools.find((t) => t.id === item.parentId)
-                    : null;
-                  return (
-                    <div key={item.id} className="search-result-cell">
-                      <ToolItem
-                        tool={item}
-                        index={index}
-                        isSearching={isSearching}
-                        noImageMode={noImageMode}
-                        onContextMenu={handleContextMenu}
-                        onClick={() => handleToolClick(item)}
-                      />
-                      {parentFolder && (
-                        <div className="search-folder-label">位于：{parentFolder.name}</div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
+                <div className="desktop-tool-grid desktop-tool-grid-flat">
+                  {filteredData.map((item, index) => {
+                    const parentFolder =
+                      item.parentId != null
+                        ? allTools.find((tool) => tool.id === item.parentId)
+                        : null;
+                    return (
+                      <div key={item.id} className="search-result-cell">
+                        <ToolItem
+                          tool={item}
+                          index={index}
+                          isSearching={isSearching}
+                          noImageMode={noImageMode}
+                          onContextMenu={handleContextMenu}
+                          onClick={() => resetSearch()}
+                        />
+                        {parentFolder && (
+                          <div className="search-folder-label">位于：{parentFolder.name}</div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               )
             ) : (
-              <WidgetGrid
+              <PanelGrid
                 tools={gridTools}
                 allTools={allTools}
                 noImageMode={noImageMode}
                 listItemSize={data?.siteConfig?.folderListItemSize ?? 28}
-                onToolClick={handleToolClick}
+                onToolClick={() => resetSearch()}
                 onToolContextMenu={handleContextMenu}
-                onMoveToFolder={handleMoveToFolderCb}
+                onMoveToFolder={(toolId, folderId) => moveToFolder.mutate({ toolId, folderId })}
                 onMoveOutOfFolder={handleMoveOutOfFolderCb}
-                onMergeToFolder={handleMergeToFolderCb}
+                onMergeToFolder={(toolId1, toolId2, pos1, pos2) => {
+                  const firstTool = data?.tools?.find((tool) => tool.id === toolId1);
+                  const secondTool = data?.tools?.find((tool) => tool.id === toolId2);
+                  if (!firstTool || !secondTool) return;
+                  const earlier =
+                    pos1.y < pos2.y || (pos1.y === pos2.y && pos1.x < pos2.x) ? pos1 : pos2;
+                  mergeToFolder.mutate({
+                    toolId1,
+                    toolId2,
+                    category: firstTool.category || secondTool.category || "",
+                    gridX: earlier.x,
+                    gridY: earlier.y,
+                  });
+                }}
               />
             )}
           </div>
         </section>
 
-        <DockBar items={data?.dockItems ?? []} onChange={refreshContent} />
+        <Dock items={data?.dockItems ?? []} onChange={refreshContent} />
       </main>
 
-      <ToolContextMenu
+      <ToolMenu
         state={contextMenu}
         onClose={closeContextMenu}
         onViewModeChange={handleViewModeChange}
-        onAddToDock={handleAddToDock}
+        onAddToDock={(tool) => addToDock.mutate(tool.id)}
         isInDock={isInDock}
         allTools={allTools}
         onRefresh={refreshContent}
@@ -301,6 +272,4 @@ const Content = () => {
       />
     </>
   );
-};
-
-export default Content;
+}
