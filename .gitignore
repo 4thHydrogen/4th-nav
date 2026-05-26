@@ -135,4 +135,8 @@ requirements.txt
 .codex/
 .claude/
 .tmp/
-AGENTS.md
+
+# Retired Spec Kit archive: keep only the marker README in git.
+docs/archive/spec-kit/**
+!docs/archive/spec-kit/
+!docs/archive/spec-kit/README.md

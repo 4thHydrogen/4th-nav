@@ -32,7 +32,6 @@ export function FolderListPreview({
     <div
       className="widget-folder-list-preview"
       style={{ "--folder-list-item-size": `${itemSize}px` } as React.CSSProperties}
-      onClick={(e) => e.stopPropagation()}
     >
       {visible.map((item) => (
         <FolderListPreviewItem
@@ -44,7 +43,7 @@ export function FolderListPreview({
         />
       ))}
       {overflow > 0 && (
-        <div className="widget-folder-list-overflow">+{overflow}</div>
+        <div className="widget-folder-list-overflow">···</div>
       )}
     </div>
   );
@@ -69,8 +68,6 @@ function FolderListPreviewItem({
       rel="noreferrer"
       draggable={false}
       onDragStart={(e) => e.preventDefault()}
-      onMouseDown={(e) => e.stopPropagation()}
-      onPointerDown={(e) => e.stopPropagation()}
       onClick={(e) => {
         e.preventDefault();
         e.stopPropagation();

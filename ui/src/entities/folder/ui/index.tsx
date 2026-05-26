@@ -5,7 +5,6 @@ import type { FolderItem, LinkItem } from "../../panel/types";
 import { parseSize } from "../../tool/ui/WidgetTool";
 import { FolderGridPreview } from "./FolderGridPreview";
 import { FolderListPreview } from "./FolderListPreview";
-import { FolderOpenButton } from "./FolderOpenButton";
 
 interface WidgetFolderProps {
   folder: FolderItem;
@@ -71,10 +70,6 @@ const WidgetFolder = ({ folder, listItemSize, onOpen, onOpenChild, onContextMenu
             onOpenChild={onOpenChild}
             onChildContextMenu={onChildContextMenu}
           />
-        )}
-
-        {isListMode && !isEmpty && (
-          <FolderOpenButton onOpen={onOpen} />
         )}
       </div>
 

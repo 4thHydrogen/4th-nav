@@ -5,9 +5,9 @@ export interface AccentColors {
 }
 
 const DEFAULT_COLORS: AccentColors = {
-  glow1: [88, 176, 255],
-  glow2: [96, 128, 255],
-  glow3: [128, 222, 255],
+  glow1: [255, 255, 255],
+  glow2: [255, 255, 255],
+  glow3: [255, 255, 255],
 };
 
 const MAX_DIM = 64;
@@ -56,6 +56,10 @@ function sampleDominantColors(img: HTMLImageElement): AccentColors {
     b: 0,
     count: 0,
   }));
+  let avgR = 0;
+  let avgG = 0;
+  let avgB = 0;
+  let avgCount = 0;
 
   for (let i = 0; i < pixels.length; i += 4) {
     const r = pixels[i] / 255;
@@ -64,7 +68,16 @@ function sampleDominantColors(img: HTMLImageElement): AccentColors {
 
     const [h, s, l] = rgbToHsl(r, g, b);
 
-    if (s < MIN_SATURATION || l < MIN_LIGHTNESS || l > MAX_LIGHTNESS) {
+    if (l < MIN_LIGHTNESS || l > MAX_LIGHTNESS) {
+      continue;
+    }
+
+    avgR += pixels[i];
+    avgG += pixels[i + 1];
+    avgB += pixels[i + 2];
+    avgCount++;
+
+    if (s < MIN_SATURATION) {
       continue;
     }
 
@@ -99,6 +112,18 @@ function sampleDominantColors(img: HTMLImageElement): AccentColors {
     }
   }
 
+  if (selected.length === 0 && avgCount > 0) {
+    selected.push({
+      r: Math.round(avgR / avgCount),
+      g: Math.round(avgG / avgCount),
+      b: Math.round(avgB / avgCount),
+    });
+  }
+
+  while (selected.length > 0 && selected.length < 3) {
+    selected.push(selected[selected.length - 1]);
+  }
+
   if (selected.length < 3) return DEFAULT_COLORS;
 
   return {
@@ -116,9 +141,19 @@ function boostColor(color: {
   g: number;
   b: number;
 }): [number, number, number] {
-  const [h] = rgbToHsl(color.r / 255, color.g / 255, color.b / 255);
-  const [r, g, b] = hslToRgb(h, GLOW_SATURATION, GLOW_LIGHTNESS);
+  const [h, s, l] = rgbToHsl(color.r / 255, color.g / 255, color.b / 255);
+  if (s < MIN_SATURATION) {
+    const value = Math.round(clamp(l * 1.25, 0.55, 0.78) * 255);
+    return [value, value, value];
+  }
+
+  const boostedSaturation = clamp(s * 1.4, 0.24, GLOW_SATURATION);
+  const [r, g, b] = hslToRgb(h, boostedSaturation, GLOW_LIGHTNESS);
   return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+}
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, value));
 }
 
 function rgbToHsl(r: number, g: number, b: number): [number, number, number] {

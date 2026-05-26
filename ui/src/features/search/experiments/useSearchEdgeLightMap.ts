@@ -1,13 +1,17 @@
 import { useEffect } from "react";
-import { extractEdgeLightMap } from "./extractEdgeLightMap";
+import {
+  extractEdgeLightMap,
+  fallbackGradients,
+} from "./extractEdgeLightMap";
 
-const CSS_VAR = "--search-edge-light-map";
+const CSS_VAR_BORDER = "--search-edge-light-map";
+const CSS_VAR_OUTER_GLOW = "--search-edge-outer-glow-map";
 const RESIZE_DEBOUNCE_MS = 150;
 
 export function useSearchEdgeLightMap(localImageUrl: string | null) {
   useEffect(() => {
     if (!localImageUrl) {
-      removeVariable();
+      removeVariables();
       return;
     }
 
@@ -17,8 +21,28 @@ export function useSearchEdgeLightMap(localImageUrl: string | null) {
 
       const rect = wrapper.getBoundingClientRect();
       const accentColor = readAccentColor();
-      const gradient = extractEdgeLightMap(img, rect, accentColor);
-      document.documentElement.style.setProperty(CSS_VAR, gradient);
+      const result = extractEdgeLightMap(img, rect, accentColor);
+
+      if (result) {
+        document.documentElement.style.setProperty(
+          CSS_VAR_BORDER,
+          result.border
+        );
+        document.documentElement.style.setProperty(
+          CSS_VAR_OUTER_GLOW,
+          result.outerGlow
+        );
+      } else {
+        const fallback = fallbackGradients(accentColor);
+        document.documentElement.style.setProperty(
+          CSS_VAR_BORDER,
+          fallback.border
+        );
+        document.documentElement.style.setProperty(
+          CSS_VAR_OUTER_GLOW,
+          fallback.outerGlow
+        );
+      }
     };
 
     const img = new Image();
@@ -26,10 +50,10 @@ export function useSearchEdgeLightMap(localImageUrl: string | null) {
       try {
         apply(img);
       } catch {
-        removeVariable();
+        removeVariables();
       }
     };
-    img.onerror = () => removeVariable();
+    img.onerror = () => removeVariables();
     img.src = localImageUrl;
 
     let timer: ReturnType<typeof setTimeout>;
@@ -50,7 +74,7 @@ export function useSearchEdgeLightMap(localImageUrl: string | null) {
     return () => {
       window.removeEventListener("resize", onResize);
       clearTimeout(timer);
-      removeVariable();
+      removeVariables();
     };
   }, [localImageUrl]);
 }
@@ -67,6 +91,7 @@ function readAccentColor(): [number, number, number] | undefined {
   return parts as [number, number, number];
 }
 
-function removeVariable() {
-  document.documentElement.style.removeProperty(CSS_VAR);
+function removeVariables() {
+  document.documentElement.style.removeProperty(CSS_VAR_BORDER);
+  document.documentElement.style.removeProperty(CSS_VAR_OUTER_GLOW);
 }

@@ -1,56 +1,75 @@
-# AGENTS.md
-
-<!-- SPECKIT START -->
-- **Active Plan**: `specs/003-icon-system/plan.md` — Icon 系统增强：高清获取与批量管理
-- **Active Plan**: `specs/004-glassmorphism-wallpaper/plan.md` — 毛玻璃主题与 Pexels 壁纸
-- **Active Plan**: `specs/005-unified-overlay-system/plan.md` — 统一浮层系统与交互修复
-<!-- SPECKIT END -->
+# CLAUDE.md
 
 ## Workflow
 
-This project uses:
-- Spec Kit for specs, plans, and task tracking.
-- Basic Memory for durable project knowledge.
-- Serena for codebase navigation and semantic code understanding.
+This project uses OpenSpec for medium and large requirement changes, and direct edit for everyday implementation work.
 
-Before implementation:
-1. Read the relevant Spec Kit files under `specs/`.
-2. Search Basic Memory for related architecture decisions, conventions, and prior lessons.
-3. Use Serena to locate related symbols, references, and implementation patterns.
-4. Only implement the task explicitly requested by the user.
+Spec Kit is retired. Historical Spec Kit artifacts live under `docs/archive/spec-kit/` and are not active instructions.
 
-During implementation:
+## Default Direct-Edit Workflow
+
+Use direct edit for:
+- UI tuning and visual polish.
+- Bug fixes.
+- Styling experiments.
+- Small refactors.
+- Changes limited to one feature area.
+- Prototype-only work.
+
+Steps:
+1. Inspect relevant files.
+2. Make small reversible changes.
+3. Verify with build, test, or targeted manual checks when practical.
+4. Summarize changed files, reasons, and verification.
+
+## OpenSpec Workflow
+
+Use OpenSpec only when the work has durable requirements or reviewable scope:
+- User-facing behavior changes with acceptance criteria.
+- Multi-module changes.
+- API, data model, storage, or integration changes.
+- Architecture decisions that should remain documented.
+
+OpenSpec files live in:
+- `openspec/project.md`
+- `openspec/specs/`
+- `openspec/changes/`
+
+For change proposals, use:
+- `proposal.md` for why and what.
+- `design.md` only when the technical approach matters.
+- `tasks.md` for implementation checklist.
+- `specs/<capability>/spec.md` for requirement deltas.
+
+Keep OpenSpec lightweight. Do not create proposal folders for tiny CSS changes, quick visual iteration, or isolated bug fixes.
+
+## Implementation Rules
+
+- Only implement the task explicitly requested by the user.
 - Keep changes small and reversible.
 - Do not modify unrelated files.
-- Do not implement tasks outside the current request.
 - Prefer existing architecture and naming conventions.
-- Do not add dependencies unless the current plan explicitly allows it.
-
-After implementation:
-1. Explain changed files.
-2. Explain why they changed.
-3. Explain how to verify the change.
-4. Update Basic Memory only if durable project knowledge was created.
+- Do not add dependencies unless the current request explicitly needs them.
 
 ## Basic Memory Rules
 
 Save only durable knowledge:
-- architecture decisions
-- API conventions
-- module responsibilities
-- recurring bugs and fixes
-- deployment notes
-- constraints future development must know
+- Architecture decisions.
+- API conventions.
+- Module responsibilities.
+- Recurring bugs and fixes.
+- Deployment notes.
+- Constraints future development must know.
 
 Do not save temporary implementation details.
 
 ## Serena Rules
 
 Use Serena for:
-- finding symbols
-- finding references
-- understanding code structure
-- locating existing implementation patterns
+- Finding symbols.
+- Finding references.
+- Understanding code structure.
+- Locating existing implementation patterns.
 
 Do not use Serena memory as the source of truth for architecture decisions.
-Basic Memory is the source of truth for long-term project knowledge.
+Basic Memory and OpenSpec are the durable documentation sources.
